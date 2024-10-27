@@ -12,11 +12,14 @@ close;
 
 function Number main(Array args):
 
-    Array datas: ["Antoine", 16];
-    String name: datas[0];
-    Number age: datas[1];
+    datas: ["", 0];
 
-    echo name + " tiene " + age + " anos.";
+    datas[]
+
+    name $datas[0];
+    age $datas[1];
+
+    echo name & " tiene " & age & " anos.";
 
     if age = 18:
         echo name + " es mayor de edad";

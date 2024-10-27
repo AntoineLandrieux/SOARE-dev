@@ -1,0 +1,66 @@
+#ifndef __SOARE_TOKENIZER_H__
+#define __SOARE_TOKENIZER_H__ 0x1
+
+/**
+ * 
+ */
+
+/**
+ * @brief 
+ * 
+ */
+typedef enum token_type
+{
+    
+    TKN_EOF,
+    TKN_TYPE,
+    TKN_NAME,
+    TKN_NUMBER,
+    TKN_STRING,
+    TKN_KEYWORD
+
+} token_type;
+
+/**
+ * @brief 
+ * 
+ */
+typedef struct Tokens
+{
+    
+    char *value;
+    token_type type;
+
+    char *file;
+
+    unsigned long ln;
+    unsigned long col;
+    
+    struct Tokens *next;
+
+} Tokens;
+
+/**
+ * @brief 
+ * 
+ * @param _Token 
+ */
+void TokensLog(Tokens *_Token);
+
+/**
+ * @brief 
+ * 
+ * @param _Token 
+ */
+void TokensFree(Tokens *_Token);
+
+/**
+ * @brief 
+ * 
+ * @param _Filename 
+ * @param _Text 
+ * @return Tokens* 
+ */
+Tokens *Tokenizer(char *_Filename, char *_Text);
+
+#endif /* __SOARE_TOKENIZER_H__ */

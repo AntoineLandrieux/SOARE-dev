@@ -8,9 +8,9 @@ static void __attribute__((constructor)) init(void)
     return;
 }
 
-int main(int argc, char *argv[])
+int main(void)
 {
-    TOKENS token = Tokenizer("hello world'H!y'57.5 d4 4if");
+    Tokens *token = Tokenizer("input", "@hello world'H!y'57.5 d4 4if");
     TokensLog(token);
     TokensFree(token);
     return EXIT_SUCCESS;

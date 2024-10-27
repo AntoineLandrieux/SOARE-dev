@@ -1,0 +1,10 @@
+# IDE
+
+.vscode/
+.idea/
+
+# TMP
+
+bin/
+min/
+tmp/
