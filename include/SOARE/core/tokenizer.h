@@ -31,14 +31,18 @@ typedef struct Tokens
     char *value;
     token_type type;
 
-    char *file;
-
-    unsigned long ln;
-    unsigned long col;
+    Document file;
     
     struct Tokens *next;
 
 } Tokens;
+
+/**
+ * @brief 
+ * 
+ * @return Document 
+ */
+Document EmptyDocument();
 
 /**
  * @brief 

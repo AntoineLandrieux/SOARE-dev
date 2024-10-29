@@ -1,0 +1,36 @@
+#ifndef __SOARE_INT_H__
+#define __SOARE_INT_H__ 0x1
+
+/**
+ * 
+ * 
+ */
+
+/* 8 bit (1 Byte) */
+typedef char _8;
+/* 16 bit (2 Bytes) */
+typedef short _16;
+/* 32 bit (4 Bytes) */
+typedef int _32;
+/* 64 bit (8 Bytes) */
+typedef long long _64;
+
+/* 8 bit (1 Byte) signed */
+typedef signed char s8;
+/* 16 bit (2 Bytes) signed */
+typedef signed short s16;
+/* 32 bit (4 Bytes) signed */
+typedef signed int s32;
+/* 64 bit (8 Bytes) signed */
+typedef signed long long s64;
+
+/* 8 bit (1 Byte) unsigned */
+typedef unsigned char u8;
+/* 16 bit (2 Bytes) unsigned */
+typedef unsigned short u16;
+/* 32 bit (4 Bytes) unsigned */
+typedef unsigned int u32;
+/* 64 bit (8 Bytes) unsigned */
+typedef unsigned long long u64;
+
+#endif /* __SOARE_INT_H__ */

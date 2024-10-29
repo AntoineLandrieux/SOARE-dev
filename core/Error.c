@@ -6,6 +6,7 @@
  */
 
 #include <SOARE/SOARE.h>
+#include <SOARE/utils/int.h>
 
 static const char *Exceptions[] = {
     //
@@ -14,13 +15,13 @@ static const char *Exceptions[] = {
     //
 };
 
-//
-static unsigned char Exception = 1;
+/*  */
+static u8 Exception = 1;
 
 /**
- * @brief 
- * 
- * @param _Ignore 
+ * @brief
+ *
+ * @param _Ignore
  */
 void IgnoreException(unsigned char _Ignore)
 {
@@ -33,13 +34,21 @@ void IgnoreException(unsigned char _Ignore)
  * @param _Error
  * @param _String
  * @param _File
- * @param _Ln
- * @param _Col
  * @return void*
  */
-void *LeaveException(soare_error _Error, char *_String, char *_File, unsigned long _Ln, unsigned long _Col)
+void *LeaveException(soare_error _Error, char *_String, Document _File)
 {
     if (Exception)
-        fprintf(stderr, "Except: %s\n\t\"%.5s...\"\n\t ^~~~\n\tAt file %s:%ld:%ld", Exceptions[_Error], _String, _File, _Ln, _Col);
+        fprintf(
+            //
+            stderr,
+            "Except: %s\n\t\"%.5s...\"\n\t ^~~~\n\tAt file %s:%lld:%lld",
+            Exceptions[_Error],
+            _String,
+            _File.file,
+            _File.ln,
+            _File.col
+            //
+        );
     return NULL;
 }

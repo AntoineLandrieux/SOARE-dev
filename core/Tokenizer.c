@@ -7,14 +7,15 @@
  */
 
 #include <SOARE/SOARE.h>
+#include <SOARE/utils/int.h>
 
 /**
  * @brief
  *
  * @param _Char
- * @return unsigned char
+ * @return u8
  */
-static unsigned char chrNum(const char _Char)
+static u8 chrNum(const char _Char)
 {
     return _Char >= '0' && _Char <= '9';
 }
@@ -23,9 +24,9 @@ static unsigned char chrNum(const char _Char)
  * @brief
  *
  * @param _Char
- * @return unsigned char
+ * @return u8
  */
-static unsigned char chrAlpha(const char _Char)
+static u8 chrAlpha(const char _Char)
 {
     return (_Char >= 'a' && _Char <= 'z') || (_Char >= 'A' && _Char <= 'Z');
 }
@@ -34,9 +35,9 @@ static unsigned char chrAlpha(const char _Char)
  * @brief
  *
  * @param _Char
- * @return unsigned char
+ * @return u8
  */
-static unsigned char chrAlnum(const char _Char)
+static u8 chrAlnum(const char _Char)
 {
     return chrAlpha(_Char) || chrNum(_Char);
 }
@@ -45,9 +46,9 @@ static unsigned char chrAlnum(const char _Char)
  * @brief
  *
  * @param _Char
- * @return unsigned char
+ * @return u8
  */
-static unsigned char chrLn(const char _Char)
+static u8 chrLn(const char _Char)
 {
     return _Char == '\r' || _Char == '\n';
 }
@@ -56,9 +57,9 @@ static unsigned char chrLn(const char _Char)
  * @brief
  *
  * @param _Char
- * @return unsigned char
+ * @return u8
  */
-static unsigned char chrSpace(const char _Char)
+static u8 chrSpace(const char _Char)
 {
     return _Char == ' ' || _Char == '\t' || chrLn(_Char);
 }
@@ -67,24 +68,23 @@ static unsigned char chrSpace(const char _Char)
  * @brief
  *
  * @param _String
- * @return unsigned char
+ * @return u8
  */
-static unsigned char strKeyword(char *_String)
+static u8 strKeyword(char *_String)
 {
     return (
         //
         !strcmp("if", _String) ||
+        !strcmp("nop", _String) ||
         !strcmp("try", _String) ||
-        !strcmp("elif", _String) ||
         !strcmp("else", _String) ||
-        !strcmp("echo", _String) ||
         !strcmp("exit", _String) ||
+        !strcmp("write", _String) ||
         !strcmp("close", _String) ||
         !strcmp("raise", _String) ||
         !strcmp("while", _String) ||
         !strcmp("break", _String) ||
         !strcmp("prompt", _String) ||
-        !strcmp("typeof", _String) ||
         !strcmp("return", _String) ||
         !strcmp("iferror", _String) ||
         !strcmp("continue", _String) ||
@@ -98,9 +98,9 @@ static unsigned char strKeyword(char *_String)
  * @brief
  *
  * @param _String
- * @return unsigned char
+ * @return u8
  */
-static unsigned char strType(char *_String)
+static u8 strType(char *_String)
 {
     return (
         //
@@ -110,6 +110,17 @@ static unsigned char strType(char *_String)
         !strcmp("String", _String)
         //
     );
+}
+
+Document EmptyDocument()
+{
+    Document document;
+
+    document.file = NULL;
+    document.ln = 0;
+    document.col = 0;
+
+    return document;
 }
 
 /**
@@ -127,11 +138,13 @@ Tokens *Token(char *_Filename, char *_Value, token_type _Type)
     if (token == NULL)
         return NULL;
 
-    token->file = _Filename;
-    token->value = _Value;
+    token->value = _Value == NULL ? NULL : strdup(_Value);
     token->type = _Type;
-    token->ln = 0;
-    token->col = 0;
+
+    token->file.ln = 0;
+    token->file.col = 0;
+    token->file.file = _Filename;
+
     token->next = NULL;
 
     return token;
@@ -163,11 +176,11 @@ void TokensLog(Tokens *_Token)
         return;
 
     printf(
-        "[TOKEN] %p %s:%.5ld:%.5ld %.2X, \"%s\"\n",
+        "[TOKENS] [0x%p, %s:%.5lld:%.5lld, %.2X, \"%s\"]\n",
         _Token,
-        _Token->file,
-        _Token->ln,
-        _Token->col,
+        _Token->file.file,
+        _Token->file.ln,
+        _Token->file.col,
         _Token->type,
         _Token->value);
     TokensLog(_Token->next);
@@ -199,10 +212,10 @@ static char *strcut(const char *_String, size_t _Long)
  * @param ln
  * @param col
  */
-static void updateln(unsigned long *ln, unsigned long *col)
+static void updateln(u64 *ln, u64 *col)
 {
     *ln = *ln + 1;
-    *col = 0;
+    *col = 1;
 }
 
 /**
@@ -217,11 +230,11 @@ Tokens *Tokenizer(char *_Filename, char *_Text)
     if (_Text == NULL)
         return NULL;
 
-    Tokens *token = Token(_Filename, NULL, TKN_EOF);
+    Tokens *token = Token(_Filename, "EOF", TKN_EOF);
     Tokens *curr = token;
 
-    unsigned long col = 0;
-    unsigned long ln = 0;
+    u64 col = 0;
+    u64 ln = 0;
 
     updateln(&ln, &col);
 
@@ -236,7 +249,10 @@ Tokens *Tokenizer(char *_Filename, char *_Text)
 
         char *content = NULL;
         token_type type = TKN_EOF;
-        unsigned long long offset = 0;
+        u64 offset = 0;
+
+        curr->file.ln = ln;
+        curr->file.col = col;
 
         if (chrAlpha(*_Text))
         {
@@ -248,7 +264,7 @@ Tokens *Tokenizer(char *_Filename, char *_Text)
 
         else if (chrNum(*_Text))
         {
-            unsigned char point = 0;
+            u8 point = 0;
             while (chrNum((&*_Text)[offset]) || ((&*_Text)[offset] == '.' && !point))
                 offset++;
             content = strcut(&*_Text, offset);
@@ -269,17 +285,15 @@ Tokens *Tokenizer(char *_Filename, char *_Text)
         else
         {
             TokensFree(token);
-            return LeaveException(ERR_CHARACTER, &*_Text, _Filename, ln, col);
+            return LeaveException(ERR_CHARACTER, &*_Text, curr->file);
         }
 
         curr->value = content;
         curr->type = type;
-        curr->col = col;
-        curr->ln = ln;
         curr->next = Token(_Filename, NULL, TKN_EOF);
         curr = curr->next;
 
-        for (unsigned long long i = 0; i < offset; col += (volatile unsigned long long)i++)
+        for (u64 i = 0; i < offset; col += (volatile u64)i++)
             (volatile char *)_Text++;
     }
 

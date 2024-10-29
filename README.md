@@ -10,22 +10,20 @@ iferror:
     exit;
 close;
 
-function Number main(Array args):
+function Number main(Int argc; Array argv) 
 
-    datas: ["", 0];
+    Array datas: ["", 0];
 
-    datas[]
-
-    name $datas[0];
-    age $datas[1];
+    String name datas[0];
+    Int age datas[1];
 
     echo name & " tiene " & age & " anos.";
 
     if age = 18:
         echo name + " es mayor de edad";
-    elif age > 18:
+    elsif age > 18:
         echo name + " es aldulto";
-    else
+    else:
         echo name + " es menor de edad";
     close;
 
@@ -33,25 +31,23 @@ function Number main(Array args):
 
 close;
 
-Number ret: main();
+Number ret: main(0;[]);
 ```
 
 ### KEYWORDS
 
 - `if`
+- `nop`
 - `try`
-- `elif`
 - `else`
-- `echo`
 - `exit`
+- `write`
 - `close`
 - `raise`
 - `while`
-- `break*`
 - `prompt`
-- `typeof*`
 - `return`
-- `iferror*`
+- `iferror`
 - `continue*`
 - `function`
 - `loadimport`

@@ -23,10 +23,8 @@ typedef enum
  * @param _Error
  * @param _String
  * @param _File
- * @param _Ln
- * @param _Col
  * @return void*
  */
-void *LeaveException(soare_error _Error, char *_String, char *_File, unsigned long _Ln, unsigned long _Col);
+void *LeaveException(soare_error _Error, char *_String, Document _File);
 
 #endif /* __ERROR_H__ */

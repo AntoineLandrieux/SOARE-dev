@@ -2,7 +2,7 @@
 #define __SOARE__ 0x1
 
 /**
- * 
+ *
  */
 
 //
@@ -19,8 +19,23 @@ namespace SOARE
     {
 #endif
 
+        /**
+         * @brief
+         *
+         */
+        typedef struct Document
+        {
+
+            char *file;
+
+            unsigned long long ln;
+            unsigned long long col;
+
+        } Document;
+
 #include "core/error.h"
 #include "core/tokenizer.h"
+#include "core/parser.h"
 
 #ifdef __cplusplus
     }
