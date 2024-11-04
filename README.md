@@ -37,19 +37,17 @@ Number ret: main(0;[]);
 ### KEYWORDS
 
 - `if`
-- `nop`
+  - `nop`
 - `try`
 - `else`
-- `exit`
 - `write`
 - `close`
-- `raise`
+  - `raise`
 - `while`
 - `prompt`
 - `return`
 - `iferror`
-- `continue*`
 - `function`
-- `loadimport`
+  - `loadimport`
 
 `*` -> unsure

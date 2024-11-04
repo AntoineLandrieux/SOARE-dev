@@ -2,6 +2,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+/**
+ *  _____  _____  ___  ______ _____
+ * /  ___||  _  |/ _ \ | ___ \  ___|
+ * \ `--. | | | / /_\ \| |_/ / |__ 
+ *  `--. \| | | |  _  ||    /|  __|
+ * /\__/ /\ \_/ / | | || |\ \| |___
+ * \____/  \___/\_| |_/\_| \_\____/
+ */
+
 #include <SOARE/SOARE.h>
 
 static void __attribute__((constructor)) init(void)

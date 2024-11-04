@@ -3,7 +3,12 @@
 #include <string.h>
 
 /**
- *
+ *  _____  _____  ___  ______ _____
+ * /  ___||  _  |/ _ \ | ___ \  ___|
+ * \ `--. | | | / /_\ \| |_/ / |__ 
+ *  `--. \| | | |  _  ||    /|  __|
+ * /\__/ /\ \_/ / | | || |\ \| |___
+ * \____/  \___/\_| |_/\_| \_\____/
  */
 
 #include <SOARE/SOARE.h>
@@ -11,8 +16,10 @@
 
 /**
  * @brief
+ * @author Antoine LANDRIEUX
  *
  * @param _Char
+ * 
  * @return u8
  */
 static u8 chrNum(const char _Char)
@@ -22,6 +29,7 @@ static u8 chrNum(const char _Char)
 
 /**
  * @brief
+ * @author Antoine LANDRIEUX
  *
  * @param _Char
  * @return u8
@@ -33,6 +41,7 @@ static u8 chrAlpha(const char _Char)
 
 /**
  * @brief
+ * @author Antoine LANDRIEUX
  *
  * @param _Char
  * @return u8
@@ -44,6 +53,7 @@ static u8 chrAlnum(const char _Char)
 
 /**
  * @brief
+ * @author Antoine LANDRIEUX
  *
  * @param _Char
  * @return u8
@@ -55,6 +65,7 @@ static u8 chrLn(const char _Char)
 
 /**
  * @brief
+ * @author Antoine LANDRIEUX
  *
  * @param _Char
  * @return u8
@@ -66,6 +77,7 @@ static u8 chrSpace(const char _Char)
 
 /**
  * @brief
+ * @author Antoine LANDRIEUX
  *
  * @param _String
  * @return u8
@@ -78,16 +90,13 @@ static u8 strKeyword(char *_String)
         !strcmp("nop", _String) ||
         !strcmp("try", _String) ||
         !strcmp("else", _String) ||
-        !strcmp("exit", _String) ||
         !strcmp("write", _String) ||
         !strcmp("close", _String) ||
         !strcmp("raise", _String) ||
         !strcmp("while", _String) ||
-        !strcmp("break", _String) ||
         !strcmp("prompt", _String) ||
         !strcmp("return", _String) ||
         !strcmp("iferror", _String) ||
-        !strcmp("continue", _String) ||
         !strcmp("function", _String) ||
         !strcmp("loadimport", _String)
         //

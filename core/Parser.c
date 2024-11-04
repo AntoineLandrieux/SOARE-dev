@@ -3,17 +3,24 @@
 #include <string.h>
 
 /**
- *
+ *  _____  _____  ___  ______ _____
+ * /  ___||  _  |/ _ \ | ___ \  ___|
+ * \ `--. | | | / /_\ \| |_/ / |__ 
+ *  `--. \| | | |  _  ||    /|  __|
+ * /\__/ /\ \_/ / | | || |\ \| |___
+ * \____/  \___/\_| |_/\_| \_\____/
  */
 
 #include <SOARE/SOARE.h>
 
 /**
  * @brief
+ * @author Antoine LANDRIEUX
  *
  * @param _Value
  * @param _Type
  * @param _File
+ * 
  * @return Node*
  */
 Node *Branch(char *_Value, node_type _Type, Document _File)
@@ -32,7 +39,8 @@ Node *Branch(char *_Value, node_type _Type, Document _File)
 
 /**
  * @brief
- *
+ * @author Antoine LANDRIEUX
+ * 
  * @param _Parent
  * @param _Child
  */
@@ -54,6 +62,7 @@ void JoinBranch(Node *_Parent, Node *_Child)
 
 /**
  * @brief
+ * @author Antoine LANDRIEUX
  *
  * @param _Tree
  */
@@ -69,9 +78,10 @@ void TreeFree(AST *_Tree)
 }
 
 /**
- * @brief 
- * 
- * @param _Tree 
+ * @brief
+ * @author Antoine LANDRIEUX
+ *
+ * @param _Tree
  */
 void TreeLog(AST *_Tree)
 {
@@ -102,9 +112,10 @@ void TreeLog(AST *_Tree)
 }
 
 /**
- * @brief 
- * 
- * @param _Tokens 
+ * @brief
+ * @author Antoine LANDRIEUX
+ *
+ * @param _Tokens
  */
 static void Next(Tokens **_Tokens)
 {
@@ -112,9 +123,10 @@ static void Next(Tokens **_Tokens)
 }
 
 /**
- * @brief 
- * 
- * @return AST* 
+ * @brief
+ * @author Antoine LANDRIEUX
+ *
+ * @return AST*
  */
 AST *Parse(Tokens *_Tokens)
 {
@@ -129,18 +141,23 @@ AST *Parse(Tokens *_Tokens)
         switch (_Tokens->type)
         {
         case TKN_KEYWORD:
-            if (!strcmp(old->value, "loadimport"))
+
+            if (!strcmp(old->value, "nop"))
+                JoinBranch(curr, Branch(curr->value, NODE_NOP, old->file));
+            
+            else if (!strcmp(old->value, "loadimport") || !strcmp(old->value, "raise"))
             {
                 if (_Tokens->type != TKN_STRING)
                 {
                     TreeFree(root);
                     return LeaveException(ERR_CHARACTER, old->value, old->file);
                 }
-                JoinBranch(curr, Branch(_Tokens->value, NODE_IMPORT, old->file));
+                JoinBranch(curr, Branch(_Tokens->value, strcmp(old->value, "raise") ? NODE_IMPORT : NODE_RAISE, old->file));
                 Next(_Tokens);
             }
+
             break;
-        
+
         default:
             break;
         }

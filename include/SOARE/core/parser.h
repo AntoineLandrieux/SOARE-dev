@@ -2,7 +2,12 @@
 #define __SOARE_PARSER_H__ 0x1
 
 /**
- * 
+ *  _____  _____  ___  ______ _____
+ * /  ___||  _  |/ _ \ | ___ \  ___|
+ * \ `--. | | | / /_\ \| |_/ / |__ 
+ *  `--. \| | | |  _  ||    /|  __|
+ * /\__/ /\ \_/ / | | || |\ \| |___
+ * \____/  \___/\_| |_/\_| \_\____/
  */
 
 /**
@@ -13,7 +18,10 @@ typedef enum node_type
 {
 
     NODE_ROOT,
-    NODE_IMPORT,
+    NODE_NOP,
+    NODE_QUIT,
+    NODE_RAISE,
+    NODE_IMPORT
 
 } node_type;
 
