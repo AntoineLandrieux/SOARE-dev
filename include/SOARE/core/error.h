@@ -10,17 +10,30 @@
  * \____/  \___/\_| |_/\_| \_\____/
  */
 
+/* */
+#define InterpreterError "InterpreterError"
+/* */
+#define CharacterError "CharacterError"
+
 /**
- * @brief
- *
+ * @brief 
+ * 
+ * @param _Ignore 
  */
-typedef enum
-{
+void IgnoreException(unsigned char _Ignore);
 
-    ERR_INTERPRETER,
-    ERR_CHARACTER,
+/**
+ * @brief 
+ * 
+ */
+void ClearException();
 
-} soare_error;
+/**
+ * @brief 
+ * 
+ * @return char 
+ */
+char ErrorLevel();
 
 /**
  * @brief
@@ -30,6 +43,6 @@ typedef enum
  * @param _File
  * @return void*
  */
-void *LeaveException(soare_error _Error, char *_String, Document _File);
+void *LeaveException(char *_Error, char *_String, Document _File);
 
 #endif /* __ERROR_H__ */

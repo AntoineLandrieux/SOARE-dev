@@ -185,7 +185,7 @@ void TokensLog(Tokens *_Token)
         return;
 
     printf(
-        "[TOKENS] [0x%p, %s:%.5lld:%.5lld, %.2X, \"%s\"]\n",
+        "[TOKENS] [%p, %s:%.5lld:%.5lld, %.2X, \"%s\"]\n",
         _Token,
         _Token->file.file,
         _Token->file.ln,
@@ -263,7 +263,14 @@ Tokens *Tokenizer(char *_Filename, char *_Text)
         curr->file.ln = ln;
         curr->file.col = col;
 
-        if (chrAlpha(*_Text))
+        if (*_Text == ';')
+        {
+            offset++;
+            content = strdup(";");
+            type = TKN_SEMICOLON;
+        }
+
+        else if (chrAlpha(*_Text))
         {
             while (chrAlnum((&*_Text)[offset]))
                 offset++;
@@ -294,7 +301,7 @@ Tokens *Tokenizer(char *_Filename, char *_Text)
         else
         {
             TokensFree(token);
-            return LeaveException(ERR_CHARACTER, &*_Text, curr->file);
+            return LeaveException(CharacterError, &*_Text, curr->file);
         }
 
         curr->value = content;

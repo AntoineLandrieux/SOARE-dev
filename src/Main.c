@@ -19,25 +19,16 @@ static void __attribute__((constructor)) init(void)
 
 int main(void)
 {
-    Tokens *tokens = Tokenizer("input", "hello world'H!y'57.5 d4 4if");
+    Tokens *tokens = Tokenizer(NULL, "try nop ; iferror raise 'Other error' ; close ; raise 'Other error 2' ;");
     TokensLog(tokens);
+
+    AST *ast = Parse(tokens);
+    TreeLog(ast);
+
+    free(Runtime(ast));
+
+    TreeFree(ast);
     TokensFree(tokens);
-    
-    Document doc;
-    
-    doc.file = (char*)"input";
-    doc.ln = 1;
-    doc.col = 1;
-
-    Node *a = Branch(strdup("1"), NODE_ROOT, doc);
-    Node *b = Branch(strdup("2"), NODE_ROOT, doc);
-    Node *c = Branch(strdup("3"), NODE_ROOT, doc);
-    
-    JoinBranch(a, b);
-    JoinBranch(a, c);
-
-    TreeLog(a);
-    TreeFree(a);
 
     return EXIT_SUCCESS;
 }

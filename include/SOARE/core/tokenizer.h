@@ -22,7 +22,8 @@ typedef enum token_type
     TKN_NAME,
     TKN_NUMBER,
     TKN_STRING,
-    TKN_KEYWORD
+    TKN_KEYWORD,
+    TKN_SEMICOLON
 
 } token_type;
 

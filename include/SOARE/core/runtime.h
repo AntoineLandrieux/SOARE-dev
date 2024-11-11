@@ -10,4 +10,12 @@
  * \____/  \___/\_| |_/\_| \_\____/
  */
 
+/**
+ * @brief 
+ * 
+ * @param _Tree 
+ * @return char* 
+ */
+char *Runtime(AST *_Tree);
+
 #endif /* __SOARE_RUNTIME_H__ */

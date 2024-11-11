@@ -19,9 +19,11 @@ typedef enum node_type
 
     NODE_ROOT,
     NODE_NOP,
-    NODE_QUIT,
+    NODE_TRY,
+    NODE_BODY,
     NODE_RAISE,
-    NODE_IMPORT
+    NODE_IMPORT,
+    NODE_IFERROR
 
 } node_type;
 
@@ -77,5 +79,13 @@ void TreeFree(AST *_Tree);
  * @param _Tree 
  */
 void TreeLog(AST *_Tree);
+
+/**
+ * @brief 
+ * 
+ * @param _Tokens 
+ * @return AST* 
+ */
+AST *Parse(Tokens *_Tokens);
 
 #endif /* __SOARE_PARSER_H__ */

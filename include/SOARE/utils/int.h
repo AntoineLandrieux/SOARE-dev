@@ -11,13 +11,13 @@
  */
 
 /* 8 bit (1 Byte) */
-typedef char _8;
+typedef char i8;
 /* 16 bit (2 Bytes) */
-typedef short _16;
+typedef short i16;
 /* 32 bit (4 Bytes) */
-typedef int _32;
+typedef int i32;
 /* 64 bit (8 Bytes) */
-typedef long long _64;
+typedef long long i64;
 
 /* 8 bit (1 Byte) signed */
 typedef signed char s8;

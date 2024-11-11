@@ -14,15 +14,10 @@
 #include <SOARE/utils/int.h>
 
 /*  */
-static const char *Exceptions[] = {
-    //
-    "InterpreterError",
-    "CharacterError"
-    //
-};
+static u8 Exception = 1;
 
 /*  */
-static u8 Exception = 1;
+static i8 ErrorLvl = 0;
 
 /**
  * @brief
@@ -32,7 +27,26 @@ static u8 Exception = 1;
  */
 void IgnoreException(unsigned char _Ignore)
 {
-    Exception = _Ignore;
+    Exception = !_Ignore;
+}
+
+/**
+ * @brief 
+ * 
+ */
+void ClearException()
+{
+    ErrorLvl = 0;
+}
+
+/**
+ * @brief 
+ * 
+ * @return char 
+ */
+char ErrorLevel()
+{
+    return ErrorLvl;
 }
 
 /**
@@ -45,19 +59,20 @@ void IgnoreException(unsigned char _Ignore)
  * 
  * @return void*
  */
-void *LeaveException(soare_error _Error, char *_String, Document _File)
+void *LeaveException(char *_Error, char *_String, Document _File)
 {
     if (Exception)
         fprintf(
             //
             stderr,
-            "Except: %s\n\t\"%.5s...\"\n\t ^~~~\n\tAt file %s:%lld:%lld",
-            Exceptions[_Error],
+            "Except: %s\n\t\"%.8s...\"\n\t ^~~~\n\tAt file %s:%lld:%lld",
+            _Error,
             _String,
             _File.file,
             _File.ln,
             _File.col
             //
         );
+    ErrorLvl = 1;
     return NULL;
 }

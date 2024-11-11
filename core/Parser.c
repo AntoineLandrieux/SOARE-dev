@@ -92,7 +92,7 @@ void TreeLog(AST *_Tree)
 
     if (_Tree->parent != NULL)
         printf(
-            "[0x%p, %s:%.5lld:%.5lld, %.2X, \"%s\"]\t",
+            "[%p, %s:%.5lld:%.5lld, %.2X, \"%s\"]\t",
             _Tree->parent,
             _Tree->parent->file.file,
             _Tree->parent->file.ln,
@@ -100,7 +100,7 @@ void TreeLog(AST *_Tree)
             _Tree->parent->type,
             _Tree->parent->value);
     printf(
-        "[0x%p, %s:%.5lld:%.5lld, %.2X, \"%s\"]\n",
+        "[%p, %s:%.5lld:%.5lld, %.2X, \"%s\"]\n",
         _Tree,
         _Tree->file.file,
         _Tree->file.ln,
@@ -135,11 +135,18 @@ AST *Parse(Tokens *_Tokens)
 
     while (_Tokens != NULL)
     {
-        Tokens *old = _Tokens;
-        Next(_Tokens);
 
-        switch (_Tokens->type)
+        if (_Tokens->type == TKN_EOF)
+            break;
+
+        Tokens *old = _Tokens;
+        Next(&_Tokens);
+
+        switch (old->type)
         {
+        case TKN_SEMICOLON:
+            break;
+
         case TKN_KEYWORD:
 
             if (!strcmp(old->value, "nop"))
@@ -150,16 +157,43 @@ AST *Parse(Tokens *_Tokens)
                 if (_Tokens->type != TKN_STRING)
                 {
                     TreeFree(root);
-                    return LeaveException(ERR_CHARACTER, old->value, old->file);
+                    return LeaveException(CharacterError, old->value, old->file);
                 }
                 JoinBranch(curr, Branch(_Tokens->value, strcmp(old->value, "raise") ? NODE_IMPORT : NODE_RAISE, old->file));
-                Next(_Tokens);
+                Next(&_Tokens);
             }
 
+            else if (!strcmp(old->value, "try"))
+            {
+                Node *try = Branch(old->value, NODE_TRY, old->file);
+                JoinBranch(try, Branch("body", NODE_BODY, old->file));
+                JoinBranch(curr, try);
+                curr = try->child;
+            }
+
+            else if (!strcmp(old->value, "iferror"))
+            {
+                if (curr->parent->type != NODE_TRY || curr->type == NODE_IFERROR)
+                {
+                    TreeFree(root);
+                    return LeaveException(CharacterError, old->value, old->file);
+                }
+                Node *iferror = Branch(old->value, NODE_IFERROR, old->file);
+                JoinBranch(curr->parent, iferror);
+                curr = iferror;
+            }
+            
+            else if (!strcmp(old->value, "close"))
+            {
+                if (curr->parent != root)
+                    curr = curr->parent->parent;
+            }
+            
             break;
 
         default:
-            break;
+            TreeFree(root);
+            return LeaveException(CharacterError, old->value, old->file);
         }
     }
 

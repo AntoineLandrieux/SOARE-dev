@@ -2,12 +2,12 @@
 
 ## INTERPRETER
 
-```soare
-try:
+```txt
+try
     loadimport "script.soare";
-iferror:
+    Number ret: main(0;[]);
+iferror
     echo `"script.soare" is required.`;
-    exit;
 close;
 
 function Number main(Int argc; Array argv) 
@@ -30,15 +30,23 @@ function Number main(Int argc; Array argv)
     return 0;
 
 close;
+```
 
-Number ret: main(0;[]);
+### ADVENCEMENT
+
+```txt
+try
+  nop;
+iferror
+  raise "Error";
+close;
 ```
 
 ### KEYWORDS
 
 - `if`
   - `nop`
-- `try`
+  - `try`
 - `else`
 - `write`
 - `close`
@@ -46,8 +54,6 @@ Number ret: main(0;[]);
 - `while`
 - `prompt`
 - `return`
-- `iferror`
+  - `iferror`
 - `function`
   - `loadimport`
-
-`*` -> unsure

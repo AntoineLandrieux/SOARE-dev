@@ -4,7 +4,7 @@
 /**
  *  _____  _____  ___  ______ _____
  * /  ___||  _  |/ _ \ | ___ \  ___|
- * \ `--. | | | / /_\ \| |_/ / |__ 
+ * \ `--. | | | / /_\ \| |_/ / |__
  *  `--. \| | | |  _  ||    /|  __|
  * /\__/ /\ \_/ / | | || |\ \| |___
  * \____/  \___/\_| |_/\_| \_\____/
@@ -42,6 +42,7 @@ namespace SOARE
 #include "core/error.h"
 #include "core/tokenizer.h"
 #include "core/parser.h"
+#include "core/runtime.h"
 
 #ifdef __cplusplus
     }
