@@ -90,12 +90,12 @@ static u8 strKeyword(char *_String)
         !strcmp("nop", _String) ||
         !strcmp("try", _String) ||
         !strcmp("else", _String) ||
-        !strcmp("write", _String) ||
         !strcmp("close", _String) ||
         !strcmp("raise", _String) ||
         !strcmp("while", _String) ||
         !strcmp("prompt", _String) ||
         !strcmp("return", _String) ||
+        !strcmp("writeln", _String) ||
         !strcmp("iferror", _String) ||
         !strcmp("function", _String) ||
         !strcmp("loadimport", _String)
@@ -113,8 +113,8 @@ static u8 strType(char *_String)
 {
     return (
         //
+        !strcmp("$", _String) ||
         !strcmp("Int", _String) ||
-        !strcmp("Array", _String) ||
         !strcmp("Float", _String) ||
         !strcmp("String", _String)
         //

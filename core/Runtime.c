@@ -13,6 +13,21 @@
 
 #include <SOARE/SOARE.h>
 
+
+typedef struct MEM
+{
+
+    char *name;
+
+    AST *value;
+    AST *args;
+
+    MEM *next;
+
+} MEM;
+
+static MEM *MEMORY = NULL;
+
 char *Runtime(AST *_Tree)
 {
     if (_Tree == NULL)
@@ -24,10 +39,7 @@ char *Runtime(AST *_Tree)
     for (AST *curr = root->child; curr; curr = curr->sibling)
     {
         switch (curr->type)
-        {
-        case NODE_NOP:
-            break;
-        
+        {        
         case NODE_IMPORT:
             // TODO: implement import
             break;
@@ -51,7 +63,7 @@ char *Runtime(AST *_Tree)
             return LeaveException(curr->value, "raise", curr->file);
 
         default:
-            return LeaveException(InterpreterError, curr->value, curr->file);
+            break;
         }
     }
 

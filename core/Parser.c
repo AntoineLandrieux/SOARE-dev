@@ -157,7 +157,7 @@ AST *Parse(Tokens *_Tokens)
                 if (_Tokens->type != TKN_STRING)
                 {
                     TreeFree(root);
-                    return LeaveException(CharacterError, old->value, old->file);
+                    return LeaveException(SyntaxError, old->value, old->file);
                 }
                 JoinBranch(curr, Branch(_Tokens->value, strcmp(old->value, "raise") ? NODE_IMPORT : NODE_RAISE, old->file));
                 Next(&_Tokens);
@@ -176,7 +176,7 @@ AST *Parse(Tokens *_Tokens)
                 if (curr->parent->type != NODE_TRY || curr->type == NODE_IFERROR)
                 {
                     TreeFree(root);
-                    return LeaveException(CharacterError, old->value, old->file);
+                    return LeaveException(UnexpectedNear, old->value, old->file);
                 }
                 Node *iferror = Branch(old->value, NODE_IFERROR, old->file);
                 JoinBranch(curr->parent, iferror);
@@ -185,15 +185,19 @@ AST *Parse(Tokens *_Tokens)
             
             else if (!strcmp(old->value, "close"))
             {
-                if (curr->parent != root)
-                    curr = curr->parent->parent;
+                if (curr->parent == root)
+                {
+                    TreeFree(root);
+                    return LeaveException(UnexpectedNear, old->value, old->file);
+                }
+                curr = curr->parent->parent;
             }
             
             break;
 
         default:
             TreeFree(root);
-            return LeaveException(CharacterError, old->value, old->file);
+            return LeaveException(UnexpectedNear, old->value, old->file);
         }
     }
 

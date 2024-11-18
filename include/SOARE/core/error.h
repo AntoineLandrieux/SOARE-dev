@@ -14,6 +14,10 @@
 #define InterpreterError "InterpreterError"
 /* */
 #define CharacterError "CharacterError"
+/* */
+#define UnexpectedNear "UnexpectedNear"
+/* */
+#define SyntaxError "SyntaxError"
 
 /**
  * @brief 
