@@ -1,7 +1,7 @@
 
 default:
 	mkdir -p bin
-	gcc src/Main.c core/*.c -o bin/soare.exe -I include -Wall -Wextra -Werror
+	gcc src/Main.c core/*.c -o bin/soare.exe -I include -Wall -Wextra -Werror -Wpedantic
 
 run:
 	./bin/soare.exe

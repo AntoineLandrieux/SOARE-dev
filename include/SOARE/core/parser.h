@@ -22,8 +22,14 @@ typedef enum node_type
     NODE_TRY,
     NODE_BODY,
     NODE_RAISE,
+    NODE_OUTPUT,
+    NODE_NUMBER,
+    NODE_STRING,
     NODE_IMPORT,
-    NODE_IFERROR
+    NODE_MEMGET,
+    NODE_MEMSET,
+    NODE_IFERROR,
+    NODE_OPERATOR
 
 } node_type;
 

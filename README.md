@@ -5,26 +5,23 @@
 ```txt
 try
   loadimport "script.soare";
-  Number ret: main(0;[]);
+  if @main<"Antoine";14> do
+    raise "ProgramError";
+  close;
 iferror
   writeln `"script.soare" is required.`;
 close;
 
-function Number main(Int argc; Array argv) 
+function Int main <String name; Int age> 
 
-  Array datas: ["", 0];
-
-  String name datas[0];
-  Int age datas[1];
-
-  writeln name & " tiene " & age & " anos.";
+  writeln name, " a ", age, " ans.";
 
   if age = 18:
-    writeln name + " es mayor de edad";
+    writeln name, " est tout juste majeur";
   elsif age > 18:
-    writeln name + " es aldulto";
+    writeln name, " est un adulte";
   else:
-    writeln name + " es menor de edad";
+    writeln name, " est un enfant";
   close;
 
   return 0;

@@ -22,11 +22,11 @@ typedef struct MEM
     AST *value;
     AST *args;
 
-    MEM *next;
+    struct MEM *next;
 
 } MEM;
 
-static MEM *MEMORY = NULL;
+// static MEM *MEMORY = NULL;
 
 char *Runtime(AST *_Tree)
 {

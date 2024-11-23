@@ -5,7 +5,7 @@
 /**
  *  _____  _____  ___  ______ _____
  * /  ___||  _  |/ _ \ | ___ \  ___|
- * \ `--. | | | / /_\ \| |_/ / |__ 
+ * \ `--. | | | / /_\ \| |_/ / |__
  *  `--. \| | | |  _  ||    /|  __|
  * /\__/ /\ \_/ / | | || |\ \| |___
  * \____/  \___/\_| |_/\_| \_\____/
@@ -19,7 +19,7 @@
  * @author Antoine LANDRIEUX
  *
  * @param _Char
- * 
+ *
  * @return u8
  */
 static u8 chrNum(const char _Char)
@@ -82,6 +82,34 @@ static u8 chrSpace(const char _Char)
  * @param _String
  * @return u8
  */
+static u8 chrOperator(const char _Char)
+{
+    return strchr("+-^*/%%,", _Char) != NULL;
+}
+
+/**
+ * @brief
+ * @author Antoine LANDRIEUX
+ *
+ * @param _String
+ * @return u8
+ */
+static u8 strOperator(char *_String)
+{
+    return (
+        !strcasecmp("equ", _String) ||
+        !strcasecmp("neq", _String) ||
+        !strcasecmp("and", _String) ||
+        !strcasecmp("or", _String));
+}
+
+/**
+ * @brief
+ * @author Antoine LANDRIEUX
+ *
+ * @param _String
+ * @return u8
+ */
 static u8 strKeyword(char *_String)
 {
     return (
@@ -119,6 +147,17 @@ static u8 strType(char *_String)
         !strcmp("String", _String)
         //
     );
+}
+
+static token_type Symbol(char *_String)
+{
+    if (strKeyword(_String))
+        return TKN_KEYWORD;
+    if (strType(_String))
+        return TKN_TYPE;
+    if (strOperator(_String))
+        return TKN_OPERATOR;
+    return TKN_NAME;
 }
 
 Document EmptyDocument()
@@ -186,7 +225,7 @@ void TokensLog(Tokens *_Token)
 
     printf(
         "[TOKENS] [%p, %s:%.5lld:%.5lld, %.2X, \"%s\"]\n",
-        _Token,
+        (void *)_Token,
         _Token->file.file,
         _Token->file.ln,
         _Token->file.col,
@@ -251,7 +290,9 @@ Tokens *Tokenizer(char *_Filename, char *_Text)
     {
         if (chrSpace(*_Text))
         {
-            chrLn(*_Text) ? updateln(&ln, &col) : col++;
+            col++;
+            if (chrLn(*_Text))
+                updateln(&ln, &col);
             (volatile char *)_Text++;
             continue;
         }
@@ -263,11 +304,11 @@ Tokens *Tokenizer(char *_Filename, char *_Text)
         curr->file.ln = ln;
         curr->file.col = col;
 
-        if (*_Text == ';')
+        if (chrOperator(*_Text) || *_Text == '@' || *_Text == ';')
         {
             offset++;
-            content = strdup(";");
-            type = TKN_SEMICOLON;
+            content = strcut(&*_Text, offset);
+            type = *_Text == ';' ? TKN_SEMICOLON : (*_Text == '@' ? TKN_FUNCTION : TKN_OPERATOR);
         }
 
         else if (chrAlpha(*_Text))
@@ -275,7 +316,7 @@ Tokens *Tokenizer(char *_Filename, char *_Text)
             while (chrAlnum((&*_Text)[offset]))
                 offset++;
             content = strcut(&*_Text, offset);
-            type = strKeyword(content) ? TKN_KEYWORD : (strType(content) ? TKN_TYPE : TKN_NAME);
+            type = Symbol(content);
         }
 
         else if (chrNum(*_Text))

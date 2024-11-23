@@ -19,7 +19,7 @@ static void __attribute__((constructor)) init(void)
 
 int main(void)
 {
-    Tokens *tokens = Tokenizer(NULL, "try nop ; iferror raise 'Other error' ; close ; raise 'Other error 2' ;");
+    Tokens *tokens = Tokenizer(NULL, "writeln 5+5*8");
     TokensLog(tokens);
 
     AST *ast = Parse(tokens);
