@@ -1,4 +1,7 @@
-# SOARE
+
+# ![LOGO](resources/icon/icon.svg) SOARE
+
+---
 
 ## INTERPRETER
 
@@ -9,18 +12,20 @@ try
     raise "ProgramError";
   close;
 iferror
-  writeln `"script.soare" is required.`;
+  writeln `Error: Module or program error`;
 close;
 
+? Main function
+? Take 2 arguments (name and age)
 function Int main <String name; Int age> 
 
   writeln name, " a ", age, " ans.";
 
-  if age = 18:
+  if age equ 18 do
     writeln name, " est tout juste majeur";
-  elsif age > 18:
+  else age > 18 do
     writeln name, " est un adulte";
-  else:
+  else do
     writeln name, " est un enfant";
   close;
 
@@ -38,19 +43,3 @@ iferror
   raise "Error";
 close;
 ```
-
-### KEYWORDS
-
-- `if`
-  - `nop`
-  - `try`
-- `else`
-- `writeln`
-  - `close`
-  - `raise`
-- `while`
-- `prompt`
-- `return`
-  - `iferror`
-- `function`
-  - `loadimport`

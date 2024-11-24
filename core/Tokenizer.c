@@ -114,8 +114,8 @@ static u8 strKeyword(char *_String)
 {
     return (
         //
+        !strcmp("do", _String) ||
         !strcmp("if", _String) ||
-        !strcmp("nop", _String) ||
         !strcmp("try", _String) ||
         !strcmp("else", _String) ||
         !strcmp("close", _String) ||

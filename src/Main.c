@@ -15,6 +15,7 @@
 
 static void __attribute__((constructor)) init(void)
 {
+    asm("nop");
 }
 
 int main(void)
