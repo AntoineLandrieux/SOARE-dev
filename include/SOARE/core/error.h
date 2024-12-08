@@ -11,13 +11,22 @@
  */
 
 /* */
-#define InterpreterError "InterpreterError"
-/* */
 #define CharacterError "CharacterError"
+
 /* */
-#define UnexpectedNear "UnexpectedNear"
+#define DivideByZero "DivideByZero"
+
+/* */
+#define InterpreterError "InterpreterError"
+
 /* */
 #define SyntaxError "SyntaxError"
+
+/* */
+#define TypeError "TypeError"
+
+/* */
+#define UnexpectedNear "UnexpectedNear"
 
 /**
  * @brief 

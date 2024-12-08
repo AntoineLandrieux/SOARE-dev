@@ -37,4 +37,10 @@ typedef unsigned int u32;
 /* 64 bit (8 Bytes) unsigned */
 typedef unsigned long long u64;
 
+/* */
+#define int_max(x, y) ((x) > (y) ? (x) : (y))
+
+/* */
+#define int_min(x, y) ((x) < (y) ? (x) : (y))
+
 #endif /* __SOARE_INT_H__ */

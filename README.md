@@ -8,30 +8,41 @@
 ```txt
 try
   loadimport "script.soare";
-  if @main<"Antoine";14> do
-    raise "ProgramError";
-  close;
 iferror
-  writeln `Error: Module or program error`;
+  writeln `Error: can't import all files.`;
+  quit;
 close;
 
 ? Main function
 ? Take 2 arguments (name and age)
-function Int main <String name; Int age> 
+function Int main(String first_name; String last_name; Int age)
 
-  writeln name, " a ", age, " ans.";
+  def
+    String full_name,
+    String message,
+    Int estMajeur;
+
+  full_name = first_name, " ", last_name
+  message = full_name, " a ", age;
+  estMajeur = 1
+
+  writeln message;
 
   if age equ 18 do
-    writeln name, " est tout juste majeur";
-  else age > 18 do
-    writeln name, " est un adulte";
-  else do
-    writeln name, " est un enfant";
+    writeln full_name, " est tout juste majeur";
+  elseif age > 18 do
+    writeln full_name, " est un adulte";
+  else
+    writeln full_name, " est un enfant";
+    estMajeur = 0
   close;
 
-  return 0;
+  return estMajeur;
 
 close;
+
+main!("Antoine"; "Landrieux"; 14)
+
 ```
 
 ### ADVENCEMENT

@@ -21,6 +21,7 @@ typedef enum node_type
     NODE_NOP,
     NODE_TRY,
     NODE_BODY,
+    NODE_TYPE,
     NODE_RAISE,
     NODE_OUTPUT,
     NODE_NUMBER,
@@ -69,8 +70,9 @@ Node *Branch(char *_Value, node_type _Type, Document _File);
  * 
  * @param _Parent 
  * @param _Child 
+ * @return AST* 
  */
-void JoinBranch(Node *_Parent, Node *_Child);
+AST *JoinBranch(Node *_Parent, Node *_Child);
 
 /**
  * @brief 

@@ -43,13 +43,12 @@ Node *Branch(char *_Value, node_type _Type, Document _File)
  *
  * @param _Parent
  * @param _Child
+ * @return AST*
  */
-void JoinBranch(Node *_Parent, Node *_Child)
+AST *JoinBranch(Node *_Parent, Node *_Child)
 {
-    if (_Parent == NULL)
-        _Parent = _Child;
     if (_Child == NULL || _Parent == NULL)
-        return;
+        return NULL;
     if (_Parent->child == NULL)
         _Parent->child = _Child;
     else
@@ -60,6 +59,7 @@ void JoinBranch(Node *_Parent, Node *_Child)
         tmp->sibling = _Child;
     }
     _Child->parent = _Parent;
+    return _Parent;
 }
 
 /**
@@ -151,28 +151,41 @@ static AST *ParseValue(Tokens **_Tokens)
 
     case TKN_NAME:
         value->type = NODE_MEMGET;
-        break;
 
-    case TKN_FUNCTION:
-
-        value->value = (*_Tokens)->value;
-        Next(_Tokens);
-
-        if ((*_Tokens)->type != TKN_OPERATOR || *(*_Tokens)->value != '<')
-            return NULL;
-
-        while (1)
+        if ((*_Tokens)->type == TKN_FUNCTION)
         {
-            JoinBranch(value, ParseExpr(_Tokens));
-            if ((*_Tokens)->type != TKN_SEMICOLON)
-                break;
+            Next(_Tokens);
+
+            if ((*_Tokens)->type != TKN_PARENL)
+                return NULL;
+
+            Next(_Tokens);
+
+            while (1)
+            {
+                TokensLog(*_Tokens);
+                AST *expr = ParseExpr(_Tokens);
+
+                if (expr == NULL)
+                {
+                    TreeFree(value);
+                    return NULL;
+                }
+
+                JoinBranch(value, expr);
+                if ((*_Tokens)->type != TKN_SEMICOLON)
+                    break;
+                Next(_Tokens);
+            }
+
+            if ((*_Tokens)->type != TKN_PARENR)
+            {
+                TreeFree(value);
+                return NULL;
+            }
+
             Next(_Tokens);
         }
-
-        if ((*_Tokens)->type != TKN_OPERATOR || *(*_Tokens)->value != '>')
-            return NULL;
-
-        Next(_Tokens);
         break;
 
     default:
@@ -198,11 +211,11 @@ static AST *ParseExpr(Tokens **_Tokens)
 
     if ((*_Tokens)->type == TKN_OPERATOR)
     {
-        Node *operator= Branch((*_Tokens)->value, NODE_OPERATOR, (*_Tokens)->file);
+        Node *operator = Branch((*_Tokens)->value, NODE_OPERATOR, (*_Tokens)->file);
         Next(_Tokens);
         Node *right = ParseExpr(_Tokens);
 
-        if (right == NULL || operator== NULL)
+        if (operator== NULL || right == NULL)
         {
             TreeFree(left);
             TreeFree(right);
@@ -279,6 +292,44 @@ AST *Parse(Tokens *_Tokens)
                 curr = iferror;
             }
 
+            else if (!strcmp(old->value, "def"))
+            {
+                while (1)
+                {
+                    old = _Tokens;
+                    Next(&_Tokens);
+
+                    if (old->type != TKN_TYPE || _Tokens->type != TKN_NAME)
+                    {
+                        TreeFree(root);
+                        return LeaveException(UnexpectedNear, old->value, old->file);
+                    }
+
+                    JoinBranch(
+                        //
+                        curr,
+                        //
+                        JoinBranch(
+                            //
+                            Branch(_Tokens->value, NODE_MEMSET, _Tokens->file),
+                            Branch(old->value, NODE_TYPE, old->file)
+                            //
+                            )
+                        //
+                    );
+
+                    Next(&_Tokens);
+
+                    if (_Tokens->type == TKN_OPERATOR && *(_Tokens->value) == ',')
+                    {
+                        Next(&_Tokens);
+                        continue;
+                    }
+
+                    break;
+                }
+            }
+
             else if (!strcmp(old->value, "writeln"))
             {
                 AST *content = ParseExpr(&_Tokens);
@@ -289,10 +340,18 @@ AST *Parse(Tokens *_Tokens)
                     return LeaveException(SyntaxError, old->value, old->file);
                 }
 
-                AST *writeln = Branch("writeln", NODE_OUTPUT, old->file);
-                
-                JoinBranch(writeln, content);
-                JoinBranch(curr, writeln);
+                JoinBranch(
+                    //
+                    curr,
+                    //
+                    JoinBranch(
+                        //
+                        Branch("writeln", NODE_OUTPUT, old->file),
+                        content
+                        //
+                        )
+                    //
+                );
             }
 
             else if (!strcmp(old->value, "close"))

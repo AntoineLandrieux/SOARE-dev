@@ -20,13 +20,15 @@ static void __attribute__((constructor)) init(void)
 
 int main(void)
 {
-    Tokens *tokens = Tokenizer(NULL, "writeln 5+5*8");
+    // TODO: Fix ParseExpr ?
+    // Why ??
+    Tokens *tokens = Tokenizer(NULL, "writeln 4+5*2 ? Hello");
     TokensLog(tokens);
 
     AST *ast = Parse(tokens);
     TreeLog(ast);
 
-    free(Runtime(ast));
+    Runtime(ast);
 
     TreeFree(ast);
     TokensFree(tokens);

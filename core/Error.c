@@ -65,7 +65,7 @@ void *LeaveException(char *_Error, char *_String, Document _File)
         fprintf(
             //
             stderr,
-            "Except: %s\n\t\"%.8s...\"\n\t ^~~~\n\tAt file %s:%lld:%lld",
+            "Except: %s\n\t\"%.10s\"\n\t ^~~~\n\tAt file %s:%lld:%lld\n",
             _Error,
             _String,
             _File.file,

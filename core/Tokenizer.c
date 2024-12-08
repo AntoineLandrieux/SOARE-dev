@@ -84,7 +84,7 @@ static u8 chrSpace(const char _Char)
  */
 static u8 chrOperator(const char _Char)
 {
-    return strchr("+-^*/%%,", _Char) != NULL;
+    return strchr("<+-^*/%%,>", _Char) != NULL;
 }
 
 /**
@@ -297,6 +297,14 @@ Tokens *Tokenizer(char *_Filename, char *_Text)
             continue;
         }
 
+        else if (*_Text == '?')
+        {
+            while (!chrLn(*_Text) && *_Text)
+                (volatile char *)_Text++;
+            updateln(&ln, &col);
+            continue;
+        }
+
         char *content = NULL;
         token_type type = TKN_EOF;
         u64 offset = 0;
@@ -304,11 +312,18 @@ Tokens *Tokenizer(char *_Filename, char *_Text)
         curr->file.ln = ln;
         curr->file.col = col;
 
-        if (chrOperator(*_Text) || *_Text == '@' || *_Text == ';')
+        if (strchr("()", *_Text))
         {
             offset++;
             content = strcut(&*_Text, offset);
-            type = *_Text == ';' ? TKN_SEMICOLON : (*_Text == '@' ? TKN_FUNCTION : TKN_OPERATOR);
+            type = *_Text == '(' ? TKN_PARENL : TKN_PARENR;
+        }
+
+        else if (chrOperator(*_Text) || *_Text == '!' || *_Text == ';')
+        {
+            offset++;
+            content = strcut(&*_Text, offset);
+            type = *_Text == ';' ? TKN_SEMICOLON : (*_Text == '!' ? TKN_FUNCTION : TKN_OPERATOR);
         }
 
         else if (chrAlpha(*_Text))
