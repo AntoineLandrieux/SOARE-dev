@@ -152,40 +152,40 @@ static AST *ParseValue(Tokens **_Tokens)
     case TKN_NAME:
         value->type = NODE_MEMGET;
 
-        if ((*_Tokens)->type == TKN_FUNCTION)
+        if ((*_Tokens)->type != TKN_FUNCTION)
+            break;
+        
+        Next(_Tokens);
+
+        if ((*_Tokens)->type != TKN_PARENL)
+            return NULL;
+
+        Next(_Tokens);
+
+        while (1)
         {
-            Next(_Tokens);
+            TokensLog(*_Tokens);
+            AST *expr = ParseExpr(_Tokens);
 
-            if ((*_Tokens)->type != TKN_PARENL)
-                return NULL;
-
-            Next(_Tokens);
-
-            while (1)
-            {
-                TokensLog(*_Tokens);
-                AST *expr = ParseExpr(_Tokens);
-
-                if (expr == NULL)
-                {
-                    TreeFree(value);
-                    return NULL;
-                }
-
-                JoinBranch(value, expr);
-                if ((*_Tokens)->type != TKN_SEMICOLON)
-                    break;
-                Next(_Tokens);
-            }
-
-            if ((*_Tokens)->type != TKN_PARENR)
+            if (expr == NULL)
             {
                 TreeFree(value);
                 return NULL;
             }
 
+            JoinBranch(value, expr);
+            if ((*_Tokens)->type != TKN_SEMICOLON)
+                break;
             Next(_Tokens);
         }
+
+        if ((*_Tokens)->type != TKN_PARENR)
+        {
+            TreeFree(value);
+            return NULL;
+        }
+
+        Next(_Tokens);
         break;
 
     default:

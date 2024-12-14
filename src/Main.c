@@ -22,7 +22,7 @@ int main(void)
 {
     // TODO: Fix ParseExpr ?
     // Why ??
-    Tokens *tokens = Tokenizer(NULL, "writeln 4+5*2 ? Hello");
+    Tokens *tokens = Tokenizer(NULL, "writeln e4+5*2 ? Hello");
     TokensLog(tokens);
 
     AST *ast = Parse(tokens);

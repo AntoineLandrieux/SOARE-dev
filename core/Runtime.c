@@ -85,10 +85,20 @@ static MEM *get_mem(char *_Name)
     return NULL;
 }
 
+static u8 isNaN(char *_Number)
+{
+    char *endptr;
+    strtod(_Number, &endptr);
+    return *endptr == '\0';
+}
+
 static char *RunMaths(AST *_Tree)
 {
 
     char *tmp = malloc(int_min(strlen(_Tree->value) + 1, 11));
+
+    if (tmp == NULL)
+        return strdup("0");
 
     char *sx;
     char *sy;
@@ -117,7 +127,7 @@ static char *RunMaths(AST *_Tree)
         
         size = strlen(sx) + strlen(sy) + 1;
 
-        if (*(_Tree->value) == ',')
+        if (*(_Tree->value) == '+' && (isNaN(sx) || isNaN(sy)))
         {
             tmp = realloc(tmp, size);
             strcat(strcpy(tmp, sx), sy);
@@ -129,8 +139,8 @@ static char *RunMaths(AST *_Tree)
 
         if (strchr("/%", *(_Tree->value)) != NULL && !iy)
         {
-            LeaveException(DivideByZero, _Tree->value, _Tree->file);
-            break;
+            free(tmp);
+            return LeaveException(DivideByZero, _Tree->value, _Tree->file);
         }
 
         switch (*(_Tree->value))
@@ -172,10 +182,11 @@ char *Runtime(AST *_Tree)
         return NULL;
 
     AST *root = _Tree;
-    char *returned = NULL;
 
-    for (AST *curr = root->child; curr; curr = curr->sibling)
+    for (AST *curr = root->child; curr && !ErrorLevel(); curr = curr->sibling)
     {
+        char *returned = NULL;
+
         switch (curr->type)
         {
         case NODE_IMPORT:
@@ -189,7 +200,7 @@ char *Runtime(AST *_Tree)
             returned = Runtime(curr->child);
             IgnoreException(0x0);
 
-            if (ErrorLevel())
+            if (!ErrorLevel())
                 returned = Runtime(curr->child->sibling);
 
             if (returned != NULL)
@@ -199,7 +210,8 @@ char *Runtime(AST *_Tree)
 
         case NODE_OUTPUT:
             returned = RunMaths(curr->child);
-            printf("%s\n", returned);
+            if (returned != NULL)
+                printf("%s\n", returned);
             free(returned);
             break;
 
