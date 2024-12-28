@@ -1,7 +1,7 @@
 
 default:
 	mkdir -p bin
-	gcc src/Main.c core/*.c -o bin/soare.exe -I include -Wall -Wextra -Werror -Wpedantic -Wno-unused-function
+	gcc src/Main.c core/*.c -o bin/soare.exe -I include -Wall -Wextra -Werror -Wpedantic -Wno-unused-function -D __SOARE_DEBUG
 
 run:
 	./bin/soare.exe

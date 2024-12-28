@@ -30,7 +30,10 @@ typedef enum node_type
     NODE_MEMGET,
     NODE_MEMSET,
     NODE_IFERROR,
-    NODE_OPERATOR
+    NODE_OPERATOR,
+    NODE_CONDITION,
+    NODE_REPETITION,
+    NODE_RETURN
 
 } node_type;
 

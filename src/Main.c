@@ -20,20 +20,18 @@ static void __attribute__((constructor)) init(void)
 
 int main(void)
 {
-    // TODO: Fix ParseExpr ?
-    // Why ??
-    Tokens *tokens = Tokenizer(NULL, "writeln e4+5*2 ? Hello");
-    TokensLog(tokens);
-
-    AST *ast = Parse(tokens);
-    TreeLog(ast);
-
-    Runtime(ast);
-
-    TreeFree(ast);
-    TokensFree(tokens);
-
-    return EXIT_SUCCESS;
+    return Execute(
+"\
+? BD\n \
+if 0 do \
+    writeln 'A' \
+orif 1 do \
+    writeln 'B' \
+else \
+    writeln 'C' \
+close \
+writeln 'D' \
+");
 }
 
 static void __attribute__((destructor)) kill(void)

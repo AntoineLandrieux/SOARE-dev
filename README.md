@@ -1,46 +1,30 @@
 
-# ![LOGO](resources/icon/icon.svg) SOARE
+# The SOARE Interpreter
+
+# ![LOGO](resources/github/logo.svg)
+
+SOARE is distributed under the [WTFPL](LICENSE).
 
 ---
+
+## Documentation
+
+See [SOARE Documentation](doc/documentation.md) and [SOARE Changelog](CHANGELOG.md)
 
 ## INTERPRETER
 
 ```txt
-try
-  loadimport "script.soare";
-iferror
-  writeln `Error: can't import all files.`;
-  quit;
-close;
-
-? Main function
-? Take 2 arguments (name and age)
-function Int main(String first_name; String last_name; Int age)
-
-  def
-    String full_name +
-    String message +
-    Int estMajeur;
-
-  full_name = first_name + " " + last_name
-  message = full_name + " a " + age;
-  estMajeur = 1
-
-  writeln message;
-
-  if age equ 18 do
-    writeln full_name + " est tout juste majeur";
-  elseif age > 18 do
-    writeln full_name + " est un adulte";
-  else
-    writeln full_name + " est un enfant";
-    estMajeur = 0
-  close;
-
-  return estMajeur;
-
-close;
-
-main!("Antoine"; "Landrieux"; 14)
-
+? This is your first SOARE code !
+writeln "Hello World!";
 ```
+
+## Contributing
+
+The SOARE source code is located in the Git repository at [github.com/AntoineLandrieux/SOARE](https://github.com/AntoineLandrieux/SOARE/).
+Contributions are most welcome by forking the repository and sending a pull request.
+
+## Credit
+
+See [SOARE Authors](AUTHORS)
+
+[![WTFPL](http://www.wtfpl.net/wp-content/uploads/2012/12/wtfpl-badge-2.png)](http://www.wtfpl.net/)

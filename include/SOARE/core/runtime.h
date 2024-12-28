@@ -18,4 +18,11 @@
  */
 char *Runtime(AST *_Tree);
 
+/**
+ * @brief 
+ * 
+ * @param _RawCode 
+ */
+int Execute(char *_RawCode);
+
 #endif /* __SOARE_RUNTIME_H__ */

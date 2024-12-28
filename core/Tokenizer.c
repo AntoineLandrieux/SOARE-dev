@@ -84,7 +84,7 @@ static u8 chrSpace(const char _Char)
  */
 static u8 chrOperator(const char _Char)
 {
-    return strchr("<+-^*/%%,>", _Char) != NULL;
+    return strchr("<+-^*/%%>", _Char) != NULL;
 }
 
 /**
@@ -114,19 +114,20 @@ static u8 strKeyword(char *_String)
 {
     return (
         //
-        !strcmp("do", _String) ||
-        !strcmp("if", _String) ||
-        !strcmp("try", _String) ||
-        !strcmp("else", _String) ||
-        !strcmp("close", _String) ||
-        !strcmp("raise", _String) ||
-        !strcmp("while", _String) ||
-        !strcmp("prompt", _String) ||
-        !strcmp("return", _String) ||
-        !strcmp("writeln", _String) ||
-        !strcmp("iferror", _String) ||
-        !strcmp("function", _String) ||
-        !strcmp("loadimport", _String)
+        !strcmp("do", _String) ||       // tk ok ps ok ex na
+        !strcmp("if", _String) ||       // tk ok ps ok ex ok
+        !strcmp("try", _String) ||      // tk ok ps ok ex ok
+        !strcmp("orif", _String) ||     // tk ok ps ok ex ok
+        !strcmp("else", _String) ||     // tk ok ps ok ex ok
+        !strcmp("close", _String) ||    // tk ok ps ok ex na
+        !strcmp("raise", _String) ||    // tk ok ps ok ex ok
+        !strcmp("while", _String) ||    // tk ok ps ok ex ok
+        !strcmp("prompt", _String) ||   // tk ok ps -- ex --
+        !strcmp("return", _String) ||   // tk ok ps ok ex ok
+        !strcmp("writeln", _String) ||  // tk ok ps ok ex ok
+        !strcmp("iferror", _String) ||  // tk ok ps ok ex ok
+        !strcmp("function", _String) || // tk ok ps -- ex --
+        !strcmp("loadimport", _String)  // tk ok ps ok ex --
         //
     );
 }
@@ -141,7 +142,6 @@ static u8 strType(char *_String)
 {
     return (
         //
-        !strcmp("$", _String) ||
         !strcmp("Int", _String) ||
         !strcmp("Float", _String) ||
         !strcmp("String", _String)
@@ -149,17 +149,28 @@ static u8 strType(char *_String)
     );
 }
 
+/**
+ * @brief 
+ * 
+ * @param _String 
+ * @return token_type 
+ */
 static token_type Symbol(char *_String)
 {
     if (strKeyword(_String))
         return TKN_KEYWORD;
-    if (strType(_String))
+    else if (strType(_String))
         return TKN_TYPE;
-    if (strOperator(_String))
+    else if (strOperator(_String))
         return TKN_OPERATOR;
     return TKN_NAME;
 }
 
+/**
+ * @brief 
+ * 
+ * @return Document 
+ */
 Document EmptyDocument()
 {
     Document document;
@@ -184,7 +195,7 @@ Tokens *Token(char *_Filename, char *_Value, token_type _Type)
     Tokens *token = (Tokens *)malloc(sizeof(Tokens));
 
     if (token == NULL)
-        return NULL;
+        return LeaveException(InterpreterError, "OUT OF MEMORY", EmptyDocument());
 
     token->value = _Value == NULL ? NULL : strdup(_Value);
     token->type = _Type;
@@ -288,6 +299,12 @@ Tokens *Tokenizer(char *_Filename, char *_Text)
 
     while (*_Text)
     {
+        if (ErrorLevel())
+        {
+            TokensFree(token);
+            return NULL;
+        }
+
         if (chrSpace(*_Text))
         {
             col++;
@@ -356,8 +373,8 @@ Tokens *Tokenizer(char *_Filename, char *_Text)
 
         else
         {
-            TokensFree(token);
-            return LeaveException(CharacterError, &*_Text, curr->file);
+            LeaveException(CharacterError, &*_Text, curr->file);
+            continue;
         }
 
         curr->value = content;
