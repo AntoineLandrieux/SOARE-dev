@@ -29,7 +29,7 @@ orif 1 do \
     writeln 'B' \
 else \
     writeln 'C' \
-close \
+end \
 writeln 'D' \
 ");
 }

@@ -465,7 +465,7 @@ AST *Parse(Tokens *_Tokens)
                 );
             }
 
-            else if (!strcmp(old->value, "close"))
+            else if (!strcmp(old->value, "end"))
             {
                 if (curr == root)
                 {

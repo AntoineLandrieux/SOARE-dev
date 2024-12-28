@@ -3,7 +3,7 @@ try
 iferror
   writeln `Error: can't import all files.`;
   quit;
-close;
+end;
 
 ? Main function
 ? Take 2 arguments (name and age)
@@ -27,10 +27,10 @@ function Int main(String first_name; String last_name; Int age)
   else
     writeln full_name + " est un enfant";
     estMajeur = 0
-  close;
+  end;
 
   return estMajeur;
 
-close;
+end;
 
 main!("Antoine"; "Landrieux"; 14)

@@ -114,12 +114,12 @@ static u8 strKeyword(char *_String)
 {
     return (
         //
-        !strcmp("do", _String) ||       // tk ok ps ok ex na
         !strcmp("if", _String) ||       // tk ok ps ok ex ok
+        !strcmp("do", _String) ||       // tk ok ps ok ex na
+        !strcmp("end", _String) ||      // tk ok ps ok ex na
         !strcmp("try", _String) ||      // tk ok ps ok ex ok
         !strcmp("orif", _String) ||     // tk ok ps ok ex ok
         !strcmp("else", _String) ||     // tk ok ps ok ex ok
-        !strcmp("close", _String) ||    // tk ok ps ok ex na
         !strcmp("raise", _String) ||    // tk ok ps ok ex ok
         !strcmp("while", _String) ||    // tk ok ps ok ex ok
         !strcmp("prompt", _String) ||   // tk ok ps -- ex --
