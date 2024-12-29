@@ -341,44 +341,6 @@ AST *Parse(Tokens *_Tokens)
                 curr = iferror;
             }
 
-            else if (!strcmp(old->value, "def"))
-            {
-                while (1)
-                {
-                    old = _Tokens;
-                    Next(&_Tokens);
-
-                    if (old->type != TKN_TYPE || _Tokens->type != TKN_NAME)
-                    {
-                        TreeFree(root);
-                        return LeaveException(UnexpectedNear, old->value, old->file);
-                    }
-
-                    JoinBranch(
-                        //
-                        curr,
-                        //
-                        JoinBranch(
-                            //
-                            Branch(_Tokens->value, NODE_MEMSET, _Tokens->file),
-                            Branch(old->value, NODE_TYPE, old->file)
-                            //
-                            )
-                        //
-                    );
-
-                    Next(&_Tokens);
-
-                    if (_Tokens->type == TKN_OPERATOR && *(_Tokens->value) == '+')
-                    {
-                        Next(&_Tokens);
-                        continue;
-                    }
-
-                    break;
-                }
-            }
-
             else if (!strcmp(old->value, "if") || !strcmp(old->value, "while"))
             {
                 AST *content = ParseExpr(&_Tokens, 0xFF);
@@ -483,7 +445,7 @@ AST *Parse(Tokens *_Tokens)
                     TreeFree(root);
                     return LeaveException(UnexpectedNear, old->value, old->file);
                 }
-                
+
                 curr = curr->parent->parent;
             }
 
