@@ -33,7 +33,11 @@ typedef enum node_type
     NODE_OPERATOR,
     NODE_CONDITION,
     NODE_REPETITION,
-    NODE_RETURN
+    NODE_RETURN,
+    NODE_BREAK,
+    NODE_CONTINUE,
+    NODE_ARRAY,
+    NODE_CALL
 
 } node_type;
 

@@ -465,6 +465,17 @@ AST *Parse(Tokens *_Tokens)
                 );
             }
 
+            else if (!strcmp(old->value, "continue") || !strcmp(old->value, "break"))
+            {
+                if (curr == root)
+                {
+                    TreeFree(root);
+                    return LeaveException(UnexpectedNear, old->value, old->file);
+                }
+
+                JoinBranch(curr, Branch(old->value, strcmp(old->value, "continue") ? NODE_BREAK : NODE_CONTINUE, old->file));
+            }
+
             else if (!strcmp(old->value, "end"))
             {
                 if (curr == root)
@@ -472,6 +483,7 @@ AST *Parse(Tokens *_Tokens)
                     TreeFree(root);
                     return LeaveException(UnexpectedNear, old->value, old->file);
                 }
+                
                 curr = curr->parent->parent;
             }
 

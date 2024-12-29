@@ -31,6 +31,8 @@ typedef struct MEM
 static MEM *MEMORY = NULL;
 static MEM *MEM_PTR = NULL;
 
+static u8 broken = 0;
+
 static void init_mem()
 {
     if (MEMORY != NULL)
@@ -112,6 +114,11 @@ static char *RunMaths(AST *_Tree)
 
     switch (_Tree->type)
     {
+    case NODE_ARRAY:
+
+        strcpy(tmp, "(Array)");
+        break;
+
     case NODE_STRING:
 
         strcpy(tmp, _Tree->value);
@@ -218,6 +225,11 @@ char *Runtime(AST *_Tree)
         case NODE_IMPORT:
             // TODO: implement import
             break;
+        
+        case NODE_BREAK:
+            broken = 1;
+        case NODE_CONTINUE:
+            return NULL;
 
         case NODE_CONDITION:
 
@@ -233,6 +245,9 @@ char *Runtime(AST *_Tree)
 
                     if (returned != NULL)
                         return returned;
+                    
+                    if (broken)
+                        break;
 
                     break;
                 }
@@ -253,18 +268,20 @@ char *Runtime(AST *_Tree)
         case NODE_REPETITION:
 
             returned = RunMaths(curr->child);
+            broken = 0;
 
             while (strcmp(returned == NULL ? "0" : returned, "0"))
             {
                 free(returned);
                 returned = Runtime(curr->child->sibling);
 
-                if (returned != NULL)
+                if (returned != NULL || broken)
                     return returned;
 
                 returned = RunMaths(curr->child);
             }
 
+            broken = 0;
             break;
 
         case NODE_TRY:

@@ -25,9 +25,10 @@ int main(void)
 ? BD\n \
 if 0 do \
     writeln 'A' \
-orif 1 do \
+orif 0 do \
     writeln 'B' \
 else \
+    ? continue \n \
     writeln 'C' \
 end \
 writeln 'D' \

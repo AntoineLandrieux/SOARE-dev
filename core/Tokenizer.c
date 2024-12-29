@@ -122,11 +122,13 @@ static u8 strKeyword(char *_String)
         !strcmp("else", _String) ||     // tk ok ps ok ex ok
         !strcmp("raise", _String) ||    // tk ok ps ok ex ok
         !strcmp("while", _String) ||    // tk ok ps ok ex ok
+        !strcmp("break", _String) ||    // tk ok ps ok ex ok
         !strcmp("prompt", _String) ||   // tk ok ps -- ex --
         !strcmp("return", _String) ||   // tk ok ps ok ex ok
         !strcmp("writeln", _String) ||  // tk ok ps ok ex ok
         !strcmp("iferror", _String) ||  // tk ok ps ok ex ok
         !strcmp("function", _String) || // tk ok ps -- ex --
+        !strcmp("continue", _String) || // tk ok ps ok ex ok
         !strcmp("loadimport", _String)  // tk ok ps ok ex --
         //
     );
