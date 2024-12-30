@@ -13,6 +13,7 @@
 
 #include <SOARE/SOARE.h>
 #include <SOARE/utils/int.h>
+#include <SOARE/utils/keywords.h>
 
 /**
  * @brief
@@ -159,6 +160,8 @@ static AST *ParseValue(Tokens **_Tokens)
         if ((*_Tokens)->type != TKN_FUNCTION)
             break;
 
+        value->type = NODE_MEMCALL;
+
         Next(_Tokens);
 
         if ((*_Tokens)->type != TKN_PARENL)
@@ -289,10 +292,10 @@ AST *Parse(Tokens *_Tokens)
 
         case TKN_KEYWORD:
 
-            if (!strcmp(old->value, "nop"))
+            if (!strcmp(old->value, KEYWORD_NOP))
                 JoinBranch(curr, Branch(curr->value, NODE_NOP, old->file));
 
-            else if (!strcmp(old->value, "return"))
+            else if (!strcmp(old->value, KEYWORD_RETURN))
                 JoinBranch(
                     //
                     curr,
@@ -306,7 +309,7 @@ AST *Parse(Tokens *_Tokens)
                     //
                 );
 
-            else if (!strcmp(old->value, "loadimport") || !strcmp(old->value, "raise"))
+            else if (!strcmp(old->value, KEYWORD_LOADIMPORT) || !strcmp(old->value, KEYWORD_RAISE))
             {
                 if (_Tokens->type != TKN_STRING)
                 {
@@ -314,11 +317,11 @@ AST *Parse(Tokens *_Tokens)
                     return LeaveException(SyntaxError, old->value, old->file);
                 }
 
-                JoinBranch(curr, Branch(_Tokens->value, strcmp(old->value, "raise") ? NODE_IMPORT : NODE_RAISE, old->file));
+                JoinBranch(curr, Branch(_Tokens->value, strcmp(old->value, KEYWORD_RAISE) ? NODE_IMPORT : NODE_RAISE, old->file));
                 Next(&_Tokens);
             }
 
-            else if (!strcmp(old->value, "try"))
+            else if (!strcmp(old->value, KEYWORD_TRY))
             {
                 Node *try = Branch(old->value, NODE_TRY, old->file);
                 JoinBranch(try, Branch("BODY", NODE_BODY, old->file));
@@ -327,7 +330,7 @@ AST *Parse(Tokens *_Tokens)
                 curr = try->child;
             }
 
-            else if (!strcmp(old->value, "iferror"))
+            else if (!strcmp(old->value, KEYWORD_IFERROR))
             {
                 if (curr->parent->type != NODE_TRY || curr->type == NODE_IFERROR)
                 {
@@ -341,7 +344,7 @@ AST *Parse(Tokens *_Tokens)
                 curr = iferror;
             }
 
-            else if (!strcmp(old->value, "if") || !strcmp(old->value, "while"))
+            else if (!strcmp(old->value, KEYWORD_IF) || !strcmp(old->value, KEYWORD_WHILE))
             {
                 AST *content = ParseExpr(&_Tokens, 0xFF);
 
@@ -351,7 +354,7 @@ AST *Parse(Tokens *_Tokens)
                     return LeaveException(SyntaxError, old->value, old->file);
                 }
 
-                AST *statement = Branch(old->value, strcmp(old->value, "if") ? NODE_REPETITION : NODE_CONDITION, old->file);
+                AST *statement = Branch(old->value, strcmp(old->value, KEYWORD_IF) ? NODE_REPETITION : NODE_CONDITION, old->file);
                 AST *body = Branch("BODY", NODE_BODY, old->file);
 
                 JoinBranch(statement, content);
@@ -362,7 +365,7 @@ AST *Parse(Tokens *_Tokens)
                 Next(&_Tokens);
             }
 
-            else if (!strcmp(old->value, "orif"))
+            else if (!strcmp(old->value, KEYWORD_ORIF))
             {
                 if (curr->parent->type != NODE_CONDITION)
                 {
@@ -387,7 +390,7 @@ AST *Parse(Tokens *_Tokens)
                 Next(&_Tokens);
             }
 
-            else if (!strcmp(old->value, "else"))
+            else if (!strcmp(old->value, KEYWORD_ELSE))
             {
                 if (curr->parent->type != NODE_CONDITION)
                 {
@@ -403,7 +406,7 @@ AST *Parse(Tokens *_Tokens)
                 curr = body;
             }
 
-            else if (!strcmp(old->value, "writeln"))
+            else if (!strcmp(old->value, KEYWORD_WRITELN))
             {
                 AST *content = ParseExpr(&_Tokens, 0xFF);
 
@@ -427,7 +430,7 @@ AST *Parse(Tokens *_Tokens)
                 );
             }
 
-            else if (!strcmp(old->value, "continue") || !strcmp(old->value, "break"))
+            else if (!strcmp(old->value, KEYWORD_CONTINUE) || !strcmp(old->value, KEYWORD_BREAK))
             {
                 if (curr == root)
                 {
@@ -435,10 +438,10 @@ AST *Parse(Tokens *_Tokens)
                     return LeaveException(UnexpectedNear, old->value, old->file);
                 }
 
-                JoinBranch(curr, Branch(old->value, strcmp(old->value, "continue") ? NODE_BREAK : NODE_CONTINUE, old->file));
+                JoinBranch(curr, Branch(old->value, strcmp(old->value, KEYWORD_CONTINUE) ? NODE_BREAK : NODE_CONTINUE, old->file));
             }
 
-            else if (!strcmp(old->value, "end"))
+            else if (!strcmp(old->value, KEYWORD_END))
             {
                 if (curr == root)
                 {
@@ -450,6 +453,41 @@ AST *Parse(Tokens *_Tokens)
             }
 
             break;
+        
+        case TKN_TYPE:
+
+            if (_Tokens->type != TKN_NAME)
+            {
+                TreeFree(root);
+                return LeaveException(UnexpectedNear, old->value, old->file);
+            }
+
+            Node *mem = Branch(_Tokens->value, NODE_MEMCREATE, _Tokens->file);
+            JoinBranch(mem, Branch(old->value, NODE_TYPE, old->file));
+
+            Next(&_Tokens);
+
+            if (_Tokens->type == TKN_ASSIGN)
+            {
+                Next(&_Tokens);
+                AST *content = ParseExpr(&_Tokens, 0xFF);
+
+                if (content == NULL)
+                {
+                    TreeFree(mem);
+                    TreeFree(root);
+                    return LeaveException(SyntaxError, old->value, old->file);
+                }
+
+                JoinBranch(mem, content);
+            }
+
+            JoinBranch(curr, mem);
+            break;
+        
+        case TKN_NAME:
+
+
 
         default:
             TreeFree(root);

@@ -25,6 +25,7 @@ typedef struct MEM
     AST *value;
 
     struct MEM *next;
+    struct MEM *prev;
 
 } MEM;
 
@@ -42,9 +43,17 @@ static void init_mem()
     MEM_PTR = MEMORY;
 
     if (MEMORY == NULL)
+    {
         LeaveException(InterpreterError, "OUT OF MEMORY", EmptyDocument());
-    else
-        MEMORY->next = NULL;
+        return;
+    }
+
+    MEM_PTR->name = NULL;
+    MEM_PTR->type = NULL;
+    MEM_PTR->value = NULL;
+
+    MEM_PTR->next = NULL;
+    MEM_PTR->prev = NULL;
 }
 
 static void push_mem(char *_Name, char *_Type, AST *_Value)
@@ -55,10 +64,25 @@ static void push_mem(char *_Name, char *_Type, AST *_Value)
     MEM_PTR->name = _Name;
     MEM_PTR->type = _Type;
     MEM_PTR->value = _Value;
+
     MEM_PTR->next = (MEM *)malloc(sizeof(struct MEM));
 
-    if (MEM_PTR->next != NULL)
-        MEM_PTR = MEM_PTR->next;
+    if (MEM_PTR->next == NULL)
+    {
+        LeaveException(InterpreterError, "OUT OF MEMORY", EmptyDocument());
+        return;
+    }
+
+    MEM *old = MEM_PTR;
+
+    MEM_PTR = MEM_PTR->next;
+
+    MEM_PTR->name = NULL;
+    MEM_PTR->type = NULL;
+    MEM_PTR->value = NULL;
+
+    MEM_PTR->next = NULL;
+    MEM_PTR->prev = old;
 }
 
 static void free_mem()
@@ -83,10 +107,21 @@ static void free_mem()
 
 static MEM *get_mem(char *_Name)
 {
-    for (MEM *curr = MEMORY; curr != NULL; curr = curr->next)
-        if (!strcmp(curr->name, _Name))
+    for (MEM *curr = MEM_PTR; curr != NULL; curr = curr->prev)
+        if (curr->name != NULL && !strcmp(curr->name, _Name))
             return curr;
     return NULL;
+}
+
+static void log_mem()
+{
+    for (MEM *curr = MEMORY; curr != NULL; curr = curr->next)
+        printf(
+            "[MEMORY] [%p, %s:%s (AST *)%p]\n",
+            (void *)curr,
+            curr->name,
+            curr->type,
+            (void *)curr->value);
 }
 
 static u8 isNaN(char *_Number)
@@ -102,7 +137,7 @@ static char *RunMaths(AST *_Tree)
     char *tmp = malloc(int_max(strlen(_Tree->value) + 1, 12));
 
     if (tmp == NULL)
-        return strdup("0");
+        return LeaveException(InterpreterError, "OUT OF MEMORY", EmptyDocument());
 
     char *sx;
     char *sy;
@@ -225,11 +260,15 @@ char *Runtime(AST *_Tree)
         case NODE_IMPORT:
             // TODO: implement import
             break;
-        
+
         case NODE_BREAK:
             broken = 1;
         case NODE_CONTINUE:
             return NULL;
+
+        case NODE_MEMCREATE:
+            push_mem(curr->value, curr->child->value, curr->child->sibling);
+            break;
 
         case NODE_CONDITION:
 
@@ -245,7 +284,7 @@ char *Runtime(AST *_Tree)
 
                     if (returned != NULL)
                         return returned;
-                    
+
                     if (broken)
                         break;
 
@@ -257,11 +296,10 @@ char *Runtime(AST *_Tree)
 
                     if (tmp == NULL)
                         break;
-                        
+
                     returned = RunMaths(tmp);
                 }
             }
-            
 
             break;
 
@@ -334,7 +372,7 @@ char *Runtime(AST *_Tree)
 int Execute(char *_RawCode)
 {
     init_mem();
-    ClearException(0x0);
+    ClearException();
 
     Tokens *tokens = Tokenizer(NULL, _RawCode);
     AST *ast = Parse(tokens);
@@ -345,6 +383,11 @@ int Execute(char *_RawCode)
 #endif
 
     free(Runtime(ast));
+
+#ifdef __SOARE_DEBUG
+    log_mem();
+#endif
+
     TokensFree(tokens);
     TreeFree(ast);
     free_mem();

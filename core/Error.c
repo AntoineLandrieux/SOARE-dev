@@ -34,7 +34,7 @@ void IgnoreException(unsigned char _Ignore)
  * @brief 
  * 
  */
-void ClearException()
+void ClearException(void)
 {
     ErrorLvl = 0;
 }
@@ -44,7 +44,7 @@ void ClearException()
  * 
  * @return char 
  */
-char ErrorLevel()
+char ErrorLevel(void)
 {
     return ErrorLvl;
 }

@@ -13,6 +13,7 @@
 
 #include <SOARE/SOARE.h>
 #include <SOARE/utils/int.h>
+#include <SOARE/utils/keywords.h>
 
 /**
  * @brief
@@ -114,22 +115,23 @@ static u8 strKeyword(char *_String)
 {
     return (
         //
-        !strcmp("if", _String) ||       // tk ok ps ok ex ok
-        !strcmp("do", _String) ||       // tk ok ps ok ex na
-        !strcmp("end", _String) ||      // tk ok ps ok ex na
-        !strcmp("try", _String) ||      // tk ok ps ok ex ok
-        !strcmp("orif", _String) ||     // tk ok ps ok ex ok
-        !strcmp("else", _String) ||     // tk ok ps ok ex ok
-        !strcmp("raise", _String) ||    // tk ok ps ok ex ok
-        !strcmp("while", _String) ||    // tk ok ps ok ex ok
-        !strcmp("break", _String) ||    // tk ok ps ok ex ok
-        !strcmp("prompt", _String) ||   // tk ok ps -- ex --
-        !strcmp("return", _String) ||   // tk ok ps ok ex ok
-        !strcmp("writeln", _String) ||  // tk ok ps ok ex ok
-        !strcmp("iferror", _String) ||  // tk ok ps ok ex ok
-        !strcmp("function", _String) || // tk ok ps -- ex --
-        !strcmp("continue", _String) || // tk ok ps ok ex ok
-        !strcmp("loadimport", _String)  // tk ok ps ok ex --
+        !strcmp(KEYWORD_BREAK, _String) ||      // tk ok ps ok ex ok
+        !strcmp(KEYWORD_CONTINUE, _String) ||   // tk ok ps ok ex na
+        !strcmp(KEYWORD_DO, _String) ||         // tk ok ps ok ex na
+        !strcmp(KEYWORD_ELSE, _String) ||       // tk ok ps ok ex na
+        !strcmp(KEYWORD_END, _String) ||        // tk ok ps ok ex ok
+        !strcmp(KEYWORD_FUNCTION, _String) ||   // tk ok ps ok ex ok
+        !strcmp(KEYWORD_IF, _String) ||         // tk ok ps ok ex ok
+        !strcmp(KEYWORD_IFERROR, _String) ||    // tk ok ps ok ex ok
+        !strcmp(KEYWORD_LOADIMPORT, _String) || // tk ok ps ok ex ok
+        !strcmp(KEYWORD_NOP, _String) ||        // tk ok ps ok ex ok
+        !strcmp(KEYWORD_ORIF, _String) ||       // tk ok ps -- ex --
+        !strcmp(KEYWORD_PROMPT, _String) ||     // tk ok ps ok ex ok
+        !strcmp(KEYWORD_RAISE, _String) ||      // tk ok ps ok ex ok
+        !strcmp(KEYWORD_RETURN, _String) ||     // tk ok ps ok ex ok
+        !strcmp(KEYWORD_TRY, _String) ||        // tk ok ps -- ex --
+        !strcmp(KEYWORD_WHILE, _String) ||      // tk ok ps ok ex ok
+        !strcmp(KEYWORD_WRITELN, _String)       // tk ok ps ok ex --
         //
     );
 }
@@ -144,18 +146,18 @@ static u8 strType(char *_String)
 {
     return (
         //
-        !strcmp("Int", _String) ||
-        !strcmp("Float", _String) ||
-        !strcmp("String", _String)
+        !strcmp(TYPE_FLOAT, _String) ||
+        !strcmp(TYPE_INT, _String) ||
+        !strcmp(TYPE_STRING, _String)
         //
     );
 }
 
 /**
- * @brief 
- * 
- * @param _String 
- * @return token_type 
+ * @brief
+ *
+ * @param _String
+ * @return token_type
  */
 static token_type Symbol(char *_String)
 {
@@ -169,9 +171,9 @@ static token_type Symbol(char *_String)
 }
 
 /**
- * @brief 
- * 
- * @return Document 
+ * @brief
+ *
+ * @return Document
  */
 Document EmptyDocument()
 {
@@ -331,7 +333,14 @@ Tokens *Tokenizer(char *_Filename, char *_Text)
         curr->file.ln = ln;
         curr->file.col = col;
 
-        if (strchr("()", *_Text))
+        if ('=' == *_Text)
+        {
+            offset++;
+            content = strcut(&*_Text, offset);
+            type = TKN_ASSIGN;
+        }
+
+        else if (strchr("()", *_Text))
         {
             offset++;
             content = strcut(&*_Text, offset);
