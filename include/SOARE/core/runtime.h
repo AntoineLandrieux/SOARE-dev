@@ -10,13 +10,18 @@
  * \____/  \___/\_| |_/\_| \_\____/
  */
 
+#include "math.h"
+
+extern MEM *MEMORY;
+
 /**
  * @brief 
  * 
+ * @param _Type 
  * @param _Tree 
  * @return char* 
  */
-char *Runtime(AST *_Tree);
+char *Runtime(char *_Type, AST *_Tree);
 
 /**
  * @brief 

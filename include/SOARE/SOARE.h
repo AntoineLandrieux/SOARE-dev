@@ -10,12 +10,6 @@
  * \____/  \___/\_| |_/\_| \_\____/
  */
 
-/*  */
-#define SOARE_MAJOR 1
-/*  */
-#define SOARE_MINOR 0
-/*  */
-#define SOARE_PATCH 0
 
 #ifdef __cplusplus
 namespace SOARE
@@ -23,6 +17,14 @@ namespace SOARE
     extern "C"
     {
 #endif
+
+/*  */
+#define SOARE_MAJOR 1
+/*  */
+#define SOARE_MINOR 0
+/*  */
+#define SOARE_PATCH 0
+
 
         /**
          * @brief
@@ -39,9 +41,15 @@ namespace SOARE
 
         } Document;
 
+
+/*  */
+#define __SOARE_FILE__ "_input"
+
 #include "core/error.h"
 #include "core/tokenizer.h"
 #include "core/parser.h"
+#include "core/memory.h"
+#include "core/math.h"
 #include "core/runtime.h"
 
 #ifdef __cplusplus

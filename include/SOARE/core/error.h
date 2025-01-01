@@ -1,5 +1,5 @@
-#ifndef __ERROR_H__
-#define __ERROR_H__ 0x1
+#ifndef __SOARE_ERROR_H__
+#define __SOARE_ERROR_H__ 0x1
 
 /**
  *  _____  _____  ___  ______ _____
@@ -26,7 +26,13 @@
 #define TypeError "TypeError"
 
 /* */
+#define MathError "MathError"
+
+/* */
 #define UnexpectedNear "UnexpectedNear"
+
+/* */
+#define UndefinedReference "UndefinedReference"
 
 /**
  * @brief 
@@ -58,4 +64,4 @@ char ErrorLevel();
  */
 void *LeaveException(char *_Error, char *_String, Document _File);
 
-#endif /* __ERROR_H__ */
+#endif /* __SOARE_ERROR_H__ */

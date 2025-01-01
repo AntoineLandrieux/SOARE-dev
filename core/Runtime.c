@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <math.h>
-
 /**
  *  _____  _____  ___  ______ _____
  * /  ___||  _  |/ _ \ | ___ \  ___|
@@ -15,240 +13,31 @@
 
 #include <SOARE/SOARE.h>
 #include <SOARE/utils/int.h>
+#include <SOARE/utils/keywords.h>
 
-typedef struct MEM
-{
-
-    char *name;
-    char *type;
-
-    AST *value;
-
-    struct MEM *next;
-    struct MEM *prev;
-
-} MEM;
-
-static MEM *MEMORY = NULL;
-static MEM *MEM_PTR = NULL;
+MEM *MEMORY = NULL;
 
 static u8 broken = 0;
 
-static void init_mem()
-{
-    if (MEMORY != NULL)
-        return;
-
-    MEMORY = (MEM *)malloc(sizeof(struct MEM));
-    MEM_PTR = MEMORY;
-
-    if (MEMORY == NULL)
-    {
-        LeaveException(InterpreterError, "OUT OF MEMORY", EmptyDocument());
-        return;
-    }
-
-    MEM_PTR->name = NULL;
-    MEM_PTR->type = NULL;
-    MEM_PTR->value = NULL;
-
-    MEM_PTR->next = NULL;
-    MEM_PTR->prev = NULL;
-}
-
-static void push_mem(char *_Name, char *_Type, AST *_Value)
-{
-    if (MEM_PTR == NULL)
-        return;
-
-    MEM_PTR->name = _Name;
-    MEM_PTR->type = _Type;
-    MEM_PTR->value = _Value;
-
-    MEM_PTR->next = (MEM *)malloc(sizeof(struct MEM));
-
-    if (MEM_PTR->next == NULL)
-    {
-        LeaveException(InterpreterError, "OUT OF MEMORY", EmptyDocument());
-        return;
-    }
-
-    MEM *old = MEM_PTR;
-
-    MEM_PTR = MEM_PTR->next;
-
-    MEM_PTR->name = NULL;
-    MEM_PTR->type = NULL;
-    MEM_PTR->value = NULL;
-
-    MEM_PTR->next = NULL;
-    MEM_PTR->prev = old;
-}
-
-static void free_mem()
-{
-    if (MEMORY == NULL)
-        return;
-
-    while (1)
-    {
-        MEM *old = MEMORY;
-        MEMORY = MEMORY->next;
-
-        free(old);
-
-        if (MEMORY == NULL)
-            break;
-    }
-
-    MEMORY = NULL;
-    MEM_PTR = NULL;
-}
-
-static MEM *get_mem(char *_Name)
-{
-    for (MEM *curr = MEM_PTR; curr != NULL; curr = curr->prev)
-        if (curr->name != NULL && !strcmp(curr->name, _Name))
-            return curr;
-    return NULL;
-}
-
-static void log_mem()
-{
-    for (MEM *curr = MEMORY; curr != NULL; curr = curr->next)
-        printf(
-            "[MEMORY] [%p, %s:%s (AST *)%p]\n",
-            (void *)curr,
-            curr->name,
-            curr->type,
-            (void *)curr->value);
-}
-
-static u8 isNaN(char *_Number)
-{
-    char *endptr;
-    strtod(_Number, &endptr);
-    return *endptr != '\0';
-}
-
-static char *RunMaths(AST *_Tree)
-{
-
-    char *tmp = malloc(int_max(strlen(_Tree->value) + 1, 12));
-
-    if (tmp == NULL)
-        return LeaveException(InterpreterError, "OUT OF MEMORY", EmptyDocument());
-
-    char *sx;
-    char *sy;
-    double dx = 0;
-    double dy = 0;
-
-    size_t size = 0;
-    strcpy(tmp, "0");
-
-    switch (_Tree->type)
-    {
-    case NODE_ARRAY:
-
-        strcpy(tmp, "(Array)");
-        break;
-
-    case NODE_STRING:
-
-        strcpy(tmp, _Tree->value);
-        break;
-
-    case NODE_NUMBER:
-
-        sprintf(tmp, "%.f", atof(_Tree->value));
-        break;
-
-    case NODE_OPERATOR:
-
-        sx = RunMaths(_Tree->child);
-        sy = RunMaths(_Tree->child->sibling);
-
-        if (*(_Tree->value) == '+' && (isNaN(sx) || isNaN(sy)))
-        {
-            size = strlen(sx) + strlen(sy) + 1;
-            tmp = realloc(tmp, size);
-            strcat(strcpy(tmp, sx), sy);
-            break;
-        }
-
-        else if (!strcasecmp(_Tree->value, "equ") || !strcasecmp(_Tree->value, "neq"))
-        {
-            strcpy(tmp, (strcasecmp(_Tree->value, "neq") ? !strcmp(sx, sy) : strcmp(sx, sy)) ? "1" : "0");
-            break;
-        }
-
-        dx = atof(sx);
-        dy = atof(sy);
-
-        if (!strcasecmp(_Tree->value, "and") || !strcasecmp(_Tree->value, "or"))
-        {
-            strcpy(tmp, (strcasecmp(_Tree->value, "or") ? dx && dy : dx || dy) ? "1" : "0");
-            break;
-        }
-
-        if (strchr("/%", *(_Tree->value)) != NULL && !dy)
-        {
-            free(tmp);
-            return LeaveException(DivideByZero, _Tree->value, _Tree->file);
-        }
-
-        switch (*(_Tree->value))
-        {
-        case '*':
-            sprintf(tmp, "%.f", dx * dy);
-            break;
-
-        case '^':
-            sprintf(tmp, "%.f", pow(dx, dy));
-            break;
-
-        case '/':
-            sprintf(tmp, "%.f", dx / dy);
-            break;
-
-        case '%':
-            itoa((int)dx % (int)dy, tmp, 10);
-            break;
-
-        case '+':
-            sprintf(tmp, "%.f", dx + dy);
-            break;
-
-        case '-':
-            sprintf(tmp, "%.f", dx - dy);
-            break;
-
-        case '<':
-            sprintf(tmp, "%d", dx < dy);
-            break;
-
-        case '>':
-            sprintf(tmp, "%d", dx > dy);
-            break;
-
-        default:
-            break;
-        }
-
-    default:
-        break;
-    }
-
-    return tmp;
-}
-
-char *Runtime(AST *_Tree)
+char *Runtime(char *_Type, AST *_Tree)
 {
     if (_Tree == NULL)
         return NULL;
 
     AST *root = _Tree;
+
+    if (MEMORY == NULL)
+        MEMORY = Mem();
+
+    MEM *MEM_PTR = MemLast(MEMORY);
+
+#define __FREE_MEM                              \
+    if (MEM_PTR != MEMORY)                      \
+        MEM_PTR->next = MemFree(MEM_PTR->next); \
+    else                                        \
+        MEMORY = MemFree(MEMORY);
+
+    double condition = 0;
 
     for (AST *curr = root->child; curr && !ErrorLevel(); curr = curr->sibling)
     {
@@ -264,84 +53,87 @@ char *Runtime(AST *_Tree)
         case NODE_BREAK:
             broken = 1;
         case NODE_CONTINUE:
+            __FREE_MEM;
             return NULL;
 
         case NODE_MEMCREATE:
-            push_mem(curr->value, curr->child->value, curr->child->sibling);
+            MemPush(
+                MEM_PTR,
+                curr->value,
+                curr->child->value,
+                Math(curr->child->value, curr->child->sibling));
             break;
 
         case NODE_CONDITION:
 
-            returned = RunMaths(curr->child);
+            condition = MathFloat(curr->child);
             tmp = curr->child;
 
             while (1)
             {
-                if (strcmp(returned == NULL ? "0" : returned, "0"))
+                if (condition)
                 {
-                    free(returned);
-                    returned = Runtime(tmp->sibling);
-
+                    returned = Runtime(_Type, tmp->sibling);
                     if (returned != NULL)
+                    {
+                        __FREE_MEM;
                         return returned;
-
-                    if (broken)
-                        break;
-
+                    }
                     break;
                 }
-                else
-                {
-                    tmp = tmp->sibling->sibling;
 
-                    if (tmp == NULL)
-                        break;
+                tmp = tmp->sibling->sibling;
+                if (tmp == NULL)
+                    break;
 
-                    returned = RunMaths(tmp);
-                }
+                condition = MathFloat(tmp);
             }
 
             break;
 
         case NODE_REPETITION:
 
-            returned = RunMaths(curr->child);
+            condition = MathFloat(curr->child);
             broken = 0;
 
-            while (strcmp(returned == NULL ? "0" : returned, "0"))
+            while (condition)
             {
-                free(returned);
-                returned = Runtime(curr->child->sibling);
+                returned = Runtime(_Type, curr->child->sibling);
 
                 if (returned != NULL || broken)
+                {
+                    __FREE_MEM;
                     return returned;
+                }
 
-                returned = RunMaths(curr->child);
+                condition = MathFloat(curr->child);
             }
 
-            broken = 0;
             break;
 
         case NODE_TRY:
 
             IgnoreException(0x1);
-            returned = Runtime(curr->child);
+            returned = Runtime(_Type, curr->child);
             IgnoreException(0x0);
 
             if (ErrorLevel())
             {
                 ClearException();
-                returned = Runtime(curr->child->sibling);
+                returned = Runtime(_Type, curr->child->sibling);
             }
 
             if (returned != NULL)
+            {
+                __FREE_MEM;
                 return returned;
+            }
 
             break;
 
         case NODE_OUTPUT:
 
-            returned = RunMaths(curr->child);
+            returned = MathString(curr->child);
 
             if (returned != NULL)
                 printf("%s\n", returned);
@@ -349,10 +141,12 @@ char *Runtime(AST *_Tree)
             break;
 
         case NODE_RETURN:
-            return RunMaths(curr->child);
+            __FREE_MEM;
+            return Math(_Type, curr->child);
 
         case NODE_RAISE:
-            return LeaveException(curr->value, "raise", curr->file);
+            __FREE_MEM;
+            return LeaveException(curr->value, KEYWORD_RAISE, curr->file);
 
         default:
             break;
@@ -361,6 +155,11 @@ char *Runtime(AST *_Tree)
         free(returned);
     }
 
+#ifdef __SOARE_DEBUG
+    MemLog(MEMORY);
+#endif
+
+    __FREE_MEM;
     return NULL;
 }
 
@@ -371,10 +170,9 @@ char *Runtime(AST *_Tree)
  */
 int Execute(char *_RawCode)
 {
-    init_mem();
     ClearException();
 
-    Tokens *tokens = Tokenizer(NULL, _RawCode);
+    Tokens *tokens = Tokenizer(__SOARE_FILE__, _RawCode);
     AST *ast = Parse(tokens);
 
 #ifdef __SOARE_DEBUG
@@ -382,15 +180,10 @@ int Execute(char *_RawCode)
     TreeLog(ast);
 #endif
 
-    free(Runtime(ast));
-
-#ifdef __SOARE_DEBUG
-    log_mem();
-#endif
+    free(Runtime(TYPE_INT, ast));
 
     TokensFree(tokens);
     TreeFree(ast);
-    free_mem();
 
     return (int)ErrorLevel();
 }

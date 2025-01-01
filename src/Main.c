@@ -23,15 +23,15 @@ int main(void)
     return Execute(
 "\
 ? BD\n \
-String Msg = 10; \
-Int Value = 10; \
+String Msg = '10'; \
 if 0 do \
     writeln 'A' \
 orif 0 do \
     writeln 'B' \
 else \
     ? continue \n \
-    writeln 'C' \
+    Int Value = 4; \
+    writeln 'C' + Value \
 end \
 writeln 'D' \
 ");
