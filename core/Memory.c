@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <string.h>
 
 /**
@@ -9,11 +10,24 @@
  *  `--. \| | | |  _  ||    /|  __|
  * /\__/ /\ \_/ / | | || |\ \| |___
  * \____/  \___/\_| |_/\_| \_\____/
+ *
+ * Antoine LANDRIEUX (WTFPL) <Memory.c>
+ * <https://github.com/AntoineLandrieux/SOARE/>
+ *
+ * [!] Contribute and help me translate the comments!
+ *
  */
 
 #include <SOARE/SOARE.h>
 #include <SOARE/utils/int.h>
+#include <SOARE/utils/keywords.h>
 
+/**
+ * @brief Créer une nouvelle mémoire vide
+ * @author Antoine LANDRIEUX
+ *
+ * @return MEM*
+ */
 MEM *Mem()
 {
     MEM *MEMORY = (MEM *)malloc(sizeof(MEM));
@@ -23,12 +37,19 @@ MEM *Mem()
 
     MEMORY->name = NULL;
     MEMORY->type = NULL;
-
+    MEMORY->value = NULL;
     MEMORY->next = NULL;
 
     return MEMORY;
 }
 
+/**
+ * @brief Donne la dernière variable de la mémoire
+ * @author Antoine LANDRIEUX
+ *
+ * @param _Memory
+ * @return MEM*
+ */
 MEM *MemLast(MEM *_Memory)
 {
     if (_Memory == NULL)
@@ -39,27 +60,60 @@ MEM *MemLast(MEM *_Memory)
     return curr;
 }
 
-void MemPush(MEM *_Memory, char *_Name, char *_Type, char *_Value)
+/**
+ * @brief Ajoute une variable dans une mémoire existante
+ * @author Antoine LANDRIEUX
+ *
+ * @param _Memory
+ * @param _Name
+ * @param _Type
+ * @param ...
+ */
+MEM *MemPush(MEM *_Memory, char *_Name, char *_Type, char *_Value)
 {
     if (_Memory == NULL)
-        return;
+        return NULL;
 
-    MEM *curr = MemLast(_Memory);
-    curr->next = (MEM *)malloc(sizeof(MEM));
-    curr = curr->next;
+    MEM *mem = MemLast(_Memory);
+    mem->next = (MEM *)malloc(sizeof(MEM));
+    mem = mem->next;
 
-    if (curr == NULL)
-    {
-        LeaveException(InterpreterError, "OUT OF MEMORY", EmptyDocument());
-        return;
-    }
+    if (mem == NULL)
+        return LeaveException(InterpreterError, "OUT OF MEMORY", EmptyDocument());
 
-    curr->name = _Name;
-    curr->type = _Type;
-    curr->value = _Value;
-    curr->next = NULL;
+    mem->next = NULL;
+    mem->name = _Name;
+    mem->type = _Type;
+    mem->value = _Value;
+
+    return mem;
 }
 
+/**
+ * @brief Modifie une variable dans une mémoire existante
+ * @author Antoine LANDRIEUX
+ *
+ * @param _Memory
+ * @param _Name
+ * @param _Type
+ * @param ...
+ */
+MEM *MemSet(MEM *_Memory, char *_Value)
+{
+    if (_Memory == NULL)
+        return NULL;
+    free(_Memory->value);
+    _Memory->value = _Value;
+    return _Memory;
+}
+
+/**
+ * @brief Libére la mémoire allouée
+ * @author Antoine LANDRIEUX
+ *
+ * @param _Memory
+ * @return void* (retourne toujours NULL)
+ */
 void *MemFree(MEM *_Memory)
 {
     if (_Memory == NULL)
@@ -70,6 +124,14 @@ void *MemFree(MEM *_Memory)
     return NULL;
 }
 
+/**
+ * @brief Trouve une varible dans la mémoire
+ * @author Antoine LANDRIEUX
+ *
+ * @param _Memory
+ * @param _Name
+ * @return MEM*
+ */
 MEM *MemGet(MEM *_Memory, char *_Name)
 {
     for (MEM *curr = _Memory; curr != NULL; curr = curr->next)
@@ -80,15 +142,21 @@ MEM *MemGet(MEM *_Memory, char *_Name)
     return NULL;
 }
 
+/**
+ * @brief Affiche l'essemble des variables de la mémoire
+ * @author Antoine LANDRIEUX
+ *
+ * @param _Memory
+ */
 void MemLog(MEM *_Memory)
 {
     if (_Memory == NULL)
         return;
     printf(
-        "[MEMORY] [%p, %s:%s (AST *)%p]\n",
+        "[MEMORY] [%p, %s:%s\t%s]\n",
         (void *)_Memory,
         _Memory->name,
         _Memory->type,
-        (void *)_Memory->value);
+        _Memory->value);
     MemLog(_Memory->next);
 }

@@ -1,0 +1,21 @@
+
+? @brief isset
+function None isset(None object)
+    return object; end;
+
+? @brief atoi
+function Int atoi(String str)
+    return str; end;
+
+? @brief atof
+function Float atof(String str)
+    return str; end;
+
+? @brief itoa
+function String itoa(Int int)
+    return int; end;
+
+? @brief ftoa
+function String ftoa(Float float)
+    return float; end;
+

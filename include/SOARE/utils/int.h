@@ -1,13 +1,21 @@
 #ifndef __SOARE_INT_H__
 #define __SOARE_INT_H__ 0x1
 
+/* #prama once */
+
 /**
  *  _____  _____  ___  ______ _____
  * /  ___||  _  |/ _ \ | ___ \  ___|
- * \ `--. | | | / /_\ \| |_/ / |__ 
+ * \ `--. | | | / /_\ \| |_/ / |__
  *  `--. \| | | |  _  ||    /|  __|
  * /\__/ /\ \_/ / | | || |\ \| |___
  * \____/  \___/\_| |_/\_| \_\____/
+ *
+ * Antoine LANDRIEUX (WTFPL) <int.h>
+ * <https://github.com/AntoineLandrieux/SOARE/>
+ *
+ * [!] Contribute and help me translate the comments!
+ *
  */
 
 /* 8 bit (1 Byte) */
@@ -36,11 +44,5 @@ typedef unsigned short u16;
 typedef unsigned int u32;
 /* 64 bit (8 Bytes) unsigned */
 typedef unsigned long long u64;
-
-/* */
-#define int_max(x, y) ((x) > (y) ? (x) : (y))
-
-/* */
-#define int_min(x, y) ((x) < (y) ? (x) : (y))
 
 #endif /* __SOARE_INT_H__ */

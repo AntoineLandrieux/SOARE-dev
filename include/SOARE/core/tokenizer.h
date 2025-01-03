@@ -1,22 +1,30 @@
 #ifndef __SOARE_TOKENIZER_H__
 #define __SOARE_TOKENIZER_H__ 0x1
 
+/* #prama once */
+
 /**
  *  _____  _____  ___  ______ _____
  * /  ___||  _  |/ _ \ | ___ \  ___|
- * \ `--. | | | / /_\ \| |_/ / |__ 
+ * \ `--. | | | / /_\ \| |_/ / |__
  *  `--. \| | | |  _  ||    /|  __|
  * /\__/ /\ \_/ / | | || |\ \| |___
  * \____/  \___/\_| |_/\_| \_\____/
+ *
+ * Antoine LANDRIEUX (WTFPL) <tokenizer.h>
+ * <https://github.com/AntoineLandrieux/SOARE/>
+ *
+ * [!] Contribute and help me translate the comments!
+ *
  */
 
 /**
- * @brief 
- * 
+ * @brief Enumére les différents types de jetons
+ * @author Antoine LANDRIEUX
  */
 typedef enum token_type
 {
-    
+
     TKN_EOF,
     TKN_TYPE,
     TKN_NAME,
@@ -33,48 +41,67 @@ typedef enum token_type
 } token_type;
 
 /**
- * @brief 
- * 
+ * @brief Structure d'un jeton
+ * @author Antoine LANDRIEUX
  */
 typedef struct Tokens
 {
-    
+
+    // Valeur du jeton
     char *value;
+    // Type du jeton
     token_type type;
 
+    // Position du jeton dans le document
     Document file;
-    
+
+    // Jeton suivant
     struct Tokens *next;
 
 } Tokens;
 
 /**
- * @brief 
- * 
- * @return Document 
+ * @brief Retourne un document vide
+ * @author Antoine LANDRIEUX
+ *
+ * @return Document
  */
 Document EmptyDocument();
 
 /**
- * @brief 
- * 
- * @param _Token 
+ * @brief Créer un nouveau jeton
+ * @author Antoine LANDRIEUX
+ *
+ * @param _Filename
+ * @param _Value
+ * @param _Type
+ * @return Tokens*
  */
-void TokensLog(Tokens *_Token);
+Tokens *Token(char *_Filename, char *_Value, token_type _Type);
 
 /**
- * @brief 
- * 
- * @param _Token 
+ * @brief Libère la mémoire allouées par les jetons
+ * @author Antoine LANDRIEUX
+ *
+ * @param _Token
  */
 void TokensFree(Tokens *_Token);
 
 /**
- * @brief 
- * 
- * @param _Filename 
- * @param _Text 
- * @return Tokens* 
+ * @brief Affiche les jetons
+ * @author Antoine LANDRIEUX
+ *
+ * @param _Token
+ */
+void TokensLog(Tokens *_Token);
+
+/**
+ * @brief Transforme une chaîne de caractère en une séquence de jetons
+ * @author Antoine LANDRIEUX
+ *
+ * @param _Filename
+ * @param _Text
+ * @return Tokens*
  */
 Tokens *Tokenizer(char *_Filename, char *_Text);
 

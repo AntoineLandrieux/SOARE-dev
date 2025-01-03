@@ -6,10 +6,20 @@
 /**
  *  _____  _____  ___  ______ _____
  * /  ___||  _  |/ _ \ | ___ \  ___|
- * \ `--. | | | / /_\ \| |_/ / |__ 
+ * \ `--. | | | / /_\ \| |_/ / |__
  *  `--. \| | | |  _  ||    /|  __|
  * /\__/ /\ \_/ / | | || |\ \| |___
  * \____/  \___/\_| |_/\_| \_\____/
+ *
+ * Antoine LANDRIEUX (WTFPL) <keywords.h>
+ * <https://github.com/AntoineLandrieux/SOARE/>
+ *
+ * [!] Contribute and help me translate the comments!
+ *
+ */
+
+/*
+ * Liste des keywords (ordre alpha-numérique)
  */
 
 #define KEYWORD_BREAK "break"
@@ -17,6 +27,7 @@
 #define KEYWORD_DO "do"
 #define KEYWORD_ELSE "else"
 #define KEYWORD_END "end"
+#define KEYWORD_ENUMERATE "enumerate"
 #define KEYWORD_FUNCTION "function"
 #define KEYWORD_IF "if"
 #define KEYWORD_IFERROR "iferror"
@@ -30,8 +41,12 @@
 #define KEYWORD_WHILE "while"
 #define KEYWORD_WRITELN "writeln"
 
-#define TYPE_FLOAT "Float"
-#define TYPE_INT "Int"
+/*
+ * Liste des types (ordre alpha-numérique)
+ */
+
+#define TYPE_NONE "None"
+#define TYPE_NUMBER "Number"
 #define TYPE_STRING "String"
 
 #endif /* __SOARE_KEYWORDS_H__ */

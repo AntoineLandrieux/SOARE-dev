@@ -9,6 +9,12 @@
  *  `--. \| | | |  _  ||    /|  __|
  * /\__/ /\ \_/ / | | || |\ \| |___
  * \____/  \___/\_| |_/\_| \_\____/
+ *
+ * Antoine LANDRIEUX (WTFPL) <Tokenizer.c>
+ * <https://github.com/AntoineLandrieux/SOARE/>
+ *
+ * [!] Contribute and help me translate the comments!
+ *
  */
 
 #include <SOARE/SOARE.h>
@@ -16,7 +22,7 @@
 #include <SOARE/utils/keywords.h>
 
 /**
- * @brief
+ * @brief Vérifie si un caractère est un chiffre
  * @author Antoine LANDRIEUX
  *
  * @param _Char
@@ -29,7 +35,7 @@ static u8 chrNum(const char _Char)
 }
 
 /**
- * @brief
+ * @brief Vérifie si le caractère est une lettre
  * @author Antoine LANDRIEUX
  *
  * @param _Char
@@ -41,7 +47,7 @@ static u8 chrAlpha(const char _Char)
 }
 
 /**
- * @brief
+ * @brief Vérifie si le caractère est une lettre ou un chiffre
  * @author Antoine LANDRIEUX
  *
  * @param _Char
@@ -53,7 +59,7 @@ static u8 chrAlnum(const char _Char)
 }
 
 /**
- * @brief
+ * @brief Vérifie si le caractère est une nouvelle ligne
  * @author Antoine LANDRIEUX
  *
  * @param _Char
@@ -65,7 +71,7 @@ static u8 chrLn(const char _Char)
 }
 
 /**
- * @brief
+ * @brief Vérifie si le caractère est un espace
  * @author Antoine LANDRIEUX
  *
  * @param _Char
@@ -77,7 +83,7 @@ static u8 chrSpace(const char _Char)
 }
 
 /**
- * @brief
+ * @brief Vérifie si le caractère est un operateur
  * @author Antoine LANDRIEUX
  *
  * @param _String
@@ -89,7 +95,7 @@ static u8 chrOperator(const char _Char)
 }
 
 /**
- * @brief
+ * @brief Vérifie si la chaîne de caractères est un operateur
  * @author Antoine LANDRIEUX
  *
  * @param _String
@@ -105,7 +111,7 @@ static u8 strOperator(char *_String)
 }
 
 /**
- * @brief
+ * @brief Vérifie si la chaîne de caractères est un keyword
  * @author Antoine LANDRIEUX
  *
  * @param _String
@@ -115,29 +121,31 @@ static u8 strKeyword(char *_String)
 {
     return (
         //
-        !strcmp(KEYWORD_BREAK, _String) ||      // tk ok ps ok ex ok
-        !strcmp(KEYWORD_CONTINUE, _String) ||   // tk ok ps ok ex na
-        !strcmp(KEYWORD_DO, _String) ||         // tk ok ps ok ex na
-        !strcmp(KEYWORD_ELSE, _String) ||       // tk ok ps ok ex na
-        !strcmp(KEYWORD_END, _String) ||        // tk ok ps ok ex ok
-        !strcmp(KEYWORD_FUNCTION, _String) ||   // tk ok ps ok ex ok
-        !strcmp(KEYWORD_IF, _String) ||         // tk ok ps ok ex ok
-        !strcmp(KEYWORD_IFERROR, _String) ||    // tk ok ps ok ex ok
-        !strcmp(KEYWORD_LOADIMPORT, _String) || // tk ok ps ok ex ok
-        !strcmp(KEYWORD_NOP, _String) ||        // tk ok ps ok ex ok
-        !strcmp(KEYWORD_ORIF, _String) ||       // tk ok ps -- ex --
-        !strcmp(KEYWORD_PROMPT, _String) ||     // tk ok ps ok ex ok
-        !strcmp(KEYWORD_RAISE, _String) ||      // tk ok ps ok ex ok
-        !strcmp(KEYWORD_RETURN, _String) ||     // tk ok ps ok ex ok
-        !strcmp(KEYWORD_TRY, _String) ||        // tk ok ps -- ex --
-        !strcmp(KEYWORD_WHILE, _String) ||      // tk ok ps ok ex ok
-        !strcmp(KEYWORD_WRITELN, _String)       // tk ok ps ok ex --
+        !strcmp(KEYWORD_BREAK, _String) ||
+        !strcmp(KEYWORD_CONTINUE, _String) ||
+        !strcmp(KEYWORD_DO, _String) ||
+        !strcmp(KEYWORD_ELSE, _String) ||
+        !strcmp(KEYWORD_END, _String) ||
+        !strcmp(KEYWORD_ENUMERATE, _String) ||
+        !strcmp(KEYWORD_FUNCTION, _String) ||
+        !strcmp(KEYWORD_IF, _String) ||
+        !strcmp(KEYWORD_IFERROR, _String) ||
+        !strcmp(KEYWORD_LOADIMPORT, _String) ||
+        !strcmp(KEYWORD_NOP, _String) ||
+        !strcmp(KEYWORD_ORIF, _String) ||
+        !strcmp(KEYWORD_PROMPT, _String) ||
+        !strcmp(KEYWORD_RAISE, _String) ||
+        !strcmp(KEYWORD_RETURN, _String) ||
+        !strcmp(KEYWORD_TRY, _String) ||
+        !strcmp(KEYWORD_WHILE, _String) ||
+        !strcmp(KEYWORD_WRITELN, _String)
         //
     );
 }
 
 /**
- * @brief
+ * @brief Vérifie si la chaîne de caractères est un type
+ * @author Antoine LANDRIEUX
  *
  * @param _String
  * @return u8
@@ -146,15 +154,15 @@ static u8 strType(char *_String)
 {
     return (
         //
-        !strcmp(TYPE_FLOAT, _String) ||
-        !strcmp(TYPE_INT, _String) ||
+        !strcmp(TYPE_NONE, _String) ||
+        !strcmp(TYPE_NUMBER, _String) ||
         !strcmp(TYPE_STRING, _String)
         //
     );
 }
 
 /**
- * @brief
+ * @brief Donne le type de la chaîne de caractères
  *
  * @param _String
  * @return token_type
@@ -171,7 +179,8 @@ static token_type Symbol(char *_String)
 }
 
 /**
- * @brief
+ * @brief Retourne un document vide
+ * @author Antoine LANDRIEUX
  *
  * @return Document
  */
@@ -187,7 +196,8 @@ Document EmptyDocument()
 }
 
 /**
- * @brief
+ * @brief Créer un nouveau jeton
+ * @author Antoine LANDRIEUX
  *
  * @param _Filename
  * @param _Value
@@ -214,7 +224,8 @@ Tokens *Token(char *_Filename, char *_Value, token_type _Type)
 }
 
 /**
- * @brief
+ * @brief Libère la mémoire allouées par les jetons
+ * @author Antoine LANDRIEUX
  *
  * @param _Token
  */
@@ -229,7 +240,8 @@ void TokensFree(Tokens *_Token)
 }
 
 /**
- * @brief
+ * @brief Affiche les jetons
+ * @author Antoine LANDRIEUX
  *
  * @param _Token
  */
@@ -250,7 +262,8 @@ void TokensLog(Tokens *_Token)
 }
 
 /**
- * @brief
+ * @brief Coupe une chaîne de caractères
+ * @author Antoine LANDRIEUX
  *
  * @param _String
  * @param _Long
@@ -262,7 +275,7 @@ static char *strcut(const char *_String, size_t _Long)
         _Long = strlen(_String);
     char *result = (char *)malloc(_Long + 1);
     if (result == NULL)
-        return NULL;
+        return LeaveException(InterpreterError, "OUT OF MEMORY", EmptyDocument());
     for (size_t ptr = 0; ptr < _Long; ptr++)
         result[ptr] = _String[ptr];
     result[_Long] = 0;
@@ -270,7 +283,8 @@ static char *strcut(const char *_String, size_t _Long)
 }
 
 /**
- * @brief
+ * @brief Ajoute +1 à ln et remet col à 0
+ * @author Antoine LANDRIEUX
  *
  * @param ln
  * @param col
@@ -282,7 +296,8 @@ static void updateln(u64 *ln, u64 *col)
 }
 
 /**
- * @brief
+ * @brief Transforme une chaîne de caractère en une séquence de jetons
+ * @author Antoine LANDRIEUX
  *
  * @param _Filename
  * @param _Text
@@ -354,9 +369,9 @@ Tokens *Tokenizer(char *_Filename, char *_Text)
             type = *_Text == ';' ? TKN_SEMICOLON : (*_Text == '!' ? TKN_FUNCTION : TKN_OPERATOR);
         }
 
-        else if (chrAlpha(*_Text))
+        else if (chrAlpha(*_Text) || *_Text == '_')
         {
-            while (chrAlnum((&*_Text)[offset]))
+            while (chrAlnum((&*_Text)[offset]) || (&*_Text)[offset] == '_')
                 offset++;
             content = strcut(&*_Text, offset);
             type = Symbol(content);
