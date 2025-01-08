@@ -408,8 +408,10 @@ Tokens *Tokenizer(char *_Filename, char *_Text)
         curr->next = Token(_Filename, NULL, TKN_EOF);
         curr = curr->next;
 
-        for (u64 i = 0; i < offset; col += (volatile u64)i++)
+        u64 i = 0;
+        for (; i < offset; col += i++)
             (volatile char *)_Text++;
+        col += i;
     }
 
     return token;

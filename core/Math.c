@@ -38,14 +38,35 @@ static u8 isNaN(char *_String)
     return 0;
 }
 
+static char *vardup(char *_Value)
+{
+    if (_Value == NULL)
+        return NULL;
+    char *result = strdup(_Value);
+    if (result == NULL)
+        return LeaveException(InterpreterError, "OUT OF MEMORY", EmptyDocument());
+    return result;
+}
+
+static char *varintdup(char *_Value)
+{
+    if (_Value == NULL)
+        return NULL;
+    size_t size = strlen(_Value) + 1;
+    char *result = malloc(size);
+    if (result == NULL)
+        LeaveException(InterpreterError, "OUT OF MEMORY", EmptyDocument());
+    snprintf(result, size, "%.f", atof(_Value));
+    return result;
+}
+
 char *Math(char *_Type, AST *_Tree)
 {
     double dx, dy;
     char *sx, *sy;
     char *result = NULL;
-    MEM *get = NULL;
 
-    size_t size = 0;
+    MEM *get = NULL;
 
     switch (_Tree->type)
     {
@@ -57,43 +78,21 @@ char *Math(char *_Type, AST *_Tree)
             return LeaveException(UndefinedReference, _Tree->value, _Tree->file);
 
         if (!strcmp(get->type, TYPE_NUMBER))
-        {
-            size = strlen(get->value) + 1;
-            result = malloc(size);
-            snprintf(result, size, "%.f", atof(get->value));
-            return result;
-        }
-
+            return varintdup(get->value);
         else if (!strcmp(get->type, TYPE_STRING))
-            return strdup(get->value);
+            return vardup(get->value);
 
         break;
 
     case NODE_NUMBER:
 
-        result = strdup(_Tree->value);
-        if (result == NULL)
-            LeaveException(InterpreterError, "OUT OF MEMORY", EmptyDocument());
-        return result;
+        return vardup(_Tree->value);
 
     case NODE_STRING:
 
         if (!strcmp(_Type, TYPE_NUMBER))
-        {
-            size = strlen(_Tree->value) + 1;
-            result = malloc(size);
-
-            if (result == NULL)
-                LeaveException(InterpreterError, "OUT OF MEMORY", EmptyDocument());
-
-            snprintf(result, size, "%.f", atof(_Tree->value));
-            return result;
-        }
-
-        result = strdup(_Tree->value);
-        if (result == NULL)
-            LeaveException(InterpreterError, "OUT OF MEMORY", EmptyDocument());
-        return result;
+            return varintdup(_Tree->value);
+        return vardup(_Tree->value);
 
     case NODE_OPERATOR:
 
@@ -125,7 +124,10 @@ char *Math(char *_Type, AST *_Tree)
             }
 
             else
+            {
+                free(result);
                 return LeaveException(TypeError, _Tree->value, _Tree->file);
+            }
         }
 
         dx = atof(Math(_Type, _Tree->child));
@@ -175,12 +177,10 @@ char *Math(char *_Type, AST *_Tree)
                 snprintf(result, 50, "%d", dx > dy);
                 break;
             default:
-                LeaveException(MathError, _Tree->value, _Tree->file);
                 free(result);
-                return NULL;
+                return LeaveException(MathError, _Tree->value, _Tree->file);
             }
         }
-
         return result;
 
     default:

@@ -46,36 +46,44 @@ int Console()
     std::string file = __SOARE_FILE__;
 
     std::cout
+#ifndef __SOARE_NO_COLORED_OUTPUT
+        << "\033[1;34m"
+#endif /* __SOARE_NO_COLORED_OUTPUT */
         << "SOARE v" << SOARE_MAJOR << "." << SOARE_MINOR << "." << SOARE_PATCH
         << " Antoine LANDRIEUX (WTFPL)\n"
         << "<https://github.com/AntoineLandrieux/SOARE>\n"
+#ifndef __SOARE_NO_COLORED_OUTPUT
+        << "\033[0m"
+#endif /* __SOARE_NO_COLORED_OUTPUT */
         << "Enter 'commit' to run code or 'exit' to quit.\n"
         << std::endl;
 
-    while (1)
+    while (true)
     {
+        std::cout
 #ifndef __SOARE_NO_COLORED_OUTPUT
-        std::cout << "\033[0;35m";
+            << "\033[0;35m"
 #endif /* __SOARE_NO_COLORED_OUTPUT */
-        std::cout << ">>> ";
+            << ">>> "
 #ifndef __SOARE_NO_COLORED_OUTPUT
-        std::cout << "\033[0;39m";
+               "\033[0;39m"
 #endif /* __SOARE_NO_COLORED_OUTPUT */
+            ;
 
         std::string user = "";
         std::getline(std::cin, user);
 
-        if (user == "commit")
+        if (user == "run" || user == "commit")
         {
             SOARE::Execute(const_cast<char *>(file.c_str()), const_cast<char *>(exe.c_str()));
-            exe = "";
-            continue;
+            exe = user == "commit" ? "" : exe;
         }
 
         else if (user == "exit")
             return EXIT_SUCCESS;
 
-        exe.append(user + "\n");
+        else
+            exe.append(user + "\n");
     }
 
     return EXIT_SUCCESS;
@@ -91,5 +99,5 @@ int main(int argc, char *argv[])
 static void __attribute__((destructor)) kill(void)
 {
     if (CONSOLE)
-        fprintf(stderr, "\nBye!\n");
+        std::cerr << "\nBye!\n";
 }

@@ -120,6 +120,7 @@ void *MemFree(MEM *_Memory)
         return NULL;
 
     MemFree(_Memory->next);
+    free(_Memory->value);
     free(_Memory);
     return NULL;
 }

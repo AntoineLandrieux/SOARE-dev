@@ -181,8 +181,7 @@ char *Runtime(char *_Type, AST *_Tree)
 
         case NODE_OUTPUT:
             returned = Math(TYPE_STRING, curr->child);
-            if (returned != NULL)
-                printf("%s\n", returned);
+            printf("%s\n", returned == NULL ? "" : returned);
             break;
 
         case NODE_RETURN:
