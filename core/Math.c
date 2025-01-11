@@ -28,6 +28,13 @@
 #include <string.h>
 #include <math.h>
 
+/**
+ * @brief Retourne 1 si la chaîne de caractères est un nombre
+ * @author Antoine LANDRIEUX
+ * 
+ * @param _String 
+ * @return u8 
+ */
 static u8 isNaN(char *_String)
 {
     for (u8 dot = 1; *_String; (volatile char *)_String++)
@@ -38,6 +45,13 @@ static u8 isNaN(char *_String)
     return 0;
 }
 
+/**
+ * @brief Copie une chaîne de caractères
+ * @author Antoine LANDRIEUX
+ * 
+ * @param _Value 
+ * @return char* 
+ */
 static char *vardup(char *_Value)
 {
     if (_Value == NULL)
@@ -48,6 +62,13 @@ static char *vardup(char *_Value)
     return result;
 }
 
+/**
+ * @brief Copie une chaîne de caractères nombre
+ * @author Antoine LANDRIEUX
+ * 
+ * @param _Value 
+ * @return char* 
+ */
 static char *varintdup(char *_Value)
 {
     if (_Value == NULL)
@@ -60,6 +81,14 @@ static char *varintdup(char *_Value)
     return result;
 }
 
+/**
+ * @brief Évalue l'expression mathématique d'un arbre pour en sortir une valeur en fonction du type
+ * @author Antoine LANDRIEUX
+ *
+ * @param _Type
+ * @param _Tree
+ * @return char*
+ */
 char *Math(char *_Type, AST *_Tree)
 {
     double dx, dy;

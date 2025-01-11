@@ -55,7 +55,7 @@ int Console()
 #ifndef __SOARE_NO_COLORED_OUTPUT
         << "\033[0m"
 #endif /* __SOARE_NO_COLORED_OUTPUT */
-        << "Enter 'commit' to run code or 'exit' to quit.\n"
+        << "Enter 'run' or 'commit' to run code or 'exit' to quit.\n"
         << std::endl;
 
     while (true)

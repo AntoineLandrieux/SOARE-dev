@@ -94,9 +94,7 @@ MEM *MemPush(MEM *_Memory, char *_Name, char *_Type, char *_Value)
  * @author Antoine LANDRIEUX
  *
  * @param _Memory
- * @param _Name
  * @param _Type
- * @param ...
  */
 MEM *MemSet(MEM *_Memory, char *_Value)
 {
