@@ -31,9 +31,9 @@
 /**
  * @brief Retourne 1 si la chaîne de caractères est un nombre
  * @author Antoine LANDRIEUX
- * 
- * @param _String 
- * @return u8 
+ *
+ * @param _String
+ * @return u8
  */
 static u8 isNaN(char *_String)
 {
@@ -48,9 +48,9 @@ static u8 isNaN(char *_String)
 /**
  * @brief Copie une chaîne de caractères
  * @author Antoine LANDRIEUX
- * 
- * @param _Value 
- * @return char* 
+ *
+ * @param _Value
+ * @return char*
  */
 static char *vardup(char *_Value)
 {
@@ -65,9 +65,9 @@ static char *vardup(char *_Value)
 /**
  * @brief Copie une chaîne de caractères nombre
  * @author Antoine LANDRIEUX
- * 
- * @param _Value 
- * @return char* 
+ *
+ * @param _Value
+ * @return char*
  */
 static char *varintdup(char *_Value)
 {
@@ -96,6 +96,7 @@ char *Math(char *_Type, AST *_Tree)
     char *result = NULL;
 
     MEM *get = NULL;
+    char *tmp = NULL;
 
     switch (_Tree->type)
     {
@@ -108,10 +109,23 @@ char *Math(char *_Type, AST *_Tree)
 
         if (!strcmp(get->type, TYPE_NUMBER))
             return varintdup(get->value);
-        else if (!strcmp(get->type, TYPE_STRING))
-            return vardup(get->value);
 
-        break;
+        return vardup(get->value);
+
+    case NODE_CALL:
+
+        result = RunFunction(_Tree);
+
+        if (!strcmp(get->type, TYPE_NUMBER))
+        {
+            tmp = varintdup(result);
+            free(result);
+            return tmp;
+        }
+
+        tmp = vardup(result);
+        free(result);
+        return tmp;
 
     case NODE_NUMBER:
 

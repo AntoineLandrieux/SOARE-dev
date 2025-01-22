@@ -22,8 +22,49 @@
 #include <SOARE/utils/keywords.h>
 
 MEM *MEMORY = NULL;
+static MEM *FUNCTION = NULL;
 
 static u8 broken = 0;
+
+/**
+ * @brief Execute une fonction
+ * @author Antoine LANDRIEUX
+ *
+ * @deprecated
+ *
+ * @param _Tree
+ * @return char*
+ */
+char *RunFunction(AST *_Tree)
+{
+    AST *root = BranchRoot(_Tree);
+    AST *func = BranchFind(root, _Tree->value, NODE_FUNCTION);
+
+    if (func == NULL)
+        return LeaveException(UndefinedReference, _Tree->value, _Tree->file);
+    
+    AST *ptr = func->child->sibling;
+    AST *call = _Tree->child;
+    FUNCTION = Mem();
+
+    while (ptr != NULL)
+    {
+        if (ptr->type == NODE_BODY)
+            return Runtime(func->child->value, ptr);
+
+        if (call == NULL)
+        {
+            FUNCTION = MemFree(FUNCTION);
+            return LeaveException(UndefinedReference, ptr->value, _Tree->file);
+        }
+
+        MemPush(FUNCTION, ptr->value, ptr->child->value, Math(ptr->child->value, call));
+        call = call->sibling;
+        ptr = ptr->sibling;
+    }
+
+    return NULL;
+}
 
 /**
  * @brief Execute le code à partir d'un arbre et retourne une valeur en fonction du type
@@ -43,7 +84,9 @@ char *Runtime(char *_Type, AST *_Tree)
     if (MEMORY == NULL)
         MEMORY = Mem();
 
-    MEM *MEM_PTR = MemLast(MEMORY);
+    MemJoin(MEMORY, FUNCTION);
+    MEM *MEM_PTR = MemLast(MemLast(MEMORY));
+    FUNCTION = NULL;
 
 #define __FREE_MEM         \
     if (MEM_PTR != MEMORY) \
@@ -67,6 +110,10 @@ char *Runtime(char *_Type, AST *_Tree)
         case NODE_CONTINUE:
             __FREE_MEM;
             return NULL;
+
+        case NODE_CALL:
+            free(RunFunction(curr));
+            break;
 
         case NODE_MEMCREATE:
             MemPush(

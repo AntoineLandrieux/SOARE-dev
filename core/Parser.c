@@ -73,6 +73,42 @@ AST *JoinBranch(Node *_Parent, Node *_Child)
 }
 
 /**
+ * @brief Retourne le noeud racine
+ * @author Antoine LANDRIEUX
+ *
+ * @param _Tree
+ * @return Node*
+ */
+Node *BranchRoot(AST *_Tree)
+{
+    if (_Tree == NULL)
+        return NULL;
+    for (; _Tree->parent != NULL; _Tree = _Tree->parent)
+        ;
+    return _Tree->type == NODE_ROOT ? _Tree : NULL;
+}
+
+/**
+ * @brief Retrouve un noeud
+ * @author Antoine LANDRIEUX
+ *
+ * @param _Tree
+ * @param _Value
+ * @param _Type
+ * @return Node*
+ */
+Node *BranchFind(AST *_Tree, char *_Value, node_type _Type)
+{
+    if (_Tree == NULL)
+        return NULL;
+    if (!strcmp(_Value == NULL ? "" : _Value, _Tree->value == NULL ? "" : _Tree->value) && _Tree->type == _Type)
+        return _Tree;
+    Node *L = BranchFind(_Tree->child, _Value, _Type);
+    Node *R = BranchFind(_Tree->sibling, _Value, _Type);
+    return L == NULL ? R : L;
+}
+
+/**
  * @brief Libère la mémoire allouée par le noeud et les noeuds lié avec lui
  * @author Antoine LANDRIEUX
  *
@@ -177,9 +213,8 @@ static AST *ParseValue(Tokens **_Tokens)
 
         Next(_Tokens);
 
-        while (1)
+        while ((*_Tokens)->type != TKN_PARENR)
         {
-            TokensLog(*_Tokens);
             AST *expr = ParseExpr(_Tokens, 0xFF);
 
             if (expr == NULL)
@@ -435,14 +470,17 @@ AST *Parse(Tokens *_Tokens)
                 Next(&_Tokens);
                 Next(&_Tokens);
                 JoinBranch(function, type);
-                JoinBranch(function, body);
                 JoinBranch(curr, function);
 
                 while (1)
                 {
+                    if (_Tokens->type == TKN_PARENR)
+                        break;
+
                     if (_Tokens->type != TKN_TYPE || _Tokens->next->type != TKN_NAME)
                     {
                         TreeFree(root);
+                        TreeFree(body);
                         return LeaveException(SyntaxError, _Tokens->value, _Tokens->file);
                     }
 
@@ -463,17 +501,10 @@ AST *Parse(Tokens *_Tokens)
                     Next(&_Tokens);
 
                     if (_Tokens->type == TKN_SEMICOLON)
-                    {
                         Next(&_Tokens);
-                        continue;
-                    }
-                    else if (_Tokens->type == TKN_PARENR)
-                        break;
-
-                    TreeFree(root);
-                    return LeaveException(SyntaxError, _Tokens->value, _Tokens->file);
                 }
 
+                JoinBranch(function, body);
                 Next(&_Tokens);
                 curr = body;
             }

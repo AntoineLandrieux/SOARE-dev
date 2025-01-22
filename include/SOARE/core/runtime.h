@@ -22,20 +22,31 @@
 extern MEM *MEMORY;
 
 /**
+ * @brief Execute une fonction
+ * @author Antoine LANDRIEUX
+ *
+ * @deprecated
+ *
+ * @param _Tree
+ * @return char*
+ */
+char *RunFunction(AST *_Tree);
+
+/**
  * @brief Execute le code à partir d'un arbre et retourne une valeur en fonction du type
  * @author Antoine LANDRIEUX
- * 
- * @param _Type 
- * @param _Tree 
- * @return char* 
+ *
+ * @param _Type
+ * @param _Tree
+ * @return char*
  */
 char *Runtime(char *_Type, AST *_Tree);
 
 /**
  * @brief Execute le code à partir d'une chaîne de caractères
  * @author Antoine LANDRIEUX
- * 
- * @param _RawCode 
+ *
+ * @param _RawCode
  */
 int Execute(char *_File, char *_RawCode);
 

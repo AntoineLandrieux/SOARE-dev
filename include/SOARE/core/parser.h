@@ -58,7 +58,7 @@ typedef enum node_type
  */
 typedef struct Node
 {
-    
+
     // Valeur du noeud
     char *value;
     // Type du noeud
@@ -82,46 +82,66 @@ typedef Node AST;
 /**
  * @brief Créer un nouveau noeud
  * @author Antoine LANDRIEUX
- * 
- * @param _Value 
- * @param _Type 
- * @param _File 
- * @return Node* 
+ *
+ * @param _Value
+ * @param _Type
+ * @param _File
+ * @return Node*
  */
 Node *Branch(char *_Value, node_type _Type, Document _File);
 
 /**
+ * @brief Retourne le noeud racine
+ * @author Antoine LANDRIEUX
+ *
+ * @param _Tree
+ * @return Node*
+ */
+Node *BranchRoot(AST *_Tree);
+
+/**
+ * @brief Retrouve un noeud
+ * @author Antoine LANDRIEUX
+ *
+ * @param _Tree
+ * @param _Value
+ * @param _Type
+ * @return Node*
+ */
+Node *BranchFind(AST *_Tree, char *_Value, node_type _Type);
+
+/**
  * @brief Lie 2 branches
  * @author Antoine LANDRIEUX
- * 
- * @param _Parent 
- * @param _Child 
- * @return AST* 
+ *
+ * @param _Parent
+ * @param _Child
+ * @return AST*
  */
 AST *JoinBranch(Node *_Parent, Node *_Child);
 
 /**
  * @brief Libère la mémoire allouée par le noeud et les noeuds lié avec lui
  * @author Antoine LANDRIEUX
- * 
- * @param _Tree 
+ *
+ * @param _Tree
  */
 void TreeFree(AST *_Tree);
 
 /**
  * @brief Affiche le noeud et les noeuds liés avec lui
  * @author Antoine LANDRIEUX
- * 
- * @param _Tree 
+ *
+ * @param _Tree
  */
 void TreeLog(AST *_Tree);
 
 /**
  * @brief Transforme une séquence de jetons en arbre (AST)
  * @author Antoine LANDRIEUX
- * 
- * @param _Tokens 
- * @return AST* 
+ *
+ * @param _Tokens
+ * @return AST*
  */
 AST *Parse(Tokens *_Tokens);
 

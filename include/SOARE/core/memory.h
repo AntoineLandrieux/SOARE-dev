@@ -77,15 +77,6 @@ MEM *MemPush(MEM *_Memory, char *_Name, char *_Type, char *_Value);
 MEM *MemSet(MEM *_Memory, char *_Value);
 
 /**
- * @brief Libére la mémoire allouée
- * @author Antoine LANDRIEUX
- *
- * @param _Memory
- * @return void* (retourne toujours NULL)
- */
-void *MemFree(MEM *_Memory);
-
-/**
  * @brief Trouve une varible dans la mémoire
  * @author Antoine LANDRIEUX
  *
@@ -96,11 +87,29 @@ void *MemFree(MEM *_Memory);
 MEM *MemGet(MEM *_Memory, char *_Name);
 
 /**
+ * @brief Lie 2 mémoires
+ * @author Antoine LANDRIEUX
+ *
+ * @param _To
+ * @param _From
+ */
+void MemJoin(MEM *_To, MEM *_From);
+
+/**
  * @brief Affiche l'essemble des variables de la mémoire
  * @author Antoine LANDRIEUX
  *
  * @param _Memory
  */
 void MemLog(MEM *_Memory);
+
+/**
+ * @brief Libére la mémoire allouée
+ * @author Antoine LANDRIEUX
+ *
+ * @param _Memory
+ * @return void* (retourne toujours NULL)
+ */
+void *MemFree(MEM *_Memory);
 
 #endif /* __SOARE_MEMORY_H__ */

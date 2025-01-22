@@ -10,13 +10,19 @@
  *  `--. \| | | |  _  ||    /|  __|
  * /\__/ /\ \_/ / | | || |\ \| |___
  * \____/  \___/\_| |_/\_| \_\____/
+ *
+ * Antoine LANDRIEUX (WTFPL) <Main.cpp>
+ * <https://github.com/AntoineLandrieux/SOARE/>
+ *
+ * [!] Contribute and help me translate the comments!
+ *
  */
 
 #include <SOARE/SOARE.h>
 
 static unsigned char CONSOLE = 0;
 
-int RunFromFile(int argc, char *argv[])
+static int RunFromFile(int argc, char *argv[])
 {
     std::string error = FileError;
 
@@ -39,7 +45,7 @@ int RunFromFile(int argc, char *argv[])
     return EXIT_SUCCESS;
 }
 
-int Console()
+static int Console()
 {
     CONSOLE = 1;
     std::string exe = "";

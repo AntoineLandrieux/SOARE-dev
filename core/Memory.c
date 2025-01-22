@@ -106,24 +106,6 @@ MEM *MemSet(MEM *_Memory, char *_Value)
 }
 
 /**
- * @brief Libére la mémoire allouée
- * @author Antoine LANDRIEUX
- *
- * @param _Memory
- * @return void* (retourne toujours NULL)
- */
-void *MemFree(MEM *_Memory)
-{
-    if (_Memory == NULL)
-        return NULL;
-
-    MemFree(_Memory->next);
-    free(_Memory->value);
-    free(_Memory);
-    return NULL;
-}
-
-/**
  * @brief Trouve une varible dans la mémoire
  * @author Antoine LANDRIEUX
  *
@@ -158,4 +140,36 @@ void MemLog(MEM *_Memory)
         _Memory->type,
         _Memory->value);
     MemLog(_Memory->next);
+}
+
+/**
+ * @brief Lie 2 mémoires
+ * @author Antoine LANDRIEUX
+ *
+ * @param _To
+ * @param _From
+ */
+void MemJoin(MEM *_To, MEM *_From)
+{
+    if (_To == NULL || _From == NULL)
+        return;
+    MemLast(_To)->next = _From;
+}
+
+/**
+ * @brief Libére la mémoire allouée
+ * @author Antoine LANDRIEUX
+ *
+ * @param _Memory
+ * @return void* (retourne toujours NULL)
+ */
+void *MemFree(MEM *_Memory)
+{
+    if (_Memory == NULL)
+        return NULL;
+
+    MemFree(_Memory->next);
+    free(_Memory->value);
+    free(_Memory);
+    return NULL;
 }
