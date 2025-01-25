@@ -17,7 +17,7 @@ ECHO " /\__/ /\ \_/ / | | || |\ \| |___  "
 ECHO " \____/  \___/\_| |_/\_| \_\____/  "
 ECHO.
 ECHO SOARE Installer
-ECHO Antoine LANDRIEUX (WTFPL) install.bat
+ECHO Antoine LANDRIEUX (MIT License) install.bat
 ECHO https://github.com/AntoineLandrieux/SOARE/
 ECHO.
 

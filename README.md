@@ -3,7 +3,7 @@
 
 # ![LOGO](resources/github/logo.svg)
 
-SOARE is distributed under the [WTFPL](LICENSE).
+SOARE is distributed under the [MIT License](LICENSE).
 
 ---
 
@@ -27,4 +27,4 @@ Contributions are most welcome by forking the repository and sending a pull requ
 
 See [SOARE Authors](AUTHORS)
 
-[![WTFPL](http://www.wtfpl.net/wp-content/uploads/2012/12/wtfpl-badge-2.png)](http://www.wtfpl.net/)
+[![MIT License](http://www.MIT License.net/wp-content/uploads/2012/12/MIT License-badge-2.png)](http://www.MIT License.net/)

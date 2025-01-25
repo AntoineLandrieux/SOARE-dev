@@ -7,7 +7,7 @@
 # /\__/ /\ \_/ / | | || |\ \| |___
 # \____/  \___/\_| |_/\_| \_\____/
 #
-# Antoine LANDRIEUX (WTFPL) <Makefile>
+# Antoine LANDRIEUX (MIT License) <Makefile>
 # <https://github.com/AntoineLandrieux/SOARE/>
 #
 

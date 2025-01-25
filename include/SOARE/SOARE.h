@@ -11,7 +11,7 @@
  * /\__/ /\ \_/ / | | || |\ \| |___
  * \____/  \___/\_| |_/\_| \_\____/
  *
- * Antoine LANDRIEUX (WTFPL) <SOARE.h>
+ * Antoine LANDRIEUX (MIT License) <SOARE.h>
  * <https://github.com/AntoineLandrieux/SOARE/>
  *
  * [!] Contribute and help me translate the comments!

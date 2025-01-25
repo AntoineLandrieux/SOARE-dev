@@ -11,7 +11,7 @@
  * /\__/ /\ \_/ / | | || |\ \| |___
  * \____/  \___/\_| |_/\_| \_\____/
  *
- * Antoine LANDRIEUX (WTFPL) <Main.cpp>
+ * Antoine LANDRIEUX (MIT License) <Main.cpp>
  * <https://github.com/AntoineLandrieux/SOARE/>
  *
  * [!] Contribute and help me translate the comments!
@@ -56,7 +56,7 @@ static int Console()
         << "\033[1;34m"
 #endif /* __SOARE_NO_COLORED_OUTPUT */
         << "SOARE v" << SOARE_MAJOR << "." << SOARE_MINOR << "." << SOARE_PATCH
-        << " Antoine LANDRIEUX (WTFPL)\n"
+        << " Antoine LANDRIEUX (MIT License)\n"
         << "<https://github.com/AntoineLandrieux/SOARE>\n"
 #ifndef __SOARE_NO_COLORED_OUTPUT
         << "\033[0m"

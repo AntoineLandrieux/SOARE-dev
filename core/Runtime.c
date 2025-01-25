@@ -10,7 +10,7 @@
  * /\__/ /\ \_/ / | | || |\ \| |___
  * \____/  \___/\_| |_/\_| \_\____/
  *
- * Antoine LANDRIEUX (WTFPL) <Runtime.c>
+ * Antoine LANDRIEUX (MIT License) <Runtime.c>
  * <https://github.com/AntoineLandrieux/SOARE/>
  *
  * [!] Contribute and help me translate the comments!
@@ -24,8 +24,6 @@
 MEM *MEMORY = NULL;
 static MEM *FUNCTION = NULL;
 
-static u8 broken = 0;
-
 /**
  * @brief Execute une fonction
  * @author Antoine LANDRIEUX
@@ -37,14 +35,13 @@ static u8 broken = 0;
  */
 char *RunFunction(AST *_Tree)
 {
-    AST *root = BranchRoot(_Tree);
-    AST *func = BranchFind(root, _Tree->value, NODE_FUNCTION);
-
+    AST *func = BranchFind(_Tree->parent->child, _Tree->value, NODE_FUNCTION);
+    
     if (func == NULL)
         return LeaveException(UndefinedReference, _Tree->value, _Tree->file);
-    
+
     AST *ptr = func->child->sibling;
-    AST *call = _Tree->child;
+    AST *src = _Tree->child;
     FUNCTION = Mem();
 
     while (ptr != NULL)
@@ -52,14 +49,14 @@ char *RunFunction(AST *_Tree)
         if (ptr->type == NODE_BODY)
             return Runtime(func->child->value, ptr);
 
-        if (call == NULL)
+        if (src == NULL)
         {
             FUNCTION = MemFree(FUNCTION);
             return LeaveException(UndefinedReference, ptr->value, _Tree->file);
         }
 
-        MemPush(FUNCTION, ptr->value, ptr->child->value, Math(ptr->child->value, call));
-        call = call->sibling;
+        MemPush(FUNCTION, ptr->value, ptr->child->value, Math(ptr->child->value, src));
+        src = src->sibling;
         ptr = ptr->sibling;
     }
 
@@ -105,8 +102,6 @@ char *Runtime(char *_Type, AST *_Tree)
             // TODO: implement import
             break;
 
-        case NODE_BREAK:
-            broken = 1;
         case NODE_CONTINUE:
             __FREE_MEM;
             return NULL;
@@ -177,25 +172,19 @@ char *Runtime(char *_Type, AST *_Tree)
             }
 
             free(returned);
-
-            if (broken)
-                return NULL;
-
             break;
 
         case NODE_REPETITION:
 
             returned = Math(TYPE_NUMBER, curr->child);
-            broken = 0;
 
-            if (returned == NULL)
-                break;
-
-            while (strcmp(returned, "0") && !broken)
+            while (returned != NULL)
             {
+                if (!strcmp(returned, "0"))
+                    break;
                 free(returned);
-                returned = Runtime(_Type, curr->child->sibling);
-                if (returned != NULL || broken)
+                returned = Runtime(_Type, curr->child->sibling);                
+                if (returned != NULL)
                 {
                     __FREE_MEM;
                     return returned;
@@ -211,19 +200,17 @@ char *Runtime(char *_Type, AST *_Tree)
             IgnoreException(0x1);
             returned = Runtime(_Type, curr->child);
             IgnoreException(0x0);
-
             if (ErrorLevel())
             {
+                free(returned);
                 ClearException();
                 returned = Runtime(_Type, curr->child->sibling);
             }
-
             if (returned != NULL)
             {
                 __FREE_MEM;
                 return returned;
             }
-
             break;
 
         case NODE_OUTPUT:
@@ -267,7 +254,7 @@ int Execute(char *_File, char *_RawCode)
     TreeLog(ast);
 #endif
 
-    free(Runtime(TYPE_NUMBER, ast));
+    free(Runtime(TYPE_NONE, ast));
 
 #ifdef __SOARE_DEBUG
     MemLog(MEMORY);

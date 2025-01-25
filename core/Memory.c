@@ -11,7 +11,7 @@
  * /\__/ /\ \_/ / | | || |\ \| |___
  * \____/  \___/\_| |_/\_| \_\____/
  *
- * Antoine LANDRIEUX (WTFPL) <Memory.c>
+ * Antoine LANDRIEUX (MIT License) <Memory.c>
  * <https://github.com/AntoineLandrieux/SOARE/>
  *
  * [!] Contribute and help me translate the comments!

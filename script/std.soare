@@ -1,12 +1,12 @@
 
 ? @brief isset
-function None isset(None object)
+@None isset(None object)
     return object; end;
 
 ? @brief StringtoNumber
-function Number StoN(String str)
+@Number StoN(String str)
     return str; end;
 
 ? @brief itoa
-function String NtoS(Number nbr)
+@String NtoS(Number nbr)
     return nbr; end;

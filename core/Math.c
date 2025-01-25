@@ -12,7 +12,7 @@
  * /\__/ /\ \_/ / | | || |\ \| |___
  * \____/  \___/\_| |_/\_| \_\____/
  *
- * Antoine LANDRIEUX (WTFPL) <Math.c>
+ * Antoine LANDRIEUX (MIT License) <Math.c>
  * <https://github.com/AntoineLandrieux/SOARE/>
  *
  * [!] Contribute and help me translate the comments!
@@ -116,16 +116,14 @@ char *Math(char *_Type, AST *_Tree)
 
         result = RunFunction(_Tree);
 
-        if (!strcmp(get->type, TYPE_NUMBER))
+        if (!strcmp(_Type, TYPE_NUMBER))
         {
             tmp = varintdup(result);
             free(result);
             return tmp;
         }
 
-        tmp = vardup(result);
-        free(result);
-        return tmp;
+        return result;
 
     case NODE_NUMBER:
 

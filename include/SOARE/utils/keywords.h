@@ -11,7 +11,7 @@
  * /\__/ /\ \_/ / | | || |\ \| |___
  * \____/  \___/\_| |_/\_| \_\____/
  *
- * Antoine LANDRIEUX (WTFPL) <keywords.h>
+ * Antoine LANDRIEUX (MIT License) <keywords.h>
  * <https://github.com/AntoineLandrieux/SOARE/>
  *
  * [!] Contribute and help me translate the comments!
@@ -22,19 +22,16 @@
  * Liste des keywords (ordre alpha-numérique)
  */
 
-#define KEYWORD_BREAK "break"
 #define KEYWORD_CONTINUE "continue"
 #define KEYWORD_DO "do"
 #define KEYWORD_ELSE "else"
 #define KEYWORD_END "end"
 #define KEYWORD_ENUMERATE "enumerate"
-#define KEYWORD_FUNCTION "function"
 #define KEYWORD_IF "if"
 #define KEYWORD_IFERROR "iferror"
+#define KEYWORD_INPUTLN "inputln"
 #define KEYWORD_LOADIMPORT "loadimport"
-#define KEYWORD_NOP "nop"
 #define KEYWORD_ORIF "orif"
-#define KEYWORD_PROMPT "prompt"
 #define KEYWORD_RAISE "raise"
 #define KEYWORD_RETURN "return"
 #define KEYWORD_TRY "try"
@@ -45,6 +42,7 @@
  * Liste des types (ordre alpha-numérique)
  */
 
+#define TYPE_ARRAYLIST "ArrayList"
 #define TYPE_NONE "None"
 #define TYPE_NUMBER "Number"
 #define TYPE_STRING "String"

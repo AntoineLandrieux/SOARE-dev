@@ -11,7 +11,7 @@
  * /\__/ /\ \_/ / | | || |\ \| |___
  * \____/  \___/\_| |_/\_| \_\____/
  *
- * Antoine LANDRIEUX (WTFPL) <parser.h>
+ * Antoine LANDRIEUX (MIT License) <parser.h>
  * <https://github.com/AntoineLandrieux/SOARE/>
  *
  * [!] Contribute and help me translate the comments!
@@ -26,7 +26,6 @@ typedef enum node_type
 {
 
     NODE_ROOT,
-    NODE_NOP,
     NODE_TRY,
     NODE_BODY,
     NODE_TYPE,
@@ -47,7 +46,6 @@ typedef enum node_type
     NODE_CONDITION,
     NODE_REPETITION,
     NODE_RETURN,
-    NODE_BREAK,
     NODE_CONTINUE
 
 } node_type;
@@ -91,24 +89,15 @@ typedef Node AST;
 Node *Branch(char *_Value, node_type _Type, Document _File);
 
 /**
- * @brief Retourne le noeud racine
- * @author Antoine LANDRIEUX
- *
- * @param _Tree
- * @return Node*
- */
-Node *BranchRoot(AST *_Tree);
-
-/**
  * @brief Retrouve un noeud
  * @author Antoine LANDRIEUX
  *
- * @param _Tree
+ * @param _Source
  * @param _Value
  * @param _Type
  * @return Node*
  */
-Node *BranchFind(AST *_Tree, char *_Value, node_type _Type);
+Node *BranchFind(AST *_Source, char *_Value, node_type _Type);
 
 /**
  * @brief Lie 2 branches
@@ -118,7 +107,7 @@ Node *BranchFind(AST *_Tree, char *_Value, node_type _Type);
  * @param _Child
  * @return AST*
  */
-AST *JoinBranch(Node *_Parent, Node *_Child);
+AST *BranchJoin(Node *_Parent, Node *_Child);
 
 /**
  * @brief Libère la mémoire allouée par le noeud et les noeuds lié avec lui

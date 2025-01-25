@@ -10,7 +10,7 @@
  * /\__/ /\ \_/ / | | || |\ \| |___
  * \____/  \___/\_| |_/\_| \_\____/
  *
- * Antoine LANDRIEUX (WTFPL) <Tokenizer.c>
+ * Antoine LANDRIEUX (MIT License) <Tokenizer.c>
  * <https://github.com/AntoineLandrieux/SOARE/>
  *
  * [!] Contribute and help me translate the comments!
@@ -121,19 +121,16 @@ static u8 strKeyword(char *_String)
 {
     return (
         //
-        !strcmp(KEYWORD_BREAK, _String) ||
         !strcmp(KEYWORD_CONTINUE, _String) ||
         !strcmp(KEYWORD_DO, _String) ||
         !strcmp(KEYWORD_ELSE, _String) ||
         !strcmp(KEYWORD_END, _String) ||
         !strcmp(KEYWORD_ENUMERATE, _String) ||
-        !strcmp(KEYWORD_FUNCTION, _String) ||
         !strcmp(KEYWORD_IF, _String) ||
         !strcmp(KEYWORD_IFERROR, _String) ||
+        !strcmp(KEYWORD_INPUTLN, _String) ||
         !strcmp(KEYWORD_LOADIMPORT, _String) ||
-        !strcmp(KEYWORD_NOP, _String) ||
         !strcmp(KEYWORD_ORIF, _String) ||
-        !strcmp(KEYWORD_PROMPT, _String) ||
         !strcmp(KEYWORD_RAISE, _String) ||
         !strcmp(KEYWORD_RETURN, _String) ||
         !strcmp(KEYWORD_TRY, _String) ||
@@ -154,6 +151,7 @@ static u8 strType(char *_String)
 {
     return (
         //
+        !strcmp(TYPE_ARRAYLIST, _String) ||
         !strcmp(TYPE_NONE, _String) ||
         !strcmp(TYPE_NUMBER, _String) ||
         !strcmp(TYPE_STRING, _String)
@@ -341,58 +339,43 @@ Tokens *Tokenizer(char *_Filename, char *_Text)
             continue;
         }
 
-        char *content = NULL;
         token_type type = TKN_EOF;
-        u64 offset = 0;
+        u64 offset = 1;
 
         curr->file.ln = ln;
         curr->file.col = col;
 
         if ('=' == *_Text)
-        {
-            offset++;
-            content = strcut(&*_Text, offset);
             type = TKN_ASSIGN;
-        }
+
+        else if ('@' == *_Text)
+            type = TKN_KEYWORD;
 
         else if (strchr("()", *_Text))
-        {
-            offset++;
-            content = strcut(&*_Text, offset);
             type = *_Text == '(' ? TKN_PARENL : TKN_PARENR;
-        }
 
         else if (chrOperator(*_Text) || *_Text == '!' || *_Text == ';')
-        {
-            offset++;
-            content = strcut(&*_Text, offset);
             type = *_Text == ';' ? TKN_SEMICOLON : (*_Text == '!' ? TKN_FUNCTION : TKN_OPERATOR);
-        }
 
         else if (chrAlpha(*_Text) || *_Text == '_')
-        {
             while (chrAlnum((&*_Text)[offset]) || (&*_Text)[offset] == '_')
                 offset++;
-            content = strcut(&*_Text, offset);
-            type = Symbol(content);
-        }
 
         else if (chrNum(*_Text))
         {
             u8 point = 0;
             while (chrNum((&*_Text)[offset]) || ((&*_Text)[offset] == '.' && !point))
                 offset++;
-            content = strcut(&*_Text, offset);
             type = TKN_NUMBER;
         }
 
         else if (strchr("\"'`", *_Text) != NULL)
         {
+            offset--;
             char quote = *_Text;
             (volatile char *)_Text++;
             while ((&*_Text)[offset] != quote && (&*_Text)[offset] && !chrLn((&*_Text)[offset]))
                 offset++;
-            content = strcut(&*_Text, offset);
             type = TKN_STRING;
             offset++;
         }
@@ -403,8 +386,8 @@ Tokens *Tokenizer(char *_Filename, char *_Text)
             continue;
         }
 
-        curr->value = content;
-        curr->type = type;
+        curr->value = type == TKN_STRING ? strcut(&*_Text, offset - 1) : strcut(&*_Text, offset);
+        curr->type = type == TKN_EOF ? Symbol(curr->value) : type;
         curr->next = Token(_Filename, NULL, TKN_EOF);
         curr = curr->next;
 
