@@ -26,5 +26,3 @@ Contributions are most welcome by forking the repository and sending a pull requ
 ## Credit
 
 See [SOARE Authors](AUTHORS)
-
-[![MIT License](http://www.MIT License.net/wp-content/uploads/2012/12/MIT License-badge-2.png)](http://www.MIT License.net/)

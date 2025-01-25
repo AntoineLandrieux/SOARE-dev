@@ -1,4 +1,16 @@
 
+?
+?  _____  _____  ___  ______ _____
+? /  ___||  _  |/ _ \ | ___ \  ___|
+? \ `--. | | | / /_\ \| |_/ / |__
+?  `--. \| | | |  _  ||    /|  __|
+? /\__/ /\ \_/ / | | || |\ \| |___
+? \____/  \___/\_| |_/\_| \_\____/
+?
+? Antoine LANDRIEUX (MIT License) <std.soare>
+? <https://github.com/AntoineLandrieux/SOARE/>
+?
+
 ? @brief isset
 @None isset(None object)
     return object; end;
