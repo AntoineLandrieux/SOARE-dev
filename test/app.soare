@@ -1,11 +1,8 @@
-
-@String gh_link(String FirstName; String LastName)
-    return "https://github.com/" + FirstName + LastName + "/";
-end;
-
-? Main function
-? Take 2 arguments (name and age)
 @None card(String FirstName; String LastName; Number age)
+
+    @String gh_link(String FirstName; String LastName)
+        return "https://github.com/" + FirstName + LastName + "/";
+    end;
 
     writeln "==========================================";
     writeln "Hello " + FirstName;

@@ -1,8 +1,0 @@
-
-# SOARE Changelog
-
----
-
-## v1.0.0
-
-- First SOARE release

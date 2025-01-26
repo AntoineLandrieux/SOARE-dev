@@ -126,6 +126,7 @@ char *Runtime(char *_Type, AST *_Tree)
                 return LeaveException(UndefinedReference, curr->value, curr->file);
             }
             MemSet(get, Math(get->type, curr->child));
+            break;
 
         case NODE_ENUMERATE:
             for (tmp = curr->child; tmp != NULL; tmp = tmp->sibling)

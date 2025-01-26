@@ -86,10 +86,10 @@ Node *BranchFind(AST *_Source, char *_Value, node_type _Type)
     if (_Source == NULL)
         return NULL;
     if (!strcmp(_Value, _Source->value == NULL ? "" : _Source->value) && _Source->type == _Type)
-        return _Source; 
-    Node *L = BranchFind(_Source->parent, _Value, _Type);
+        return _Source;
     Node *R = BranchFind(_Source->sibling, _Value, _Type);
-    return L == NULL ? R : L;
+    Node *L = BranchFind(_Source->parent ? (_Source->parent->parent ? _Source->parent->parent->child : _Source->parent) : NULL, _Value, _Type);
+    return R ? R : L;
 }
 
 /**

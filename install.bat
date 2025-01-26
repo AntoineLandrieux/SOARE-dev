@@ -62,9 +62,16 @@ IF NOT errorlevel 0 ECHO Error when update REG (try to run as an Administrator)
 ECHO Creating file...
 MKDIR %install_path%
 
-FOR %%i IN ("%CD%\lib" "%CD%\bin\soare.exe" "%CD%\include" "%CD%\doc" "%CD%\resources" "%CD%\LICENSE" "%CD%\script" "%CD%\README.md") DO (
+FOR %%i IN ("%CD%\bin\soare.exe" "%CD%\LICENSE" "%CD%\README.md") DO (
     IF NOT EXIST "%%i" (
-        ECHO "%%i" is missing...
+        ECHO "File %%i" is missing...
+        GOTO :end
+    )
+)
+
+FOR %%i IN ("%CD%\lib\" "%CD%\include\" "%CD%\doc\" "%CD%\resources\" "%CD%\script\" "%CD%\windows\") DO (
+    IF NOT EXIST "%%i" (
+        ECHO "Folder %%i" is missing...
         GOTO :end
     )
 )
@@ -78,6 +85,7 @@ ECHO R | XCOPY "%CD%\lib\" "%install_path%\lib" /S /E
 ECHO R | XCOPY "%CD%\doc\" "%install_path%\doc" /S /E
 ECHO R | XCOPY "%CD%\script\" "%install_path%\script\" /S /E
 ECHO R | XCOPY "%CD%\resources\" "%install_path%\resources" /S /E
+ECHO R | XCOPY "%CD%\windows\" "%install_path%\windows" /S /E
 
 SETX SOARE "%install_path%"
 ECHO Success

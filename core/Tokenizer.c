@@ -59,18 +59,6 @@ static u8 chrAlnum(const char _Char)
 }
 
 /**
- * @brief Vérifie si le caractère est une nouvelle ligne
- * @author Antoine LANDRIEUX
- *
- * @param _Char
- * @return u8
- */
-static u8 chrLn(const char _Char)
-{
-    return _Char == '\r' || _Char == '\n';
-}
-
-/**
  * @brief Vérifie si le caractère est un espace
  * @author Antoine LANDRIEUX
  *
@@ -79,7 +67,7 @@ static u8 chrLn(const char _Char)
  */
 static u8 chrSpace(const char _Char)
 {
-    return _Char == ' ' || _Char == '\t' || chrLn(_Char);
+    return _Char == ' ' || _Char == '\t' || _Char == '\r' || _Char == '\n';
 }
 
 /**
@@ -289,7 +277,7 @@ static char *strcut(const char *_String, size_t _Long)
  */
 static void updateln(u64 *ln, u64 *col)
 {
-    *ln = *ln + 1;
+    *ln = (*ln) + 1;
     *col = 1;
 }
 
@@ -306,7 +294,7 @@ Tokens *Tokenizer(char *_Filename, char *_Text)
     if (_Text == NULL)
         return NULL;
 
-    Tokens *token = Token(_Filename, "EOF", TKN_EOF);
+    Tokens *token = Token(_Filename, NULL, TKN_EOF);
     Tokens *curr = token;
 
     u64 col = 0;
@@ -325,7 +313,7 @@ Tokens *Tokenizer(char *_Filename, char *_Text)
         if (chrSpace(*_Text))
         {
             col++;
-            if (chrLn(*_Text))
+            if (*_Text == '\n')
                 updateln(&ln, &col);
             (volatile char *)_Text++;
             continue;
@@ -333,7 +321,7 @@ Tokens *Tokenizer(char *_Filename, char *_Text)
 
         else if (*_Text == '?')
         {
-            while (!chrLn(*_Text) && *_Text)
+            while (*_Text != '\n' && *_Text)
                 (volatile char *)_Text++;
             updateln(&ln, &col);
             continue;
@@ -374,8 +362,12 @@ Tokens *Tokenizer(char *_Filename, char *_Text)
             offset--;
             char quote = *_Text;
             (volatile char *)_Text++;
-            while ((&*_Text)[offset] != quote && (&*_Text)[offset] && !chrLn((&*_Text)[offset]))
+            while ((&*_Text)[offset] != quote && (&*_Text)[offset])
+            {
+                if ((&*_Text)[offset] != '\n')
+                    updateln(&ln, &col);
                 offset++;
+            }
             type = TKN_STRING;
             offset++;
         }
@@ -391,10 +383,9 @@ Tokens *Tokenizer(char *_Filename, char *_Text)
         curr->next = Token(_Filename, NULL, TKN_EOF);
         curr = curr->next;
 
-        u64 i = 0;
-        for (; i < offset; col += i++)
+        for (u64 i = 0; i < offset; i++)
             (volatile char *)_Text++;
-        col += i;
+        col += offset + (type == TKN_STRING);
     }
 
     return token;
