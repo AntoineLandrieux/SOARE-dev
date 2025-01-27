@@ -82,7 +82,7 @@ char *Runtime(char *_Type, AST *_Tree)
         MEMORY = Mem();
 
     MemJoin(MEMORY, FUNCTION);
-    MEM *MEM_PTR = MemLast(MemLast(MEMORY));
+    MEM *MEM_PTR = MemLast(MEMORY);
     FUNCTION = NULL;
 
 #define __FREE_MEM         \
@@ -120,6 +120,7 @@ char *Runtime(char *_Type, AST *_Tree)
 
         case NODE_MEMSET:
             get = MemGet(MEMORY, curr->value);
+            printf("%s %s %s", get->name, get->type, get->value);
             if (get == NULL)
             {
                 __FREE_MEM;

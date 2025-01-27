@@ -37,8 +37,8 @@ MEM *Mem()
 
     MEMORY->name = NULL;
     MEMORY->type = NULL;
-    MEMORY->value = NULL;
     MEMORY->next = NULL;
+    MEMORY->value = NULL;
 
     return MEMORY;
 }
@@ -115,12 +115,13 @@ MEM *MemSet(MEM *_Memory, char *_Value)
  */
 MEM *MemGet(MEM *_Memory, char *_Name)
 {
-    for (MEM *curr = _Memory; curr != NULL; curr = curr->next)
-        if (curr->name == NULL)
-            ;
-        else if (!strcmp(curr->name, _Name))
-            return curr;
-    return NULL;
+    if (_Memory == NULL)
+        return NULL;
+    MEM *get = MemGet(_Memory->next, _Name);
+    if (get == NULL && _Memory->value != NULL)
+        if (!strcmp(_Memory->name, _Name))
+            return _Memory;
+    return get;
 }
 
 /**
