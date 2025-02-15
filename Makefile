@@ -25,7 +25,7 @@ INCLUDE = include
 
 CFLAGS = -Wall -Wextra -Wpedantic -Werror
 
-# DEBUG = -D __SOARE_DEBUG
+DEBUG = -D __SOARE_DEBUG
 
 default: $(BIN)/$(APP)
 

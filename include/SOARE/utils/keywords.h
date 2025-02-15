@@ -14,12 +14,10 @@
  * Antoine LANDRIEUX (MIT License) <keywords.h>
  * <https://github.com/AntoineLandrieux/SOARE/>
  *
- * [!] Contribute and help me translate the comments!
- *
  */
 
 /*
- * Liste des keywords (ordre alpha-numérique)
+ * List of keywords (alpha-numeric order)
  */
 
 #define KEYWORD_CONTINUE "continue"
@@ -37,14 +35,5 @@
 #define KEYWORD_TRY "try"
 #define KEYWORD_WHILE "while"
 #define KEYWORD_WRITELN "writeln"
-
-/*
- * Liste des types (ordre alpha-numérique)
- */
-
-#define TYPE_ARRAYLIST "ArrayList"
-#define TYPE_NONE "None"
-#define TYPE_NUMBER "Number"
-#define TYPE_STRING "String"
 
 #endif /* __SOARE_KEYWORDS_H__ */

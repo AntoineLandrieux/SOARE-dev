@@ -21,11 +21,45 @@
 #include <SOARE/utils/int.h>
 #include <SOARE/utils/keywords.h>
 
-MEM *MEMORY = NULL;
-static MEM *FUNCTION = NULL;
+MEM MEMORY = NULL;
+static MEM FUNCTION = NULL;
 
 /**
- * @brief Execute une fonction
+ * @brief From file file
+ * @author Antoine LANDRIEUX
+ * 
+ * @param _Filename 
+ * @return void* 
+ */
+static void *RunFromFile(char *_Filename)
+{
+    FILE *file = fopen(_Filename, "rb");
+
+    if (!file)
+        return LeaveException(FileError, _Filename, EmptyDocument());
+
+    fseek(file, 0, SEEK_END);
+    long size = ftell(file);
+    rewind(file);
+
+    char *content = (char *)malloc(size);
+
+    if (content == NULL)
+    {
+        fclose(file);
+        return LeaveException(InterpreterError, _Filename, EmptyDocument());
+    }
+
+    fread(content, sizeof(char), size, file);
+    content[size] = 0;
+    Execute(_Filename, content);
+    free(content);
+    fclose(file);
+    return NULL;
+}
+
+/**
+ * @brief Execute a function
  * @author Antoine LANDRIEUX
  *
  * @deprecated
@@ -33,21 +67,21 @@ static MEM *FUNCTION = NULL;
  * @param _Tree
  * @return char*
  */
-char *RunFunction(AST *_Tree)
+char *RunFunction(AST _Tree)
 {
-    AST *func = BranchFind(_Tree->parent->child, _Tree->value, NODE_FUNCTION);
-    
+    AST func = BranchFind(_Tree->parent->child, _Tree->value, NODE_FUNCTION);
+
     if (func == NULL)
         return LeaveException(UndefinedReference, _Tree->value, _Tree->file);
 
-    AST *ptr = func->child->sibling;
-    AST *src = _Tree->child;
+    AST ptr = func->child;
+    AST src = _Tree->child;
     FUNCTION = Mem();
 
     while (ptr != NULL)
     {
         if (ptr->type == NODE_BODY)
-            return Runtime(func->child->value, ptr);
+            return Runtime(ptr);
 
         if (src == NULL)
         {
@@ -55,7 +89,7 @@ char *RunFunction(AST *_Tree)
             return LeaveException(UndefinedReference, ptr->value, _Tree->file);
         }
 
-        MemPush(FUNCTION, ptr->value, ptr->child->value, Math(ptr->child->value, src));
+        MemPush(FUNCTION, ptr->value, Math(src));
         src = src->sibling;
         ptr = ptr->sibling;
     }
@@ -64,69 +98,52 @@ char *RunFunction(AST *_Tree)
 }
 
 /**
- * @brief Execute le code à partir d'un arbre et retourne une valeur en fonction du type
+ * @brief Executes code from a tree
  * @author Antoine LANDRIEUX
  *
- * @param _Type
  * @param _Tree
  * @return char*
  */
-char *Runtime(char *_Type, AST *_Tree)
+char *Runtime(AST _Tree)
 {
-    if (_Type == NULL || _Tree == NULL)
+    if (_Tree == NULL)
         return NULL;
 
-    AST *root = _Tree;
+    AST root = _Tree;
 
     if (MEMORY == NULL)
         MEMORY = Mem();
 
+    MEM statement = MemLast(MEMORY);
     MemJoin(MEMORY, FUNCTION);
-    MEM *MEM_PTR = MemLast(MEMORY);
     FUNCTION = NULL;
 
-#define __FREE_MEM         \
-    if (MEM_PTR != MEMORY) \
-        MEM_PTR->next = MemFree(MEM_PTR->next);
-
-    for (AST *curr = root->child; curr && !ErrorLevel(); curr = curr->sibling)
+    for (AST curr = root->child; curr && !ErrorLevel(); curr = curr->sibling)
     {
         char *returned = NULL;
         int enumerate = 0;
-        AST *tmp = NULL;
-        MEM *get = NULL;
+        AST tmp = NULL;
+        MEM get = NULL;
 
         switch (curr->type)
         {
         case NODE_IMPORT:
-            // TODO: implement import
+            RunFromFile(curr->value);
             break;
 
         case NODE_CONTINUE:
-            __FREE_MEM;
+            statement->next = MemFree(statement->next);
             return NULL;
 
         case NODE_CALL:
             free(RunFunction(curr));
             break;
 
-        case NODE_MEMCREATE:
-            MemPush(
-                MEM_PTR,
-                curr->value,
-                curr->child->value,
-                Math(curr->child->value, curr->child->sibling));
-            break;
-
         case NODE_MEMSET:
             get = MemGet(MEMORY, curr->value);
-            printf("%s %s %s", get->name, get->type, get->value);
-            if (get == NULL)
-            {
-                __FREE_MEM;
-                return LeaveException(UndefinedReference, curr->value, curr->file);
-            }
-            MemSet(get, Math(get->type, curr->child));
+            returned = Math(curr->child);
+            if (MemSet(get, returned) == NULL)
+                get = MemPush(statement, curr->value, returned);
             break;
 
         case NODE_ENUMERATE:
@@ -135,9 +152,8 @@ char *Runtime(char *_Type, AST *_Tree)
                 returned = malloc(((int)(enumerate / 10)) + 2);
                 snprintf(returned, (((int)(enumerate / 10))) + 2, "%d", enumerate);
                 MemPush(
-                    MEM_PTR,
+                    statement,
                     tmp->value,
-                    TYPE_NUMBER,
                     returned);
                 enumerate += 1;
             }
@@ -145,7 +161,7 @@ char *Runtime(char *_Type, AST *_Tree)
 
         case NODE_CONDITION:
 
-            returned = Math(TYPE_NUMBER, curr->child);
+            returned = Math(curr->child);
             tmp = curr->child;
 
             while (1)
@@ -156,10 +172,10 @@ char *Runtime(char *_Type, AST *_Tree)
                 if (strcmp(returned, "0"))
                 {
                     free(returned);
-                    returned = Runtime(_Type, tmp->sibling);
+                    returned = Runtime(tmp->sibling);
                     if (returned != NULL)
                     {
-                        __FREE_MEM;
+                        statement->next = MemFree(statement->next);
                         return returned;
                     }
                     break;
@@ -170,7 +186,7 @@ char *Runtime(char *_Type, AST *_Tree)
                     break;
 
                 free(returned);
-                returned = Math(TYPE_NUMBER, tmp);
+                returned = Math(tmp);
             }
 
             free(returned);
@@ -178,20 +194,20 @@ char *Runtime(char *_Type, AST *_Tree)
 
         case NODE_REPETITION:
 
-            returned = Math(TYPE_NUMBER, curr->child);
+            returned = Math(curr->child);
 
             while (returned != NULL)
             {
                 if (!strcmp(returned, "0"))
                     break;
                 free(returned);
-                returned = Runtime(_Type, curr->child->sibling);                
+                returned = Runtime(curr->child->sibling);
                 if (returned != NULL)
                 {
-                    __FREE_MEM;
+                    statement->next = MemFree(statement->next);
                     return returned;
                 }
-                returned = Math(TYPE_NUMBER, curr->child);
+                returned = Math(curr->child);
             }
 
             free(returned);
@@ -200,33 +216,34 @@ char *Runtime(char *_Type, AST *_Tree)
         case NODE_TRY:
 
             IgnoreException(0x1);
-            returned = Runtime(_Type, curr->child);
+            returned = Runtime(curr->child);
             IgnoreException(0x0);
             if (ErrorLevel())
             {
                 free(returned);
                 ClearException();
-                returned = Runtime(_Type, curr->child->sibling);
+                returned = Runtime(curr->child->sibling);
             }
             if (returned != NULL)
             {
-                __FREE_MEM;
+                statement->next = MemFree(statement->next);
                 return returned;
             }
             break;
 
         case NODE_OUTPUT:
-            returned = Math(TYPE_STRING, curr->child);
-            printf("%s\n", returned == NULL ? "" : returned);
+            returned = Math(curr->child);
+            if (returned != NULL)
+                printf("%s\n", returned);
             break;
 
         case NODE_RETURN:
-            returned = Math(_Type, curr->child);
-            __FREE_MEM;
+            returned = Math(curr->child);
+            statement->next = MemFree(statement->next);
             return returned;
 
         case NODE_RAISE:
-            __FREE_MEM;
+            statement->next = MemFree(statement->next);
             return LeaveException(curr->value, KEYWORD_RAISE, curr->file);
 
         default:
@@ -234,7 +251,7 @@ char *Runtime(char *_Type, AST *_Tree)
         }
     }
 
-    __FREE_MEM;
+    statement->next = MemFree(statement->next);
     return NULL;
 }
 
@@ -246,17 +263,15 @@ char *Runtime(char *_Type, AST *_Tree)
  */
 int Execute(char *_File, char *_RawCode)
 {
-    ClearException();
-
     Tokens *tokens = Tokenizer(_File, _RawCode);
-    AST *ast = Parse(tokens);
+    AST ast = Parse(tokens);
 
 #ifdef __SOARE_DEBUG
     TokensLog(tokens);
     TreeLog(ast);
 #endif
 
-    free(Runtime(TYPE_NONE, ast));
+    free(Runtime(ast));
 
 #ifdef __SOARE_DEBUG
     MemLog(MEMORY);

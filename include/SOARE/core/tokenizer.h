@@ -14,19 +14,16 @@
  * Antoine LANDRIEUX (MIT License) <tokenizer.h>
  * <https://github.com/AntoineLandrieux/SOARE/>
  *
- * [!] Contribute and help me translate the comments!
- *
  */
 
 /**
- * @brief Enumére les différents types de jetons
+ * @brief List the different types of tokens
  * @author Antoine LANDRIEUX
  */
 typedef enum token_type
 {
 
     TKN_EOF,
-    TKN_TYPE,
     TKN_NAME,
     TKN_NUMBER,
     TKN_STRING,
@@ -41,27 +38,27 @@ typedef enum token_type
 } token_type;
 
 /**
- * @brief Structure d'un jeton
+ * @brief Structure of a token
  * @author Antoine LANDRIEUX
  */
 typedef struct Tokens
 {
 
-    // Valeur du jeton
+    // Value
     char *value;
-    // Type du jeton
+    // Type
     token_type type;
 
-    // Position du jeton dans le document
+    // Document
     Document file;
 
-    // Jeton suivant
+    // Next
     struct Tokens *next;
 
 } Tokens;
 
 /**
- * @brief Retourne un document vide
+ * @brief Return an empty document
  * @author Antoine LANDRIEUX
  *
  * @return Document
@@ -69,7 +66,7 @@ typedef struct Tokens
 Document EmptyDocument();
 
 /**
- * @brief Créer un nouveau jeton
+ * @brief Create a new token
  * @author Antoine LANDRIEUX
  *
  * @param _Filename
@@ -80,7 +77,7 @@ Document EmptyDocument();
 Tokens *Token(char *_Filename, char *_Value, token_type _Type);
 
 /**
- * @brief Libère la mémoire allouées par les jetons
+ * @brief Free the memory allocated by the tokens
  * @author Antoine LANDRIEUX
  *
  * @param _Token
@@ -88,7 +85,7 @@ Tokens *Token(char *_Filename, char *_Value, token_type _Type);
 void TokensFree(Tokens *_Token);
 
 /**
- * @brief Affiche les jetons
+ * @brief Display the tokens
  * @author Antoine LANDRIEUX
  *
  * @param _Token
@@ -96,7 +93,7 @@ void TokensFree(Tokens *_Token);
 void TokensLog(Tokens *_Token);
 
 /**
- * @brief Transforme une chaîne de caractère en une séquence de jetons
+ * @brief Transform a string into a sequence of tokens
  * @author Antoine LANDRIEUX
  *
  * @param _Filename

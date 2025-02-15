@@ -11,14 +11,14 @@
 ? <https://github.com/AntoineLandrieux/SOARE/>
 ?
 
+? @brief Useful for math, ex: 5*M(1+2)
+@M(number) return number*1; end;
+
+? @brief NaN
+@NaN(number) try M!(Number) iferror return 1; end; end;
+
 ? @brief isset
-@None isset(None object)
-    return object; end;
+@isset(any) return any; end;
 
-? @brief StringtoNumber
-@Number StoN(String str)
-    return str; end;
-
-? @brief itoa
-@String NtoS(Number nbr)
-    return nbr; end;
+? @brief ftoi
+@ftoi(float) if NaN!(float) raise "NaN"; else return float^0; end; end;

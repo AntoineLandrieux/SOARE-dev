@@ -14,8 +14,6 @@
  * Antoine LANDRIEUX (MIT License) <int.h>
  * <https://github.com/AntoineLandrieux/SOARE/>
  *
- * [!] Contribute and help me translate the comments!
- *
  */
 
 /* 8 bit (1 Byte) */

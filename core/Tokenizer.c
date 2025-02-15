@@ -13,8 +13,6 @@
  * Antoine LANDRIEUX (MIT License) <Tokenizer.c>
  * <https://github.com/AntoineLandrieux/SOARE/>
  *
- * [!] Contribute and help me translate the comments!
- *
  */
 
 #include <SOARE/SOARE.h>
@@ -22,7 +20,7 @@
 #include <SOARE/utils/keywords.h>
 
 /**
- * @brief Vérifie si un caractère est un chiffre
+ * @brief Check if a character is a number
  * @author Antoine LANDRIEUX
  *
  * @param _Char
@@ -35,7 +33,7 @@ static u8 chrNum(const char _Char)
 }
 
 /**
- * @brief Vérifie si le caractère est une lettre
+ * @brief Check if the character is a letter
  * @author Antoine LANDRIEUX
  *
  * @param _Char
@@ -47,7 +45,7 @@ static u8 chrAlpha(const char _Char)
 }
 
 /**
- * @brief Vérifie si le caractère est une lettre ou un chiffre
+ * @brief Check if the character is a letter or a number
  * @author Antoine LANDRIEUX
  *
  * @param _Char
@@ -59,7 +57,7 @@ static u8 chrAlnum(const char _Char)
 }
 
 /**
- * @brief Vérifie si le caractère est un espace
+ * @brief Check if the character is a space
  * @author Antoine LANDRIEUX
  *
  * @param _Char
@@ -71,7 +69,7 @@ static u8 chrSpace(const char _Char)
 }
 
 /**
- * @brief Vérifie si le caractère est un operateur
+ * @brief Check if the character is an operator
  * @author Antoine LANDRIEUX
  *
  * @param _String
@@ -83,7 +81,7 @@ static u8 chrOperator(const char _Char)
 }
 
 /**
- * @brief Vérifie si la chaîne de caractères est un operateur
+ * @brief Check if the string is an operator
  * @author Antoine LANDRIEUX
  *
  * @param _String
@@ -99,7 +97,7 @@ static u8 strOperator(char *_String)
 }
 
 /**
- * @brief Vérifie si la chaîne de caractères est un keyword
+ * @brief Check if the string is a keyword
  * @author Antoine LANDRIEUX
  *
  * @param _String
@@ -129,26 +127,7 @@ static u8 strKeyword(char *_String)
 }
 
 /**
- * @brief Vérifie si la chaîne de caractères est un type
- * @author Antoine LANDRIEUX
- *
- * @param _String
- * @return u8
- */
-static u8 strType(char *_String)
-{
-    return (
-        //
-        !strcmp(TYPE_ARRAYLIST, _String) ||
-        !strcmp(TYPE_NONE, _String) ||
-        !strcmp(TYPE_NUMBER, _String) ||
-        !strcmp(TYPE_STRING, _String)
-        //
-    );
-}
-
-/**
- * @brief Donne le type de la chaîne de caractères
+ * @brief Give the type of the string
  *
  * @param _String
  * @return token_type
@@ -157,15 +136,13 @@ static token_type Symbol(char *_String)
 {
     if (strKeyword(_String))
         return TKN_KEYWORD;
-    else if (strType(_String))
-        return TKN_TYPE;
     else if (strOperator(_String))
         return TKN_OPERATOR;
     return TKN_NAME;
 }
 
 /**
- * @brief Retourne un document vide
+ * @brief Return an empty document
  * @author Antoine LANDRIEUX
  *
  * @return Document
@@ -182,7 +159,7 @@ Document EmptyDocument()
 }
 
 /**
- * @brief Créer un nouveau jeton
+ * @brief Create a new token
  * @author Antoine LANDRIEUX
  *
  * @param _Filename
@@ -210,7 +187,7 @@ Tokens *Token(char *_Filename, char *_Value, token_type _Type)
 }
 
 /**
- * @brief Libère la mémoire allouées par les jetons
+ * @brief Free the memory allocated by the tokens
  * @author Antoine LANDRIEUX
  *
  * @param _Token
@@ -226,7 +203,7 @@ void TokensFree(Tokens *_Token)
 }
 
 /**
- * @brief Affiche les jetons
+ * @brief Display the tokens
  * @author Antoine LANDRIEUX
  *
  * @param _Token
@@ -248,7 +225,7 @@ void TokensLog(Tokens *_Token)
 }
 
 /**
- * @brief Coupe une chaîne de caractères
+ * @brief Cut a string
  * @author Antoine LANDRIEUX
  *
  * @param _String
@@ -269,7 +246,7 @@ static char *strcut(const char *_String, size_t _Long)
 }
 
 /**
- * @brief Ajoute +1 à ln et remet col à 0
+ * @brief Add +1 to ln and set col to 0
  * @author Antoine LANDRIEUX
  *
  * @param ln
@@ -282,7 +259,7 @@ static void updateln(u64 *ln, u64 *col)
 }
 
 /**
- * @brief Transforme une chaîne de caractère en une séquence de jetons
+ * @brief Transform a string into a sequence of tokens
  * @author Antoine LANDRIEUX
  *
  * @param _Filename

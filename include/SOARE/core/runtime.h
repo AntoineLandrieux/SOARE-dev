@@ -14,15 +14,13 @@
  * Antoine LANDRIEUX (MIT License) <runtime.h>
  * <https://github.com/AntoineLandrieux/SOARE/>
  *
- * [!] Contribute and help me translate the comments!
- *
  */
 
-// Mémoire utilisé par l'interpreteur
-extern MEM *MEMORY;
+// Memory used by the interpreter
+extern MEM MEMORY;
 
 /**
- * @brief Execute une fonction
+ * @brief Execute a function
  * @author Antoine LANDRIEUX
  *
  * @deprecated
@@ -30,23 +28,24 @@ extern MEM *MEMORY;
  * @param _Tree
  * @return char*
  */
-char *RunFunction(AST *_Tree);
+char *RunFunction(AST _Tree);
 
 /**
  * @brief Execute le code à partir d'un arbre et retourne une valeur en fonction du type
  * @author Antoine LANDRIEUX
  *
- * @param _Type
  * @param _Tree
  * @return char*
  */
-char *Runtime(char *_Type, AST *_Tree);
+char *Runtime(AST _Tree);
 
 /**
  * @brief Execute le code à partir d'une chaîne de caractères
  * @author Antoine LANDRIEUX
  *
+ * @param _File
  * @param _RawCode
+ * @return int
  */
 int Execute(char *_File, char *_RawCode);
 

@@ -14,102 +14,96 @@
  * Antoine LANDRIEUX (MIT License) <memory.h>
  * <https://github.com/AntoineLandrieux/SOARE/>
  *
- * [!] Contribute and help me translate the comments!
- *
  */
 
 /**
- * @brief Structure de la mémoire
+ * @brief Structure of memory
  * @author Antoine LANDRIEUX
  */
-typedef struct MEM
+typedef struct mem
 {
 
-    // Nom de la variable
+    // Name
     char *name;
-    // Type de la variable
-    char *type;
-    // Valeur de la variable
+    // Value
     char *value;
 
-    // La variable suivante
-    struct MEM *next;
+    // Next
+    struct mem *next;
 
-} MEM;
+} *MEM;
 
 /**
- * @brief Créer une nouvelle mémoire vide
+ * @brief Create a new empty memory
  * @author Antoine LANDRIEUX
  *
- * @return MEM*
+ * @return MEM
  */
-MEM *Mem();
+MEM Mem();
 
 /**
- * @brief Donne la dernière variable de la mémoire
- * @author Antoine LANDRIEUX
- *
- * @param _Memory
- * @return MEM*
- */
-MEM *MemLast(MEM *_Memory);
-
-/**
- * @brief Ajoute une variable dans une mémoire existante
+ * @brief Give the last variable in the memory
  * @author Antoine LANDRIEUX
  *
  * @param _Memory
- * @param _Name
- * @param _Type
- * @param ...
+ * @return MEM
  */
-MEM *MemPush(MEM *_Memory, char *_Name, char *_Type, char *_Value);
+MEM MemLast(MEM _Memory);
 
 /**
- * @brief Modifie une variable dans une mémoire existante
+ * @brief Add a variable to an existing memory
  * @author Antoine LANDRIEUX
  *
  * @param _Memory
  * @param _Name
- * @param _Type
- * @param ...
+ * @return MEM
  */
-MEM *MemSet(MEM *_Memory, char *_Value);
+MEM MemPush(MEM _Memory, char *_Name, char *_Value);
 
 /**
- * @brief Trouve une varible dans la mémoire
+ * @brief Find a variable in the memory
  * @author Antoine LANDRIEUX
  *
  * @param _Memory
  * @param _Name
- * @return MEM*
+ * @return MEM
  */
-MEM *MemGet(MEM *_Memory, char *_Name);
+MEM MemGet(MEM _Memory, char *_Name);
 
 /**
- * @brief Lie 2 mémoires
+ * @brief Update a variable
+ * @author Antoine LANDRIEUX
+ *
+ * @param _Memory
+ * @param _Name
+ * @return MEM
+ */
+MEM MemSet(MEM _Memory, char *_Value);
+
+/**
+ * @brief Display all variables
+ * @author Antoine LANDRIEUX
+ *
+ * @param _Memory
+ */
+void MemLog(MEM _Memory);
+
+/**
+ * @brief Join 2 memories
  * @author Antoine LANDRIEUX
  *
  * @param _To
  * @param _From
  */
-void MemJoin(MEM *_To, MEM *_From);
+void MemJoin(MEM _To, MEM _From);
 
 /**
- * @brief Affiche l'essemble des variables de la mémoire
+ * @brief Free the allocated memory
  * @author Antoine LANDRIEUX
  *
  * @param _Memory
+ * @return void* (always returns NULL)
  */
-void MemLog(MEM *_Memory);
-
-/**
- * @brief Libére la mémoire allouée
- * @author Antoine LANDRIEUX
- *
- * @param _Memory
- * @return void* (retourne toujours NULL)
- */
-void *MemFree(MEM *_Memory);
+void *MemFree(MEM _Memory);
 
 #endif /* __SOARE_MEMORY_H__ */

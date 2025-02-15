@@ -14,8 +14,6 @@
  * Antoine LANDRIEUX (MIT License) <SOARE.h>
  * <https://github.com/AntoineLandrieux/SOARE/>
  *
- * [!] Contribute and help me translate the comments!
- *
  */
 
 #ifdef __cplusplus
@@ -28,31 +26,31 @@ namespace SOARE
     {
 #endif
 
-/* SOARE version majeur */
+/* SOARE major */
 #define SOARE_MAJOR 1
-/* SOARE version mineur */
+/* SOARE minor */
 #define SOARE_MINOR 0
-/* SOARE version patch */
+/* SOARE patch */
 #define SOARE_PATCH 0
 
         /**
-         * @brief Structure d'un docuement
+         * @brief Structure of a document
          * @author Antoine LANDRIEUX
          */
         typedef struct Document
         {
 
-            // Le fichier
+            // FIle
             char *file;
 
-            // La ligne
+            // Line
             unsigned long long ln;
-            // La colone
+            // Column
             unsigned long long col;
 
         } Document;
 
-/* Fichier d’entrée pour le mode console */
+/* Input file for console mode */
 #define __SOARE_FILE__ "_input"
 
 #include "core/error.h"

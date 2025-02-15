@@ -22,7 +22,7 @@ color cyan "\<(None|Number|String)\>"
 ## built-in functions
 color cyan "\<(isset|StoN|NtoS)\>"
 ## Keywords
-color brightblue "\<(continue|do|else|end|enumerate|function|if|iferror|loadimport|nop|orif|prompt|raise|return|try|while|writeln)\>"
+color brightblue "\<(continue|do|else|end|enumerate|if|iferror|loadimport|nop|orif|prompt|raise|return|try|while|writeln)\>"
 
 ## operators
 color magenta "[.:;,+*|=!\%@]" "<" ">" "/" "-" "&"

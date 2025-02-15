@@ -14,20 +14,17 @@
  * Antoine LANDRIEUX (MIT License) <math.h>
  * <https://github.com/AntoineLandrieux/SOARE/>
  *
- * [!] Contribute and help me translate the comments!
- *
  */
 
 #include "parser.h"
 
 /**
- * @brief Évalue l'expression mathématique d'un arbre pour en sortir une valeur en fonction du type
+ * @brief Evaluates the mathematical expression of a tree
  * @author Antoine LANDRIEUX
  *
- * @param _Type
  * @param _Tree
  * @return char*
  */
-char *Math(char *_Type, AST *_Tree);
+char *Math(AST _Tree);
 
 #endif /* __SOARE_MATH_H__ */

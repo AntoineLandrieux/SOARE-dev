@@ -14,8 +14,6 @@
  * Antoine LANDRIEUX (MIT License) <Main.cpp>
  * <https://github.com/AntoineLandrieux/SOARE/>
  *
- * [!] Contribute and help me translate the comments!
- *
  */
 
 #include <SOARE/SOARE.h>
@@ -53,12 +51,14 @@ static int Console()
 
     std::cout
 #ifndef __SOARE_NO_COLORED_OUTPUT
+        // Blue
         << "\033[1;34m"
 #endif /* __SOARE_NO_COLORED_OUTPUT */
         << "SOARE v" << SOARE_MAJOR << "." << SOARE_MINOR << "." << SOARE_PATCH
         << " Antoine LANDRIEUX (MIT License)\n"
         << "<https://github.com/AntoineLandrieux/SOARE>\n"
 #ifndef __SOARE_NO_COLORED_OUTPUT
+        // Normal
         << "\033[0m"
 #endif /* __SOARE_NO_COLORED_OUTPUT */
         << "Enter 'run' or 'commit' to run code or 'exit' to quit.\n"
@@ -68,11 +68,12 @@ static int Console()
     {
         std::cout
 #ifndef __SOARE_NO_COLORED_OUTPUT
+            // Purple
             << "\033[0;35m"
 #endif /* __SOARE_NO_COLORED_OUTPUT */
             << ">>> "
 #ifndef __SOARE_NO_COLORED_OUTPUT
-               "\033[0;39m"
+            << "\033[0m"
 #endif /* __SOARE_NO_COLORED_OUTPUT */
             ;
 

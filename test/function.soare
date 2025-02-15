@@ -1,11 +1,11 @@
 
-@Number Fib(Number n)
+@Fib(n)
 
-    if n < 2 do
+    if n < 1 do
+        return "Invalid Input"
+    orif n equ 1 do
         return 0;
-    end;
-
-    if n equ 2 do
+    orif n equ 2 do
         return 1;
     end;
 
@@ -13,4 +13,4 @@
 
 end;
 
-writeln Fib!(10)
+writeln Fib!(10);

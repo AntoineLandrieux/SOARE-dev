@@ -14,12 +14,10 @@
  * Antoine LANDRIEUX (MIT License) <parser.h>
  * <https://github.com/AntoineLandrieux/SOARE/>
  *
- * [!] Contribute and help me translate the comments!
- *
  */
 
 /**
- * @brief Enumére les différents types de noeud
+ * @brief List the different types of nodes
  * @author Antoine LANDRIEUX
  */
 typedef enum node_type
@@ -28,7 +26,6 @@ typedef enum node_type
     NODE_ROOT,
     NODE_TRY,
     NODE_BODY,
-    NODE_TYPE,
     NODE_RAISE,
     NODE_ARRAY,
     NODE_OUTPUT,
@@ -39,7 +36,6 @@ typedef enum node_type
     NODE_FUNCTION,
     NODE_MEMGET,
     NODE_MEMSET,
-    NODE_MEMCREATE,
     NODE_ENUMERATE,
     NODE_IFERROR,
     NODE_OPERATOR,
@@ -51,34 +47,31 @@ typedef enum node_type
 } node_type;
 
 /**
- * @brief Structure d'un noeud
+ * @brief Structure of a node
  * @author Antoine LANDRIEUX
  */
-typedef struct Node
+typedef struct node
 {
 
-    // Valeur du noeud
+    // Value
     char *value;
-    // Type du noeud
+    // Type
     node_type type;
 
-    // Position du noeud dans le document
+    // Document
     Document file;
 
-    // Noeud parent
-    struct Node *parent;
-    // Noeud enfant
-    struct Node *child;
-    // Noeud frère
-    struct Node *sibling;
+    // Node Parent
+    struct node *parent;
+    // Node Child
+    struct node *child;
+    // Node Sibling
+    struct node *sibling;
 
-} Node;
-
-/* Abstract syntax tree */
-typedef Node AST;
+} Node, *AST;
 
 /**
- * @brief Créer un nouveau noeud
+ * @brief Create a new node
  * @author Antoine LANDRIEUX
  *
  * @param _Value
@@ -89,7 +82,7 @@ typedef Node AST;
 Node *Branch(char *_Value, node_type _Type, Document _File);
 
 /**
- * @brief Retrouve un noeud
+ * @brief Find a node
  * @author Antoine LANDRIEUX
  *
  * @param _Source
@@ -97,41 +90,41 @@ Node *Branch(char *_Value, node_type _Type, Document _File);
  * @param _Type
  * @return Node*
  */
-Node *BranchFind(AST *_Source, char *_Value, node_type _Type);
+Node *BranchFind(AST _Source, char *_Value, node_type _Type);
 
 /**
- * @brief Lie 2 branches
+ * @brief Join 2 branches
  * @author Antoine LANDRIEUX
  *
  * @param _Parent
  * @param _Child
- * @return AST*
+ * @return AST
  */
-AST *BranchJoin(Node *_Parent, Node *_Child);
+AST BranchJoin(Node *_Parent, Node *_Child);
 
 /**
- * @brief Libère la mémoire allouée par le noeud et les noeuds lié avec lui
+ * @brief Frees the memory allocated by a tree
  * @author Antoine LANDRIEUX
  *
  * @param _Tree
  */
-void TreeFree(AST *_Tree);
+void TreeFree(AST _Tree);
 
 /**
- * @brief Affiche le noeud et les noeuds liés avec lui
+ * @brief Display a tree
  * @author Antoine LANDRIEUX
  *
  * @param _Tree
  */
-void TreeLog(AST *_Tree);
+void TreeLog(AST _Tree);
 
 /**
- * @brief Transforme une séquence de jetons en arbre (AST)
+ * @brief Turns a sequence of tokens into a tree (AST)
  * @author Antoine LANDRIEUX
  *
  * @param _Tokens
- * @return AST*
+ * @return AST
  */
-AST *Parse(Tokens *_Tokens);
+AST Parse(Tokens *_Tokens);
 
 #endif /* __SOARE_PARSER_H__ */

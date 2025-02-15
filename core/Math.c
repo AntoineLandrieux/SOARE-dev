@@ -15,8 +15,6 @@
  * Antoine LANDRIEUX (MIT License) <Math.c>
  * <https://github.com/AntoineLandrieux/SOARE/>
  *
- * [!] Contribute and help me translate the comments!
- *
  */
 
 #include <SOARE/SOARE.h>
@@ -26,10 +24,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 
 /**
- * @brief Retourne 1 si la chaîne de caractères est un nombre
+ * @brief Return 1 if the string is a number
  * @author Antoine LANDRIEUX
  *
  * @param _String
@@ -46,7 +43,7 @@ static u8 isNaN(char *_String)
 }
 
 /**
- * @brief Copie une chaîne de caractères
+ * @brief Copy a string
  * @author Antoine LANDRIEUX
  *
  * @param _Value
@@ -54,8 +51,6 @@ static u8 isNaN(char *_String)
  */
 static char *vardup(char *_Value)
 {
-    if (_Value == NULL)
-        return NULL;
     char *result = strdup(_Value);
     if (result == NULL)
         return LeaveException(InterpreterError, "OUT OF MEMORY", EmptyDocument());
@@ -63,97 +58,75 @@ static char *vardup(char *_Value)
 }
 
 /**
- * @brief Copie une chaîne de caractères nombre
+ * @brief Convert float to int
  * @author Antoine LANDRIEUX
  *
- * @param _Value
+ * @param _Float
  * @return char*
  */
-static char *varintdup(char *_Value)
+static char *__float(double _Float)
 {
-    if (_Value == NULL)
-        return NULL;
-    size_t size = strlen(_Value) + 1;
-    char *result = malloc(size);
+    char string[50];
+    sprintf(string, "%g", _Float);
+    char *result = (char *)malloc(strlen(string));
     if (result == NULL)
-        LeaveException(InterpreterError, "OUT OF MEMORY", EmptyDocument());
-    snprintf(result, size, "%.f", atof(_Value));
+        return LeaveException(InterpreterError, "OUT OF MEMORY", EmptyDocument());
+    strcpy(result, string);
     return result;
 }
 
 /**
- * @brief Évalue l'expression mathématique d'un arbre pour en sortir une valeur en fonction du type
+ * @brief Evaluates the mathematical expression of a tree
  * @author Antoine LANDRIEUX
  *
- * @param _Type
  * @param _Tree
  * @return char*
  */
-char *Math(char *_Type, AST *_Tree)
+char *Math(AST _Tree)
 {
     double dx, dy;
     char *sx, *sy;
     char *result = NULL;
 
-    MEM *get = NULL;
-    char *tmp = NULL;
+    MEM get = NULL;
 
     switch (_Tree->type)
     {
     case NODE_MEMGET:
 
         get = MemGet(MEMORY, _Tree->value);
-
         if (get == NULL)
             return LeaveException(UndefinedReference, _Tree->value, _Tree->file);
-
-        if (!strcmp(get->type, TYPE_NUMBER))
-            return varintdup(get->value);
-
         return vardup(get->value);
 
     case NODE_CALL:
 
-        result = RunFunction(_Tree);
+        return RunFunction(_Tree);
 
-        if (!strcmp(_Type, TYPE_NUMBER))
-        {
-            tmp = varintdup(result);
-            free(result);
-            return tmp;
-        }
-
-        return result;
-
+    case NODE_STRING:
     case NODE_NUMBER:
 
         return vardup(_Tree->value);
 
-    case NODE_STRING:
-
-        if (!strcmp(_Type, TYPE_NUMBER))
-            return varintdup(_Tree->value);
-        return vardup(_Tree->value);
-
     case NODE_OPERATOR:
 
-        sx = Math(_Type, _Tree->child);
-        sy = Math(_Type, _Tree->child->sibling);
+        sx = Math(_Tree->child);
+        sy = Math(_Tree->child->sibling);
 
         if (sx == NULL || sy == NULL)
             return NULL;
 
-        result = malloc(50);
+        result = malloc(2);
         if (result == NULL)
             LeaveException(InterpreterError, "OUT OF MEMORY", EmptyDocument());
 
         if (isNaN(sx) || isNaN(sy))
         {
             if (!strcasecmp(_Tree->value, "equ"))
-                snprintf(result, 50, "%d", !strcmp(sx, sy));
+                snprintf(result, 2, "%d", !strcmp(sx, sy));
 
             else if (!strcasecmp(_Tree->value, "neq"))
-                snprintf(result, 50, "%d", strcmp(sx, sy));
+                snprintf(result, 2, "%d", strcmp(sx, sy));
 
             else if (*_Tree->value == '+')
             {
@@ -167,58 +140,51 @@ char *Math(char *_Type, AST *_Tree)
             else
             {
                 free(result);
-                return LeaveException(TypeError, _Tree->value, _Tree->file);
+                return LeaveException(MathError, _Tree->value, _Tree->file);
             }
         }
 
-        dx = atof(Math(_Type, _Tree->child));
-        dy = atof(Math(_Type, _Tree->child->sibling));
+        dx = atof(sx);
+        dy = atof(sy);
 
         if (strchr("/%", *(_Tree->value)) != NULL && !dy)
             return LeaveException(DivideByZero, _Tree->value, _Tree->file);
 
         if (!strcasecmp(_Tree->value, "equ"))
-            snprintf(result, 50, "%d", dx == dy);
+            snprintf(result, 2, "%d", dx == dy);
 
         else if (!strcasecmp(_Tree->value, "neq"))
-            snprintf(result, 50, "%d", dx != dy);
+            snprintf(result, 2, "%d", dx != dy);
 
         else if (!strcasecmp(_Tree->value, "and"))
-            snprintf(result, 50, "%d", dx && dy);
+            snprintf(result, 2, "%d", dx && dy);
 
         else if (!strcasecmp(_Tree->value, "or"))
-            snprintf(result, 50, "%d", dx || dy);
+            snprintf(result, 2, "%d", dx || dy);
 
         else
         {
+            free(result);
+
             switch (*(_Tree->value))
             {
-            case '*':
-                snprintf(result, 50, "%.f", dx * dy);
-                break;
             case '^':
-                snprintf(result, 50, "%d", (int)dx ^ (int)dy);
-                break;
-            case '/':
-                snprintf(result, 50, "%.f", dx / dy);
-                break;
+                return __float((double)((int)dx ^ (int)dy));
             case '%':
-                snprintf(result, 50, "%d", (int)dx % (int)dy);
-                break;
+                return __float((double)((int)dx % (int)dy));
+            case '*':
+                return __float(dx * dy);
+            case '/':
+                return __float(dx / dy);
             case '+':
-                snprintf(result, 50, "%.f", dx + dy);
-                break;
+                return __float(dx + dy);
             case '-':
-                snprintf(result, 50, "%.f", dx - dy);
-                break;
+                return __float(dx - dy);
             case '<':
-                snprintf(result, 50, "%d", dx < dy);
-                break;
+                return __float(dx < dy);
             case '>':
-                snprintf(result, 50, "%d", dx > dy);
-                break;
+                return __float(dx > dy);
             default:
-                free(result);
                 return LeaveException(MathError, _Tree->value, _Tree->file);
             }
         }

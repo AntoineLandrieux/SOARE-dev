@@ -12,21 +12,19 @@
  * Antoine LANDRIEUX (MIT License) <Error.c>
  * <https://github.com/AntoineLandrieux/SOARE/>
  *
- * [!] Contribute and help me translate the comments!
- *
  */
 
 #include <SOARE/SOARE.h>
 #include <SOARE/utils/int.h>
 
-/* Activation/Désactivation de l'affichage des erreurs */
+/* Enable/disable error display */
 static u8 Exception = 1;
 
-/* niveau d'erreur */
+/* Error level */
 static i8 ErrorLvl = 0;
 
 /**
- * @brief Ignore les erreurs
+ * @brief Enable/disable error display
  * @author Antoine LANDRIEUX
  *
  * @param _Ignore 0 si non
@@ -37,7 +35,7 @@ void IgnoreException(unsigned char _Ignore)
 }
 
 /**
- * @brief Efface les erreurs
+ * @brief Clears errors
  * @author Antoine LANDRIEUX
  *
  */
@@ -47,7 +45,7 @@ void ClearException(void)
 }
 
 /**
- * @brief Retourne le niveau d'erreur
+ * @brief Returns the error level
  * @author Antoine LANDRIEUX
  *
  * @return char
@@ -58,17 +56,17 @@ char ErrorLevel(void)
 }
 
 /**
- * @brief Créer une nouvelle erreur, et l'affiche
+ * @brief Create a new error, and display it
  * @author Antoine LANDRIEUX
  *
  * @param _Error
  * @param _String
  * @param _File
- * @return void* (retourne toujours NULL)
+ * @return void* (always returns NULL)
  */
 void *LeaveException(char *_Error, char *_String, Document _File)
 {
-    // Si les erreurs sont désactivés, on affiche rien
+    // If the errors are disabled, nothing is displayed
     if (Exception)
     {
 #ifndef __SOARE_NO_COLORED_OUTPUT
@@ -91,7 +89,7 @@ void *LeaveException(char *_Error, char *_String, Document _File)
         fprintf(stderr, "\033[0;39m");
 #endif /* __SOARE_NO_COLORED_OUTPUT */
     }
-    // On mais l'erreur au niveau 1
+    // We put the error at level 1
     ErrorLvl = 1;
     return NULL;
 }

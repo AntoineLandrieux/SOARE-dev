@@ -14,42 +14,37 @@
  * Antoine LANDRIEUX (MIT License) <error.h>
  * <https://github.com/AntoineLandrieux/SOARE/>
  *
- * [!] Contribute and help me translate the comments!
- *
  */
 
-/* Caractère inconnu ou invalide */
+/* Character Error */
 #define CharacterError "CharacterError"
 
-/* Division par 0 */
+/* Divide By Zero */
 #define DivideByZero "DivideByZero"
 
-/* Erreur de l'interpreteur (allocation mémoire) */
+/* Interpreter Error (memory issues) */
 #define InterpreterError "InterpreterError"
 
-/* Erreur de syntaxe */
+/* Syntax Error */
 #define SyntaxError "SyntaxError"
 
-/* Erreur de type */
-#define TypeError "TypeError"
-
-/* Erreur mathématique (opération invalide) */
+/* Math Error */
 #define MathError "MathError"
 
-/* Symbole inattendu */
+/* Unexpected Near */
 #define UnexpectedNear "UnexpectedNear"
 
-/* Symbole inexistant */
+/* Undefined Reference */
 #define UndefinedReference "UndefinedReference"
 
-/* Assignation inexistant */
+/* Missing Assignation */
 #define MissingAssignation "MissingAssignation"
 
-/* Erreur lors de l'ouverture/lecture/écriture d'un fichier */
+/* File Error */
 #define FileError "FileError"
 
 /**
- * @brief Ignore les erreurs
+ * @brief Enable/disable error display
  * @author Antoine LANDRIEUX
  *
  * @param _Ignore 0 si non
@@ -57,14 +52,14 @@
 void IgnoreException(unsigned char _Ignore);
 
 /**
- * @brief Efface les erreurs
+ * @brief Clears errors
  * @author Antoine LANDRIEUX
  *
  */
 void ClearException();
 
 /**
- * @brief Retourne le niveau d'erreur
+ * @brief Returns the error level
  * @author Antoine LANDRIEUX
  *
  * @return char
@@ -72,13 +67,13 @@ void ClearException();
 char ErrorLevel();
 
 /**
- * @brief Créer une nouvelle erreur, et l'affiche
+ * @brief Create a new error, and display it
  * @author Antoine LANDRIEUX
  *
  * @param _Error
  * @param _String
  * @param _File
- * @return void* (retourne toujours NULL)
+ * @return void* (always returns NULL)
  */
 void *LeaveException(char *_Error, char *_String, Document _File);
 
