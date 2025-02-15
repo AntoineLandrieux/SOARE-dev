@@ -17,8 +17,6 @@
  */
 
 #include <SOARE/SOARE.h>
-#include <SOARE/utils/int.h>
-#include <SOARE/utils/keywords.h>
 
 /**
  * @brief Create a new empty memory
@@ -26,12 +24,12 @@
  *
  * @return MEM
  */
-MEM Mem()
+MEM Mem(void)
 {
     MEM MEMORY = (MEM)malloc(sizeof(struct mem));
 
     if (MEMORY == NULL)
-        return LeaveException(InterpreterError, "OUT OF MEMORY", EmptyDocument());
+        return __SOARE_OUT_OF_MEMORY();
 
     MEMORY->name = NULL;
     MEMORY->next = NULL;
@@ -44,14 +42,14 @@ MEM Mem()
  * @brief Give the last variable in the memory
  * @author Antoine LANDRIEUX
  *
- * @param _Memory
+ * @param memory
  * @return MEM
  */
-MEM MemLast(MEM _Memory)
+MEM MemLast(MEM memory)
 {
-    if (_Memory == NULL)
+    if (memory == NULL)
         return NULL;
-    MEM curr = _Memory;
+    MEM curr = memory;
     for (; curr->next != NULL; curr = curr->next)
         ;
     return curr;
@@ -61,25 +59,25 @@ MEM MemLast(MEM _Memory)
  * @brief Add a variable to an existing memory
  * @author Antoine LANDRIEUX
  *
- * @param _Memory
- * @param _Name
+ * @param memory
+ * @param name
  * @return MEM
  */
-MEM MemPush(MEM _Memory, char *_Name, char *_Value)
+MEM MemPush(MEM memory, char *name, char *value)
 {
-    if (_Memory == NULL)
+    if (memory == NULL)
         return NULL;
 
-    MEM mem = MemLast(_Memory);
+    MEM mem = MemLast(memory);
     mem->next = (MEM)malloc(sizeof(struct mem));
     mem = mem->next;
 
     if (mem == NULL)
-        return LeaveException(InterpreterError, "OUT OF MEMORY", EmptyDocument());
+        return __SOARE_OUT_OF_MEMORY();
 
     mem->next = NULL;
-    mem->name = _Name;
-    mem->value = _Value;
+    mem->name = name;
+    mem->value = value;
 
     return mem;
 }
@@ -88,18 +86,18 @@ MEM MemPush(MEM _Memory, char *_Name, char *_Value)
  * @brief Find a variable in the memory
  * @author Antoine LANDRIEUX
  *
- * @param _Memory
- * @param _Name
+ * @param memory
+ * @param name
  * @return MEM
  */
-MEM MemGet(MEM _Memory, char *_Name)
+MEM MemGet(MEM memory, char *name)
 {
-    if (_Memory == NULL)
+    if (memory == NULL)
         return NULL;
-    MEM get = MemGet(_Memory->next, _Name);
-    if (get == NULL && _Memory->value != NULL)
-        if (!strcmp(_Memory->name, _Name))
-            return _Memory;
+    MEM get = MemGet(memory->next, name);
+    if (get == NULL && memory->value != NULL)
+        if (!strcmp(memory->name, name))
+            return memory;
     return get;
 }
 
@@ -107,65 +105,65 @@ MEM MemGet(MEM _Memory, char *_Name)
  * @brief Update a variable
  * @author Antoine LANDRIEUX
  *
- * @param _Memory
- * @param _Name
+ * @param memory
+ * @param name
  * @return MEM
  */
-MEM MemSet(MEM _Memory, char *_Value)
+MEM MemSet(MEM memory, char *value)
 {
-    if (_Memory == NULL)
+    if (memory == NULL)
         return NULL;
-    free(_Memory->value);
-    _Memory->value = _Value;
-    return _Memory;
+    free(memory->value);
+    memory->value = value;
+    return memory;
 }
 
 /**
  * @brief Display all variables
  * @author Antoine LANDRIEUX
  *
- * @param _Memory
+ * @param memory
  */
-void MemLog(MEM _Memory)
+void MemLog(MEM memory)
 {
-    if (_Memory == NULL)
+    if (memory == NULL)
         return;
     printf(
         "[MEMORY] [%p, %s\t%s]\n",
-        (void *)_Memory,
-        _Memory->name,
-        _Memory->value);
-    MemLog(_Memory->next);
+        (void *)memory,
+        memory->name,
+        memory->value);
+    MemLog(memory->next);
 }
 
 /**
  * @brief Join 2 memories
  * @author Antoine LANDRIEUX
  *
- * @param _To
- * @param _From
+ * @param to
+ * @param from
  */
-void MemJoin(MEM _To, MEM _From)
+void MemJoin(MEM to, MEM from)
 {
-    if (_To == NULL || _From == NULL)
+    if (to == NULL || from == NULL)
         return;
-    MemLast(_To)->next = _From;
+    MemLast(to)->next = from;
 }
 
 /**
  * @brief Free the allocated memory
  * @author Antoine LANDRIEUX
  *
- * @param _Memory
+ * @param memory
  * @return void* (always returns NULL)
  */
-void *MemFree(MEM _Memory)
+void *MemFree(MEM memory)
 {
-    if (_Memory == NULL)
+    if (memory == NULL)
         return NULL;
 
-    MemFree(_Memory->next);
-    free(_Memory->value);
-    free(_Memory);
+    MemFree(memory->next);
+    free(memory->value);
+    free(memory);
     return NULL;
 }

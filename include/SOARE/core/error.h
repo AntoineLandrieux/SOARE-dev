@@ -47,16 +47,16 @@
  * @brief Enable/disable error display
  * @author Antoine LANDRIEUX
  *
- * @param _Ignore 0 si non
+ * @param ignore
  */
-void IgnoreException(unsigned char _Ignore);
+void IgnoreException(u8 ignore);
 
 /**
  * @brief Clears errors
  * @author Antoine LANDRIEUX
  *
  */
-void ClearException();
+void ClearException(void);
 
 /**
  * @brief Returns the error level
@@ -64,17 +64,19 @@ void ClearException();
  *
  * @return char
  */
-char ErrorLevel();
+char ErrorLevel(void);
 
 /**
  * @brief Create a new error, and display it
  * @author Antoine LANDRIEUX
  *
- * @param _Error
- * @param _String
- * @param _File
+ * @param error
+ * @param string
+ * @param file
  * @return void* (always returns NULL)
  */
-void *LeaveException(char *_Error, char *_String, Document _File);
+void *LeaveException(char *error, char *string, Document file);
+
+#define __SOARE_OUT_OF_MEMORY() LeaveException(InterpreterError, "OUT OF MEMORY", EmptyDocument());
 
 #endif /* __SOARE_ERROR_H__ */

@@ -63,43 +63,51 @@ typedef struct Tokens
  *
  * @return Document
  */
-Document EmptyDocument();
+Document EmptyDocument(void);
 
 /**
  * @brief Create a new token
  * @author Antoine LANDRIEUX
  *
- * @param _Filename
- * @param _Value
- * @param _Type
+ * @param filename
+ * @param value
+ * @param type
  * @return Tokens*
  */
-Tokens *Token(char *_Filename, char *_Value, token_type _Type);
+Tokens *Token(char *filename, char *value, token_type type);
+
+/**
+ * @brief Move on to the next token
+ * @author Antoine LANDRIEUX
+ *
+ * @param tokens
+ */
+void TokenNext(Tokens **tokens);
 
 /**
  * @brief Free the memory allocated by the tokens
  * @author Antoine LANDRIEUX
  *
- * @param _Token
+ * @param token
  */
-void TokensFree(Tokens *_Token);
+void TokensFree(Tokens *token);
 
 /**
  * @brief Display the tokens
  * @author Antoine LANDRIEUX
  *
- * @param _Token
+ * @param token
  */
-void TokensLog(Tokens *_Token);
+void TokensLog(Tokens *token);
 
 /**
  * @brief Transform a string into a sequence of tokens
  * @author Antoine LANDRIEUX
  *
- * @param _Filename
- * @param _Text
+ * @param filename
+ * @param text
  * @return Tokens*
  */
-Tokens *Tokenizer(char *_Filename, char *_Text);
+Tokens *Tokenizer(char *filename, char *text);
 
 #endif /* __SOARE_TOKENIZER_H__ */

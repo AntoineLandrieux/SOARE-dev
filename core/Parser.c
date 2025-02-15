@@ -16,28 +16,26 @@
  */
 
 #include <SOARE/SOARE.h>
-#include <SOARE/utils/int.h>
-#include <SOARE/utils/keywords.h>
 
 /**
  * @brief Create a new node
  * @author Antoine LANDRIEUX
  *
- * @param _Value
- * @param _Type
- * @param _File
+ * @param value
+ * @param type
+ * @param file
  * @return Node*
  */
-Node *Branch(char *_Value, node_type _Type, Document _File)
+Node *Branch(char *value, node_type type, Document file)
 {
     Node *branch = (Node *)malloc(sizeof(Node));
 
     if (branch == NULL)
-        return LeaveException(InterpreterError, "OUT OF MEMORY", EmptyDocument());
+        return __SOARE_OUT_OF_MEMORY();
 
-    branch->value = _Value == NULL ? NULL : strdup(_Value);
-    branch->type = _Type;
-    branch->file = _File;
+    branch->value = value == NULL ? NULL : strdup(value);
+    branch->type = type;
+    branch->file = file;
     branch->parent = NULL;
     branch->child = NULL;
     branch->sibling = NULL;
@@ -49,19 +47,19 @@ Node *Branch(char *_Value, node_type _Type, Document _File)
  * @brief Find a node
  * @author Antoine LANDRIEUX
  *
- * @param _Source
- * @param _Value
- * @param _Type
+ * @param source
+ * @param value
+ * @param type
  * @return Node*
  */
-Node *BranchFind(AST _Source, char *_Value, node_type _Type)
+Node *BranchFind(AST source, char *value, node_type type)
 {
-    if (_Source == NULL)
+    if (source == NULL)
         return NULL;
-    if (!strcmp(_Value, _Source->value == NULL ? "" : _Source->value) && _Source->type == _Type)
-        return _Source;
-    Node *R = BranchFind(_Source->sibling, _Value, _Type);
-    Node *L = BranchFind(_Source->parent ? (_Source->parent->parent ? _Source->parent->parent->child : _Source->parent) : NULL, _Value, _Type);
+    if (!strcmp(value, source->value == NULL ? "" : source->value) && source->type == type)
+        return source;
+    Node *R = BranchFind(source->sibling, value, type);
+    Node *L = BranchFind(source->parent ? (source->parent->parent ? source->parent->parent->child : source->parent) : NULL, value, type);
     return R ? R : L;
 }
 
@@ -69,251 +67,97 @@ Node *BranchFind(AST _Source, char *_Value, node_type _Type)
  * @brief Join 2 branches
  * @author Antoine LANDRIEUX
  *
- * @param _Parent
- * @param _Child
+ * @param parent
+ * @param child
  * @return AST
  */
-AST BranchJoin(Node *_Parent, Node *_Child)
+AST BranchJoin(Node *parent, Node *child)
 {
-    if (_Child == NULL || _Parent == NULL)
+    if (child == NULL || parent == NULL)
         return NULL;
-    if (_Parent->child == NULL)
-        _Parent->child = _Child;
+    if (parent->child == NULL)
+        parent->child = child;
     else
     {
-        Node *tmp = _Parent->child;
+        Node *tmp = parent->child;
         while (tmp->sibling != NULL)
             tmp = tmp->sibling;
-        tmp->sibling = _Child;
+        tmp->sibling = child;
     }
-    _Child->parent = _Parent;
-    return _Parent;
+    child->parent = parent;
+    return parent;
 }
 
 /**
  * @brief Frees the memory allocated by a tree
  * @author Antoine LANDRIEUX
  *
- * @param _Tree
+ * @param tree
  */
-void TreeFree(AST _Tree)
+void TreeFree(AST tree)
 {
-    if (_Tree == NULL)
+    if (tree == NULL)
         return;
 
-    TreeFree(_Tree->child);
-    TreeFree(_Tree->sibling);
-    free(_Tree->value);
-    free(_Tree);
+    TreeFree(tree->child);
+    TreeFree(tree->sibling);
+    free(tree->value);
+    free(tree);
 }
 
 /**
  * @brief Display a tree
  * @author Antoine LANDRIEUX
  *
- * @param _Tree
+ * @param tree
  */
-void TreeLog(AST _Tree)
+void TreeLog(AST tree)
 {
-    if (_Tree == NULL)
+    if (tree == NULL)
         return;
 
     printf("[BRANCH] ");
 
-    if (_Tree->parent != NULL)
+    if (tree->parent != NULL)
         printf(
             "[%p, %s:%.5lld:%.5lld, %.2X, \"%s\"]\t",
-            (void *)_Tree->parent,
-            _Tree->parent->file.file,
-            _Tree->parent->file.ln,
-            _Tree->parent->file.col,
-            _Tree->parent->type,
-            _Tree->parent->value);
+            (void *)tree->parent,
+            tree->parent->file.file,
+            tree->parent->file.ln,
+            tree->parent->file.col,
+            tree->parent->type,
+            tree->parent->value);
     printf(
         "[%p, %s:%.5lld:%.5lld, %.2X, \"%s\"]\n",
-        (void *)_Tree,
-        _Tree->file.file,
-        _Tree->file.ln,
-        _Tree->file.col,
-        _Tree->type,
-        _Tree->value);
-    TreeLog(_Tree->child);
-    TreeLog(_Tree->sibling);
-}
-
-/**
- * @brief Move on to the next token
- * @author Antoine LANDRIEUX
- *
- * @param _Tokens
- */
-static void Next(Tokens **_Tokens)
-{
-    *_Tokens = (*_Tokens)->next;
-}
-
-static AST ParseExpr(Tokens **_Tokens, u8 _Priority);
-
-/**
- * @brief Return the value as a node
- * @author Antoine LANDRIEUX
- *
- * @param _Tokens
- * @return AST
- */
-static AST ParseValue(Tokens **_Tokens)
-{
-    Node *value = Branch((*_Tokens)->value, NODE_ROOT, (*_Tokens)->file);
-    Tokens *old = *_Tokens;
-    Next(_Tokens);
-
-    switch (old->type)
-    {
-    case TKN_NUMBER:
-        value->type = NODE_NUMBER;
-        break;
-
-    case TKN_PARENL:
-        free(value->value);
-        value->value = NULL;
-        value->type = NODE_ARRAY;
-        while ((*_Tokens)->type != TKN_PARENR)
-            BranchJoin(value, ParseExpr(_Tokens, 0xFF));
-        break;
-
-    case TKN_STRING:
-        value->type = NODE_STRING;
-        break;
-
-    case TKN_NAME:
-        value->type = NODE_MEMGET;
-
-        if ((*_Tokens)->type != TKN_FUNCTION)
-            break;
-
-        value->type = NODE_CALL;
-
-        Next(_Tokens);
-
-        if ((*_Tokens)->type != TKN_PARENL)
-        {
-            free(value);
-            return NULL;
-        }
-
-        Next(_Tokens);
-
-        while ((*_Tokens)->type != TKN_PARENR)
-        {
-            AST expr = ParseExpr(_Tokens, 0xFF);
-            if (expr == NULL)
-            {
-                TreeFree(value);
-                return NULL;
-            }
-            BranchJoin(value, expr);
-            if ((*_Tokens)->type != TKN_SEMICOLON)
-                break;
-            Next(_Tokens);
-        }
-
-        if ((*_Tokens)->type != TKN_PARENR)
-        {
-            TreeFree(value);
-            return NULL;
-        }
-        Next(_Tokens);
-        break;
-
-    default:
-        TreeFree(value);
-        return NULL;
-    }
-
-    return value;
-}
-
-/**
- * @brief Looks up the mathematical priority of an operator
- * @author Antoine LANDRIEUX
- *
- * @param _Operator
- * @return u8
- */
-static u8 MathPriority(char _Operator)
-{
-    if (strchr("/*%^", _Operator))
-        return 0;
-    else if (strchr("+-", _Operator))
-        return 1;
-    else if (strchr("<=!>", _Operator))
-        return 2;
-    return 3;
-}
-
-/**
- * @brief Build a math tree
- * @author Antoine LANDRIEUX
- *
- * @param _Tokens
- * @return AST
- */
-static AST ParseExpr(Tokens **_Tokens, u8 _Priority)
-{
-    Node *left = ParseValue(_Tokens);
-    Node *right = NULL;
-    Node *symbol = NULL;
-
-    if (left == NULL)
-        return NULL;
-
-    while ((*_Tokens)->type == TKN_OPERATOR && !ErrorLevel())
-    {
-        u8 priority = MathPriority(*(*_Tokens)->value);
-
-        if (priority >= _Priority)
-            break;
-
-        symbol = Branch((*_Tokens)->value, NODE_OPERATOR, (*_Tokens)->file);
-        Next(_Tokens);
-        right = ParseExpr(_Tokens, priority);
-
-        if (symbol == NULL || right == NULL)
-        {
-            TreeFree(left);
-            TreeFree(right);
-            TreeFree(symbol);
-            return NULL;
-        }
-
-        BranchJoin(symbol, left);
-        BranchJoin(symbol, right);
-
-        left = symbol;
-    }
-
-    return left;
+        (void *)tree,
+        tree->file.file,
+        tree->file.ln,
+        tree->file.col,
+        tree->type,
+        tree->value);
+    TreeLog(tree->child);
+    TreeLog(tree->sibling);
 }
 
 /**
  * @brief Turns a sequence of tokens into a tree (AST)
  * @author Antoine LANDRIEUX
  *
- * @param _Tokens
+ * @param tokens
  * @return AST
  */
-AST Parse(Tokens *_Tokens)
+AST Parse(Tokens *tokens)
 {
     Node *root = Branch("root", NODE_ROOT, EmptyDocument());
     Node *curr = root;
 
-    while (_Tokens != NULL)
+    while (tokens != NULL)
     {
-        if (_Tokens->type == TKN_EOF)
+        if (tokens->type == TKN_EOF)
             break;
 
-        Tokens *old = _Tokens;
-        Next(&_Tokens);
+        Tokens *old = tokens;
+        TokenNext(&tokens);
 
         switch (old->type)
         {
@@ -324,41 +168,41 @@ AST Parse(Tokens *_Tokens)
 
             if (*(old->value) == '@')
             {
-                if (_Tokens->type != TKN_NAME || _Tokens->next->type != TKN_PARENL)
+                if (tokens->type != TKN_NAME || tokens->next->type != TKN_PARENL)
                 {
                     TreeFree(root);
                     return LeaveException(SyntaxError, old->value, old->file);
                 }
 
-                AST function = Branch(_Tokens->value, NODE_FUNCTION, old->file);
+                AST function = Branch(tokens->value, NODE_FUNCTION, old->file);
                 AST body = Branch("BODY", NODE_BODY, old->file);
 
-                Next(&_Tokens);
-                Next(&_Tokens);
+                TokenNext(&tokens);
+                TokenNext(&tokens);
                 BranchJoin(curr, function);
 
                 while (1)
                 {
-                    if (_Tokens->type == TKN_PARENR)
+                    if (tokens->type == TKN_PARENR)
                         break;
 
-                    if (_Tokens->type != TKN_NAME)
+                    if (tokens->type != TKN_NAME)
                     {
                         TreeFree(root);
                         TreeFree(body);
-                        return LeaveException(SyntaxError, _Tokens->value, _Tokens->file);
+                        return LeaveException(SyntaxError, tokens->value, tokens->file);
                     }
 
-                    BranchJoin(function, Branch(_Tokens->value, NODE_MEMSET, _Tokens->file));
+                    BranchJoin(function, Branch(tokens->value, NODE_MEMSET, tokens->file));
 
-                    Next(&_Tokens);
+                    TokenNext(&tokens);
 
-                    if (_Tokens->type == TKN_SEMICOLON)
-                        Next(&_Tokens);
+                    if (tokens->type == TKN_SEMICOLON)
+                        TokenNext(&tokens);
                 }
 
                 BranchJoin(function, body);
-                Next(&_Tokens);
+                TokenNext(&tokens);
                 curr = body;
             }
 
@@ -370,7 +214,7 @@ AST Parse(Tokens *_Tokens)
                     BranchJoin(
                         //
                         Branch(old->value, NODE_RETURN, old->file),
-                        ParseExpr(&_Tokens, 0xFF)
+                        ParseExpr(&tokens, 0xFF)
                         //
                         )
                     //
@@ -378,14 +222,14 @@ AST Parse(Tokens *_Tokens)
 
             else if (!strcmp(old->value, KEYWORD_LOADIMPORT) || !strcmp(old->value, KEYWORD_RAISE))
             {
-                if (_Tokens->type != TKN_STRING)
+                if (tokens->type != TKN_STRING)
                 {
                     TreeFree(root);
                     return LeaveException(SyntaxError, old->value, old->file);
                 }
 
-                BranchJoin(curr, Branch(_Tokens->value, strcmp(old->value, KEYWORD_RAISE) ? NODE_IMPORT : NODE_RAISE, old->file));
-                Next(&_Tokens);
+                BranchJoin(curr, Branch(tokens->value, strcmp(old->value, KEYWORD_RAISE) ? NODE_IMPORT : NODE_RAISE, old->file));
+                TokenNext(&tokens);
             }
 
             else if (!strcmp(old->value, KEYWORD_TRY))
@@ -401,19 +245,19 @@ AST Parse(Tokens *_Tokens)
             {
                 Node *enumerate = Branch(old->value, NODE_ENUMERATE, old->file);
 
-                for (; _Tokens->type != TKN_KEYWORD || strcmp(KEYWORD_END, _Tokens->value); Next(&_Tokens))
+                for (; tokens->type != TKN_KEYWORD || strcmp(KEYWORD_END, tokens->value); TokenNext(&tokens))
                 {
-                    if (_Tokens->type != TKN_NAME)
+                    if (tokens->type != TKN_NAME)
                     {
                         TreeFree(root);
                         TreeFree(enumerate);
                         return LeaveException(SyntaxError, old->value, old->file);
                     }
-                    BranchJoin(enumerate, Branch(_Tokens->value, NODE_MEMSET, _Tokens->file));
+                    BranchJoin(enumerate, Branch(tokens->value, NODE_MEMSET, tokens->file));
                 }
 
                 BranchJoin(curr, enumerate);
-                Next(&_Tokens);
+                TokenNext(&tokens);
             }
 
             else if (!strcmp(old->value, KEYWORD_IFERROR))
@@ -432,9 +276,9 @@ AST Parse(Tokens *_Tokens)
 
             else if (!strcmp(old->value, KEYWORD_IF) || !strcmp(old->value, KEYWORD_WHILE))
             {
-                AST content = ParseExpr(&_Tokens, 0xFF);
+                AST content = ParseExpr(&tokens, 0xFF);
 
-                if (content == NULL || _Tokens->type != TKN_KEYWORD || strcmp(_Tokens->value, "do"))
+                if (content == NULL || tokens->type != TKN_KEYWORD || strcmp(tokens->value, "do"))
                 {
                     TreeFree(root);
                     return LeaveException(SyntaxError, old->value, old->file);
@@ -448,7 +292,7 @@ AST Parse(Tokens *_Tokens)
                 BranchJoin(curr, statement);
 
                 curr = body;
-                Next(&_Tokens);
+                TokenNext(&tokens);
             }
 
             else if (!strcmp(old->value, KEYWORD_ORIF))
@@ -459,9 +303,9 @@ AST Parse(Tokens *_Tokens)
                     return LeaveException(UnexpectedNear, old->value, old->file);
                 }
 
-                AST content = ParseExpr(&_Tokens, 0xFF);
+                AST content = ParseExpr(&tokens, 0xFF);
 
-                if (content == NULL || _Tokens->type != TKN_KEYWORD || strcmp(_Tokens->value, "do"))
+                if (content == NULL || tokens->type != TKN_KEYWORD || strcmp(tokens->value, "do"))
                 {
                     TreeFree(root);
                     return LeaveException(SyntaxError, old->value, old->file);
@@ -473,7 +317,7 @@ AST Parse(Tokens *_Tokens)
                 BranchJoin(curr->parent, body);
 
                 curr = body;
-                Next(&_Tokens);
+                TokenNext(&tokens);
             }
 
             else if (!strcmp(old->value, KEYWORD_ELSE))
@@ -494,7 +338,7 @@ AST Parse(Tokens *_Tokens)
 
             else if (!strcmp(old->value, KEYWORD_WRITELN))
             {
-                AST content = ParseExpr(&_Tokens, 0xFF);
+                AST content = ParseExpr(&tokens, 0xFF);
 
                 if (content == NULL)
                 {
@@ -542,8 +386,8 @@ AST Parse(Tokens *_Tokens)
 
         case TKN_NAME:
 
-            _Tokens = old;
-            AST parsed = ParseValue(&_Tokens);
+            tokens = old;
+            AST parsed = ParseValue(&tokens);
 
             if (parsed == NULL)
             {
@@ -553,14 +397,14 @@ AST Parse(Tokens *_Tokens)
 
             if (parsed->type == NODE_MEMGET)
             {
-                if (_Tokens->type != TKN_ASSIGN)
+                if (tokens->type != TKN_ASSIGN)
                 {
                     TreeFree(root);
                     TreeFree(parsed);
                     return LeaveException(UnexpectedNear, old->value, old->file);
                 }
-                Next(&_Tokens);
-                AST content = ParseExpr(&_Tokens, 0xFF);
+                TokenNext(&tokens);
+                AST content = ParseExpr(&tokens, 0xFF);
                 if (content == NULL)
                 {
                     TreeFree(root);

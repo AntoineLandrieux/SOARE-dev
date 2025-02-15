@@ -15,7 +15,6 @@
  */
 
 #include <SOARE/SOARE.h>
-#include <SOARE/utils/int.h>
 
 /* Enable/disable error display */
 static u8 Exception = 1;
@@ -27,11 +26,11 @@ static i8 ErrorLvl = 0;
  * @brief Enable/disable error display
  * @author Antoine LANDRIEUX
  *
- * @param _Ignore 0 si non
+ * @param ignore
  */
-void IgnoreException(unsigned char _Ignore)
+void IgnoreException(u8 ignore)
 {
-    Exception = !_Ignore;
+    Exception = !ignore;
 }
 
 /**
@@ -59,12 +58,12 @@ char ErrorLevel(void)
  * @brief Create a new error, and display it
  * @author Antoine LANDRIEUX
  *
- * @param _Error
- * @param _String
- * @param _File
+ * @param error
+ * @param string
+ * @param file
  * @return void* (always returns NULL)
  */
-void *LeaveException(char *_Error, char *_String, Document _File)
+void *LeaveException(char *error, char *string, Document file)
 {
     // If the errors are disabled, nothing is displayed
     if (Exception)
@@ -77,11 +76,11 @@ void *LeaveException(char *_Error, char *_String, Document _File)
             //
             stderr,
             "Except: %s\n\t\"%.10s\"\n\t ^~~~\n\tAt file %s:%lld:%lld\n",
-            _Error,
-            _String,
-            _File.file,
-            _File.ln,
-            _File.col
+            error,
+            string,
+            file.file,
+            file.ln,
+            file.col
             //
         );
 #ifndef __SOARE_NO_COLORED_OUTPUT
@@ -89,7 +88,7 @@ void *LeaveException(char *_Error, char *_String, Document _File)
         fprintf(stderr, "\033[0;39m");
 #endif /* __SOARE_NO_COLORED_OUTPUT */
     }
-    // We put the error at level 1
+    // set error at level 1
     ErrorLvl = 1;
     return NULL;
 }

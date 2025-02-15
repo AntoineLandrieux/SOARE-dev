@@ -25,28 +25,26 @@ extern MEM MEMORY;
  *
  * @deprecated
  *
- * @param _Tree
+ * @param tree
  * @return char*
  */
-char *RunFunction(AST _Tree);
+char *RunFunction(AST tree);
 
 /**
- * @brief Execute le code à partir d'un arbre et retourne une valeur en fonction du type
+ * @brief Executes code from a tree
  * @author Antoine LANDRIEUX
  *
- * @param _Tree
+ * @param tree
  * @return char*
  */
-char *Runtime(AST _Tree);
+char *Runtime(AST tree);
 
 /**
- * @brief Execute le code à partir d'une chaîne de caractères
+ * @brief Execute the code from a string
  * @author Antoine LANDRIEUX
  *
- * @param _File
- * @param _RawCode
- * @return int
+ * @param rawcode
  */
-int Execute(char *_File, char *_RawCode);
+int Execute(char *file, char *rawcode);
 
 #endif /* __SOARE_RUNTIME_H__ */

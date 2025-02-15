@@ -17,12 +17,10 @@ syntax "soare" "\.soare$"
 magic "Soare script"
 comment "?"
 
-## built-in objects
-color cyan "\<(None|Number|String)\>"
 ## built-in functions
-color cyan "\<(isset|StoN|NtoS)\>"
+color cyan "\<(M|NaN|isset|ftoi)\>"
 ## Keywords
-color brightblue "\<(continue|do|else|end|enumerate|if|iferror|loadimport|nop|orif|prompt|raise|return|try|while|writeln)\>"
+color brightblue "\<(continue|do|else|end|enumerate|if|iferror|loadimport|nop|orif|inputln|raise|return|try|while|writeln)\>"
 
 ## operators
 color magenta "[.:;,+*|=!\%@]" "<" ">" "/" "-" "&"

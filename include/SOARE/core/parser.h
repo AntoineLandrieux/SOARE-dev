@@ -74,57 +74,57 @@ typedef struct node
  * @brief Create a new node
  * @author Antoine LANDRIEUX
  *
- * @param _Value
- * @param _Type
- * @param _File
+ * @param value
+ * @param type
+ * @param file
  * @return Node*
  */
-Node *Branch(char *_Value, node_type _Type, Document _File);
+Node *Branch(char *value, node_type type, Document file);
 
 /**
  * @brief Find a node
  * @author Antoine LANDRIEUX
  *
- * @param _Source
- * @param _Value
- * @param _Type
+ * @param source
+ * @param value
+ * @param type
  * @return Node*
  */
-Node *BranchFind(AST _Source, char *_Value, node_type _Type);
+Node *BranchFind(AST source, char *value, node_type type);
 
 /**
  * @brief Join 2 branches
  * @author Antoine LANDRIEUX
  *
- * @param _Parent
- * @param _Child
+ * @param parent
+ * @param child
  * @return AST
  */
-AST BranchJoin(Node *_Parent, Node *_Child);
+AST BranchJoin(Node *parent, Node *child);
 
 /**
  * @brief Frees the memory allocated by a tree
  * @author Antoine LANDRIEUX
  *
- * @param _Tree
+ * @param tree
  */
-void TreeFree(AST _Tree);
+void TreeFree(AST tree);
 
 /**
  * @brief Display a tree
  * @author Antoine LANDRIEUX
  *
- * @param _Tree
+ * @param tree
  */
-void TreeLog(AST _Tree);
+void TreeLog(AST tree);
 
 /**
  * @brief Turns a sequence of tokens into a tree (AST)
  * @author Antoine LANDRIEUX
  *
- * @param _Tokens
+ * @param tokens
  * @return AST
  */
-AST Parse(Tokens *_Tokens);
+AST Parse(Tokens *tokens);
 
 #endif /* __SOARE_PARSER_H__ */

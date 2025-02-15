@@ -53,6 +53,9 @@ namespace SOARE
 /* Input file for console mode */
 #define __SOARE_FILE__ "_input"
 
+#include <SOARE/utils/int.h>
+#include <SOARE/utils/keywords.h>
+
 #include "core/error.h"
 #include "core/tokenizer.h"
 #include "core/parser.h"

@@ -16,15 +16,41 @@
  *
  */
 
-#include "parser.h"
+/**
+ * @brief Looks up the mathematical priority of an operator
+ * @author Antoine LANDRIEUX
+ *
+ * @param symbol
+ * @return u8
+ */
+u8 MathPriority(char symbol);
+
+/**
+ * @brief Return the value as a node
+ * @author Antoine LANDRIEUX
+ *
+ * @param tokens
+ * @return AST
+ */
+AST ParseValue(Tokens **tokens);
+
+/**
+ * @brief Build a math tree
+ * @author Antoine LANDRIEUX
+ *
+ * @param tokens
+ * @param priority 
+ * @return AST
+ */
+AST ParseExpr(Tokens **tokens, u8 priority);
 
 /**
  * @brief Evaluates the mathematical expression of a tree
  * @author Antoine LANDRIEUX
  *
- * @param _Tree
+ * @param tree
  * @return char*
  */
-char *Math(AST _Tree);
+char *Math(AST tree);
 
 #endif /* __SOARE_MATH_H__ */

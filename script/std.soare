@@ -15,10 +15,10 @@
 @M(number) return number*1; end;
 
 ? @brief NaN
-@NaN(number) try M!(Number) iferror return 1; end; end;
+@NaN(number) try M!(number) iferror return 1; end; return 0; end;
 
 ? @brief isset
 @isset(any) return any; end;
 
 ? @brief ftoi
-@ftoi(float) if NaN!(float) raise "NaN"; else return float^0; end; end;
+@ftoi(float) if NaN!(float) do raise "NaN"; else return float^0; end; end;

@@ -16,112 +16,110 @@
  */
 
 #include <SOARE/SOARE.h>
-#include <SOARE/utils/int.h>
-#include <SOARE/utils/keywords.h>
 
 /**
  * @brief Check if a character is a number
  * @author Antoine LANDRIEUX
  *
- * @param _Char
+ * @param character
  *
  * @return u8
  */
-static u8 chrNum(const char _Char)
+static u8 chrNum(const char character)
 {
-    return _Char >= '0' && _Char <= '9';
+    return character >= '0' && character <= '9';
 }
 
 /**
  * @brief Check if the character is a letter
  * @author Antoine LANDRIEUX
  *
- * @param _Char
+ * @param character
  * @return u8
  */
-static u8 chrAlpha(const char _Char)
+static u8 chrAlpha(const char character)
 {
-    return (_Char >= 'a' && _Char <= 'z') || (_Char >= 'A' && _Char <= 'Z');
+    return (character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z');
 }
 
 /**
  * @brief Check if the character is a letter or a number
  * @author Antoine LANDRIEUX
  *
- * @param _Char
+ * @param character
  * @return u8
  */
-static u8 chrAlnum(const char _Char)
+static u8 chrAlnum(const char character)
 {
-    return chrAlpha(_Char) || chrNum(_Char);
+    return chrAlpha(character) || chrNum(character);
 }
 
 /**
  * @brief Check if the character is a space
  * @author Antoine LANDRIEUX
  *
- * @param _Char
+ * @param character
  * @return u8
  */
-static u8 chrSpace(const char _Char)
+static u8 chrSpace(const char character)
 {
-    return _Char == ' ' || _Char == '\t' || _Char == '\r' || _Char == '\n';
+    return character == ' ' || character == '\t' || character == '\r' || character == '\n';
 }
 
 /**
  * @brief Check if the character is an operator
  * @author Antoine LANDRIEUX
  *
- * @param _String
+ * @param string
  * @return u8
  */
-static u8 chrOperator(const char _Char)
+static u8 chrOperator(const char character)
 {
-    return strchr("<+-^*/%%>", _Char) != NULL;
+    return strchr("<+-^*/%%>", character) != NULL;
 }
 
 /**
  * @brief Check if the string is an operator
  * @author Antoine LANDRIEUX
  *
- * @param _String
+ * @param string
  * @return u8
  */
-static u8 strOperator(char *_String)
+static u8 strOperator(char *string)
 {
     return (
-        !strcasecmp("equ", _String) ||
-        !strcasecmp("neq", _String) ||
-        !strcasecmp("and", _String) ||
-        !strcasecmp("or", _String));
+        !strcasecmp("equ", string) ||
+        !strcasecmp("neq", string) ||
+        !strcasecmp("and", string) ||
+        !strcasecmp("or", string));
 }
 
 /**
  * @brief Check if the string is a keyword
  * @author Antoine LANDRIEUX
  *
- * @param _String
+ * @param string
  * @return u8
  */
-static u8 strKeyword(char *_String)
+static u8 strKeyword(char *string)
 {
     return (
         //
-        !strcmp(KEYWORD_CONTINUE, _String) ||
-        !strcmp(KEYWORD_DO, _String) ||
-        !strcmp(KEYWORD_ELSE, _String) ||
-        !strcmp(KEYWORD_END, _String) ||
-        !strcmp(KEYWORD_ENUMERATE, _String) ||
-        !strcmp(KEYWORD_IF, _String) ||
-        !strcmp(KEYWORD_IFERROR, _String) ||
-        !strcmp(KEYWORD_INPUTLN, _String) ||
-        !strcmp(KEYWORD_LOADIMPORT, _String) ||
-        !strcmp(KEYWORD_ORIF, _String) ||
-        !strcmp(KEYWORD_RAISE, _String) ||
-        !strcmp(KEYWORD_RETURN, _String) ||
-        !strcmp(KEYWORD_TRY, _String) ||
-        !strcmp(KEYWORD_WHILE, _String) ||
-        !strcmp(KEYWORD_WRITELN, _String)
+        !strcmp(KEYWORD_CONTINUE, string) ||
+        !strcmp(KEYWORD_DO, string) ||
+        !strcmp(KEYWORD_ELSE, string) ||
+        !strcmp(KEYWORD_END, string) ||
+        !strcmp(KEYWORD_ENUMERATE, string) ||
+        !strcmp(KEYWORD_IF, string) ||
+        !strcmp(KEYWORD_IFERROR, string) ||
+        !strcmp(KEYWORD_INPUTLN, string) ||
+        !strcmp(KEYWORD_LOADIMPORT, string) ||
+        !strcmp(KEYWORD_ORIF, string) ||
+        !strcmp(KEYWORD_RAISE, string) ||
+        !strcmp(KEYWORD_RETURN, string) ||
+        !strcmp(KEYWORD_TRY, string) ||
+        !strcmp(KEYWORD_WHILE, string) ||
+        !strcmp(KEYWORD_WRITELN, string)
         //
     );
 }
@@ -129,14 +127,14 @@ static u8 strKeyword(char *_String)
 /**
  * @brief Give the type of the string
  *
- * @param _String
+ * @param string
  * @return token_type
  */
-static token_type Symbol(char *_String)
+static token_type Symbol(char *string)
 {
-    if (strKeyword(_String))
+    if (strKeyword(string))
         return TKN_KEYWORD;
-    else if (strOperator(_String))
+    else if (strOperator(string))
         return TKN_OPERATOR;
     return TKN_NAME;
 }
@@ -147,7 +145,7 @@ static token_type Symbol(char *_String)
  *
  * @return Document
  */
-Document EmptyDocument()
+Document EmptyDocument(void)
 {
     Document document;
 
@@ -162,24 +160,24 @@ Document EmptyDocument()
  * @brief Create a new token
  * @author Antoine LANDRIEUX
  *
- * @param _Filename
- * @param _Value
- * @param _Type
+ * @param filename
+ * @param value
+ * @param type
  * @return Tokens*
  */
-Tokens *Token(char *_Filename, char *_Value, token_type _Type)
+Tokens *Token(char *filename, char *value, token_type type)
 {
     Tokens *token = (Tokens *)malloc(sizeof(Tokens));
 
     if (token == NULL)
-        return LeaveException(InterpreterError, "OUT OF MEMORY", EmptyDocument());
+        return __SOARE_OUT_OF_MEMORY();
 
-    token->value = _Value == NULL ? NULL : strdup(_Value);
-    token->type = _Type;
+    token->value = value == NULL ? NULL : strdup(value);
+    token->type = type;
 
     token->file.ln = 0;
     token->file.col = 0;
-    token->file.file = _Filename;
+    token->file.file = filename;
 
     token->next = NULL;
 
@@ -187,61 +185,72 @@ Tokens *Token(char *_Filename, char *_Value, token_type _Type)
 }
 
 /**
+ * @brief Move on to the next token
+ * @author Antoine LANDRIEUX
+ *
+ * @param tokens
+ */
+void TokenNext(Tokens **tokens)
+{
+    *tokens = (*tokens)->next;
+}
+
+/**
  * @brief Free the memory allocated by the tokens
  * @author Antoine LANDRIEUX
  *
- * @param _Token
+ * @param token
  */
-void TokensFree(Tokens *_Token)
+void TokensFree(Tokens *token)
 {
-    if (_Token == NULL)
+    if (token == NULL)
         return;
 
-    free(_Token->value);
-    TokensFree(_Token->next);
-    free(_Token);
+    TokensFree(token->next);
+    free(token->value);
+    free(token);
 }
 
 /**
  * @brief Display the tokens
  * @author Antoine LANDRIEUX
  *
- * @param _Token
+ * @param token
  */
-void TokensLog(Tokens *_Token)
+void TokensLog(Tokens *token)
 {
-    if (_Token == NULL)
+    if (token == NULL)
         return;
 
     printf(
         "[TOKENS] [%p, %s:%.5lld:%.5lld, %.2X, \"%s\"]\n",
-        (void *)_Token,
-        _Token->file.file,
-        _Token->file.ln,
-        _Token->file.col,
-        _Token->type,
-        _Token->value);
-    TokensLog(_Token->next);
+        (void *)token,
+        token->file.file,
+        token->file.ln,
+        token->file.col,
+        token->type,
+        token->value);
+    TokensLog(token->next);
 }
 
 /**
  * @brief Cut a string
  * @author Antoine LANDRIEUX
  *
- * @param _String
- * @param _Long
+ * @param string
+ * @param size
  * @return char*
  */
-static char *strcut(const char *_String, size_t _Long)
+static char *strcut(const char *string, size_t size)
 {
-    if (strlen(_String) < _Long)
-        _Long = strlen(_String);
-    char *result = (char *)malloc(_Long + 1);
+    if (strlen(string) < size)
+        size = strlen(string);
+    char *result = (char *)malloc(size + 1);
     if (result == NULL)
-        return LeaveException(InterpreterError, "OUT OF MEMORY", EmptyDocument());
-    for (size_t ptr = 0; ptr < _Long; ptr++)
-        result[ptr] = _String[ptr];
-    result[_Long] = 0;
+        return __SOARE_OUT_OF_MEMORY();
+    for (size_t ptr = 0; ptr < size; ptr++)
+        result[ptr] = string[ptr];
+    result[size] = 0;
     return result;
 }
 
@@ -262,16 +271,16 @@ static void updateln(u64 *ln, u64 *col)
  * @brief Transform a string into a sequence of tokens
  * @author Antoine LANDRIEUX
  *
- * @param _Filename
- * @param _Text
+ * @param filename
+ * @param text
  * @return Tokens*
  */
-Tokens *Tokenizer(char *_Filename, char *_Text)
+Tokens *Tokenizer(char *filename, char *text)
 {
-    if (_Text == NULL)
+    if (text == NULL)
         return NULL;
 
-    Tokens *token = Token(_Filename, NULL, TKN_EOF);
+    Tokens *token = Token(filename, NULL, TKN_EOF);
     Tokens *curr = token;
 
     u64 col = 0;
@@ -279,7 +288,7 @@ Tokens *Tokenizer(char *_Filename, char *_Text)
 
     updateln(&ln, &col);
 
-    while (*_Text)
+    while (*text)
     {
         if (ErrorLevel())
         {
@@ -287,19 +296,19 @@ Tokens *Tokenizer(char *_Filename, char *_Text)
             return NULL;
         }
 
-        if (chrSpace(*_Text))
+        if (chrSpace(*text))
         {
             col++;
-            if (*_Text == '\n')
+            if (*text == '\n')
                 updateln(&ln, &col);
-            (volatile char *)_Text++;
+            (volatile char *)text++;
             continue;
         }
 
-        else if (*_Text == '?')
+        else if (*text == '?')
         {
-            while (*_Text != '\n' && *_Text)
-                (volatile char *)_Text++;
+            while (*text != '\n' && *text)
+                (volatile char *)text++;
             updateln(&ln, &col);
             continue;
         }
@@ -310,38 +319,38 @@ Tokens *Tokenizer(char *_Filename, char *_Text)
         curr->file.ln = ln;
         curr->file.col = col;
 
-        if ('=' == *_Text)
+        if ('=' == *text)
             type = TKN_ASSIGN;
 
-        else if ('@' == *_Text)
+        else if ('@' == *text)
             type = TKN_KEYWORD;
 
-        else if (strchr("()", *_Text))
-            type = *_Text == '(' ? TKN_PARENL : TKN_PARENR;
+        else if (strchr("()", *text))
+            type = *text == '(' ? TKN_PARENL : TKN_PARENR;
 
-        else if (chrOperator(*_Text) || *_Text == '!' || *_Text == ';')
-            type = *_Text == ';' ? TKN_SEMICOLON : (*_Text == '!' ? TKN_FUNCTION : TKN_OPERATOR);
+        else if (chrOperator(*text) || *text == '!' || *text == ';')
+            type = *text == ';' ? TKN_SEMICOLON : (*text == '!' ? TKN_FUNCTION : TKN_OPERATOR);
 
-        else if (chrAlpha(*_Text) || *_Text == '_')
-            while (chrAlnum((&*_Text)[offset]) || (&*_Text)[offset] == '_')
+        else if (chrAlpha(*text) || *text == '_')
+            while (chrAlnum((&*text)[offset]) || (&*text)[offset] == '_')
                 offset++;
 
-        else if (chrNum(*_Text))
+        else if (chrNum(*text))
         {
             u8 point = 0;
-            while (chrNum((&*_Text)[offset]) || ((&*_Text)[offset] == '.' && !point))
+            while (chrNum((&*text)[offset]) || ((&*text)[offset] == '.' && !point))
                 offset++;
             type = TKN_NUMBER;
         }
 
-        else if (strchr("\"'`", *_Text) != NULL)
+        else if (strchr("\"'`", *text) != NULL)
         {
             offset--;
-            char quote = *_Text;
-            (volatile char *)_Text++;
-            while ((&*_Text)[offset] != quote && (&*_Text)[offset])
+            char quote = *text;
+            (volatile char *)text++;
+            while ((&*text)[offset] != quote && (&*text)[offset])
             {
-                if ((&*_Text)[offset] != '\n')
+                if ((&*text)[offset] != '\n')
                     updateln(&ln, &col);
                 offset++;
             }
@@ -351,17 +360,17 @@ Tokens *Tokenizer(char *_Filename, char *_Text)
 
         else
         {
-            LeaveException(CharacterError, &*_Text, curr->file);
+            LeaveException(CharacterError, &*text, curr->file);
             continue;
         }
 
-        curr->value = type == TKN_STRING ? strcut(&*_Text, offset - 1) : strcut(&*_Text, offset);
+        curr->value = type == TKN_STRING ? strcut(&*text, offset - 1) : strcut(&*text, offset);
         curr->type = type == TKN_EOF ? Symbol(curr->value) : type;
-        curr->next = Token(_Filename, NULL, TKN_EOF);
+        curr->next = Token(filename, NULL, TKN_EOF);
         curr = curr->next;
 
         for (u64 i = 0; i < offset; i++)
-            (volatile char *)_Text++;
+            (volatile char *)text++;
         col += offset + (type == TKN_STRING);
     }
 

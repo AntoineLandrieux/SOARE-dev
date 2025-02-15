@@ -18,8 +18,6 @@
  */
 
 #include <SOARE/SOARE.h>
-#include <SOARE/utils/int.h>
-#include <SOARE/utils/keywords.h>
 
 MEM MEMORY = NULL;
 static MEM FUNCTION = NULL;
@@ -27,16 +25,16 @@ static MEM FUNCTION = NULL;
 /**
  * @brief From file file
  * @author Antoine LANDRIEUX
- * 
- * @param _Filename 
- * @return void* 
+ *
+ * @param filename
+ * @return void*
  */
-static void *RunFromFile(char *_Filename)
+static void *RunFromFile(char *filename)
 {
-    FILE *file = fopen(_Filename, "rb");
+    FILE *file = fopen(filename, "rb");
 
     if (!file)
-        return LeaveException(FileError, _Filename, EmptyDocument());
+        return LeaveException(FileError, filename, EmptyDocument());
 
     fseek(file, 0, SEEK_END);
     long size = ftell(file);
@@ -47,12 +45,12 @@ static void *RunFromFile(char *_Filename)
     if (content == NULL)
     {
         fclose(file);
-        return LeaveException(InterpreterError, _Filename, EmptyDocument());
+        return LeaveException(InterpreterError, filename, EmptyDocument());
     }
 
     fread(content, sizeof(char), size, file);
     content[size] = 0;
-    Execute(_Filename, content);
+    Execute(filename, content);
     free(content);
     fclose(file);
     return NULL;
@@ -64,18 +62,18 @@ static void *RunFromFile(char *_Filename)
  *
  * @deprecated
  *
- * @param _Tree
+ * @param tree
  * @return char*
  */
-char *RunFunction(AST _Tree)
+char *RunFunction(AST tree)
 {
-    AST func = BranchFind(_Tree->parent->child, _Tree->value, NODE_FUNCTION);
+    AST func = BranchFind(tree->parent->child, tree->value, NODE_FUNCTION);
 
     if (func == NULL)
-        return LeaveException(UndefinedReference, _Tree->value, _Tree->file);
+        return LeaveException(UndefinedReference, tree->value, tree->file);
 
     AST ptr = func->child;
-    AST src = _Tree->child;
+    AST src = tree->child;
     FUNCTION = Mem();
 
     while (ptr != NULL)
@@ -86,7 +84,7 @@ char *RunFunction(AST _Tree)
         if (src == NULL)
         {
             FUNCTION = MemFree(FUNCTION);
-            return LeaveException(UndefinedReference, ptr->value, _Tree->file);
+            return LeaveException(UndefinedReference, ptr->value, tree->file);
         }
 
         MemPush(FUNCTION, ptr->value, Math(src));
@@ -101,15 +99,15 @@ char *RunFunction(AST _Tree)
  * @brief Executes code from a tree
  * @author Antoine LANDRIEUX
  *
- * @param _Tree
+ * @param tree
  * @return char*
  */
-char *Runtime(AST _Tree)
+char *Runtime(AST tree)
 {
-    if (_Tree == NULL)
+    if (tree == NULL)
         return NULL;
 
-    AST root = _Tree;
+    AST root = tree;
 
     if (MEMORY == NULL)
         MEMORY = Mem();
@@ -256,14 +254,14 @@ char *Runtime(AST _Tree)
 }
 
 /**
- * @brief Execute le code à partir d'une chaîne de caractères
+ * @brief Execute the code from a string
  * @author Antoine LANDRIEUX
  *
- * @param _RawCode
+ * @param rawcode
  */
-int Execute(char *_File, char *_RawCode)
+int Execute(char *file, char *rawcode)
 {
-    Tokens *tokens = Tokenizer(_File, _RawCode);
+    Tokens *tokens = Tokenizer(file, rawcode);
     AST ast = Parse(tokens);
 
 #ifdef __SOARE_DEBUG

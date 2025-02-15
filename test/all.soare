@@ -1,17 +1,12 @@
-
 try
-
-    writeln "================="
-    loadimport "function.soare"
-
-    writeln "================="
-    loadimport "maths.soare"
-
-    writeln "================="
-    loadimport "try-iferror.soare"
+    writeln "=================";
+    loadimport "function.soare";
+    writeln "=================";
+    loadimport "maths.soare";
+    writeln "=================";
+    loadimport "try-iferror.soare";
 
 iferror
-
-    writeln "Can't load all files..."
+    writeln "Can't load all files...";
 
 end;

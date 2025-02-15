@@ -61,7 +61,7 @@ static int Console()
         // Normal
         << "\033[0m"
 #endif /* __SOARE_NO_COLORED_OUTPUT */
-        << "Enter 'run' or 'commit' to run code or 'exit' to quit.\n"
+        << "Enter '?run' or '?commit' to run code or '?exit' to quit.\n"
         << std::endl;
 
     while (true)
@@ -80,17 +80,24 @@ static int Console()
         std::string user = "";
         std::getline(std::cin, user);
 
-        if (user == "run" || user == "commit")
+        if (user[0] == '?')
         {
-            SOARE::Execute(const_cast<char *>(file.c_str()), const_cast<char *>(exe.c_str()));
-            exe = user == "commit" ? "" : exe;
+            if (user == "?run" || user == "?commit")
+                SOARE::Execute(const_cast<char *>(file.c_str()), const_cast<char *>(exe.c_str()));
+
+            if (user == "?commit")
+                exe = " ";
+
+            else if (user == "?exit")
+                return EXIT_SUCCESS;
+
+            else if (user == "?clear")
+                std::cout << "\033c\033[3J";
+
+            continue;
         }
 
-        else if (user == "exit")
-            return EXIT_SUCCESS;
-
-        else
-            exe.append(user + "\n");
+        exe.append(user.append("\n"));
     }
 
     return EXIT_SUCCESS;

@@ -39,71 +39,71 @@ typedef struct mem
  *
  * @return MEM
  */
-MEM Mem();
+MEM Mem(void);
 
 /**
  * @brief Give the last variable in the memory
  * @author Antoine LANDRIEUX
  *
- * @param _Memory
+ * @param memory
  * @return MEM
  */
-MEM MemLast(MEM _Memory);
+MEM MemLast(MEM memory);
 
 /**
  * @brief Add a variable to an existing memory
  * @author Antoine LANDRIEUX
  *
- * @param _Memory
- * @param _Name
+ * @param memory
+ * @param name
  * @return MEM
  */
-MEM MemPush(MEM _Memory, char *_Name, char *_Value);
+MEM MemPush(MEM memory, char *name, char *value);
 
 /**
  * @brief Find a variable in the memory
  * @author Antoine LANDRIEUX
  *
- * @param _Memory
- * @param _Name
+ * @param memory
+ * @param name
  * @return MEM
  */
-MEM MemGet(MEM _Memory, char *_Name);
+MEM MemGet(MEM memory, char *name);
 
 /**
  * @brief Update a variable
  * @author Antoine LANDRIEUX
  *
- * @param _Memory
- * @param _Name
+ * @param memory
+ * @param name
  * @return MEM
  */
-MEM MemSet(MEM _Memory, char *_Value);
+MEM MemSet(MEM memory, char *value);
 
 /**
  * @brief Display all variables
  * @author Antoine LANDRIEUX
  *
- * @param _Memory
+ * @param memory
  */
-void MemLog(MEM _Memory);
+void MemLog(MEM memory);
 
 /**
  * @brief Join 2 memories
  * @author Antoine LANDRIEUX
  *
- * @param _To
- * @param _From
+ * @param to
+ * @param from
  */
-void MemJoin(MEM _To, MEM _From);
+void MemJoin(MEM to, MEM from);
 
 /**
  * @brief Free the allocated memory
  * @author Antoine LANDRIEUX
  *
- * @param _Memory
+ * @param memory
  * @return void* (always returns NULL)
  */
-void *MemFree(MEM _Memory);
+void *MemFree(MEM memory);
 
 #endif /* __SOARE_MEMORY_H__ */

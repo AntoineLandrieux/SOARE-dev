@@ -11,7 +11,7 @@
 # <https://github.com/AntoineLandrieux/SOARE/>
 #
 
-APP = soare.exe
+APP = soare
 VERSION_MAJ = 1
 
 CC = gcc
@@ -25,7 +25,8 @@ INCLUDE = include
 
 CFLAGS = -Wall -Wextra -Wpedantic -Werror
 
-DEBUG = -D __SOARE_DEBUG
+# DEBUG = -D __SOARE_DEBUG
+# NO_COLORED_OUTPUT = -D __SOARE_NO_COLORED_OUTPUT
 
 default: $(BIN)/$(APP)
 
@@ -37,12 +38,12 @@ $(LIB):
 	mkdir -p $(LIB)
 
 $(LIB)/%.o: $(CORE)/%.c
-	$(CC) -c $< -o $@ -I $(INCLUDE) $(CFLAGS) $(DEBUG)
+	$(CC) -c $< -o $@ -I $(INCLUDE) $(CFLAGS) $(DEBUG) $(NO_COLORED_OUTPUT)
 
 $(BIN)/$(APP): $(LIB) $(CORE_OBJS) $(SRC)/Main.cpp
 	mkdir -p $(BIN)
 	ar rcs $(LIB)/libsoare$(VERSION_MAJ).a $(CORE_OBJS)
-	$(CPP) $(SRC)/Main.cpp -o $(BIN)/$(APP) -I $(INCLUDE) -L$(LIB) -lsoare$(VERSION_MAJ) $(CFLAGS) $(DEBUG)
+	$(CPP) $(SRC)/Main.cpp -o $(BIN)/$(APP) -I $(INCLUDE) -L$(LIB) -lsoare$(VERSION_MAJ) $(CFLAGS) $(DEBUG) $(NO_COLORED_OUTPUT)
 	rm $(CORE_OBJS)
 
 run:
