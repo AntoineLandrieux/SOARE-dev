@@ -17,10 +17,26 @@
 #include <SOARE/SOARE.h>
 
 /* Enable/disable error display */
-static u8 Exception = 1;
+static u8 enable = 1;
 
 /* Error level */
 static i8 ErrorLvl = 0;
+
+/* Exceptions */
+static char *Exceptions[] = {
+
+    "InterpreterError",
+    "FileError",
+    "CharacterError",
+    "SyntaxError",
+    "MissingAssignation",
+    "UnexpectedNear",
+    "UndefinedReference",
+    "MathError",
+    "DivideByZero",
+    "Raise"
+
+};
 
 /**
  * @brief Enable/disable error display
@@ -30,7 +46,7 @@ static i8 ErrorLvl = 0;
  */
 void IgnoreException(u8 ignore)
 {
-    Exception = !ignore;
+    enable = !ignore;
 }
 
 /**
@@ -63,10 +79,10 @@ char ErrorLevel(void)
  * @param file
  * @return void* (always returns NULL)
  */
-void *LeaveException(char *error, char *string, Document file)
+void *LeaveException(SoareExceptions error, char *string, Document file)
 {
     // If the errors are disabled, nothing is displayed
-    if (Exception)
+    if (enable)
     {
 #ifndef __SOARE_NO_COLORED_OUTPUT
         // Red
@@ -76,7 +92,7 @@ void *LeaveException(char *error, char *string, Document file)
             //
             stderr,
             "Except: %s\n\t\"%.10s\"\n\t ^~~~\n\tAt file %s:%lld:%lld\n",
-            error,
+            Exceptions[error],
             string,
             file.file,
             file.ln,

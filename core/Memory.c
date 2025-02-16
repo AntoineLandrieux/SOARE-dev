@@ -26,16 +26,16 @@
  */
 MEM Mem(void)
 {
-    MEM MEMORY = (MEM)malloc(sizeof(struct mem));
+    MEM memory = (MEM)malloc(sizeof(struct mem));
 
-    if (MEMORY == NULL)
+    if (!memory)
         return __SOARE_OUT_OF_MEMORY();
 
-    MEMORY->name = NULL;
-    MEMORY->next = NULL;
-    MEMORY->value = NULL;
+    memory->name = NULL;
+    memory->next = NULL;
+    memory->value = NULL;
 
-    return MEMORY;
+    return memory;
 }
 
 /**
@@ -47,10 +47,10 @@ MEM Mem(void)
  */
 MEM MemLast(MEM memory)
 {
-    if (memory == NULL)
+    if (!memory)
         return NULL;
     MEM curr = memory;
-    for (; curr->next != NULL; curr = curr->next)
+    for (; curr->next; curr = curr->next)
         ;
     return curr;
 }
@@ -65,14 +65,14 @@ MEM MemLast(MEM memory)
  */
 MEM MemPush(MEM memory, char *name, char *value)
 {
-    if (memory == NULL)
+    if (!memory)
         return NULL;
 
     MEM mem = MemLast(memory);
     mem->next = (MEM)malloc(sizeof(struct mem));
     mem = mem->next;
 
-    if (mem == NULL)
+    if (!mem)
         return __SOARE_OUT_OF_MEMORY();
 
     mem->next = NULL;
@@ -92,10 +92,10 @@ MEM MemPush(MEM memory, char *name, char *value)
  */
 MEM MemGet(MEM memory, char *name)
 {
-    if (memory == NULL)
+    if (!memory)
         return NULL;
     MEM get = MemGet(memory->next, name);
-    if (get == NULL && memory->value != NULL)
+    if (!get && memory->value)
         if (!strcmp(memory->name, name))
             return memory;
     return get;
@@ -111,7 +111,7 @@ MEM MemGet(MEM memory, char *name)
  */
 MEM MemSet(MEM memory, char *value)
 {
-    if (memory == NULL)
+    if (!memory)
         return NULL;
     free(memory->value);
     memory->value = value;
@@ -126,7 +126,7 @@ MEM MemSet(MEM memory, char *value)
  */
 void MemLog(MEM memory)
 {
-    if (memory == NULL)
+    if (!memory)
         return;
     printf(
         "[MEMORY] [%p, %s\t%s]\n",
@@ -145,7 +145,7 @@ void MemLog(MEM memory)
  */
 void MemJoin(MEM to, MEM from)
 {
-    if (to == NULL || from == NULL)
+    if (!to || !from)
         return;
     MemLast(to)->next = from;
 }
@@ -159,7 +159,7 @@ void MemJoin(MEM to, MEM from)
  */
 void *MemFree(MEM memory)
 {
-    if (memory == NULL)
+    if (!memory)
         return NULL;
 
     MemFree(memory->next);

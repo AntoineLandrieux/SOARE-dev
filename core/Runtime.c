@@ -13,8 +13,6 @@
  * Antoine LANDRIEUX (MIT License) <Runtime.c>
  * <https://github.com/AntoineLandrieux/SOARE/>
  *
- * [!] Contribute and help me translate the comments!
- *
  */
 
 #include <SOARE/SOARE.h>
@@ -27,9 +25,9 @@ static MEM FUNCTION = NULL;
  * @author Antoine LANDRIEUX
  *
  * @param filename
- * @return void*
+ * @return AST
  */
-static void *RunFromFile(char *filename)
+static AST loadimport(char *filename)
 {
     FILE *file = fopen(filename, "rb");
 
@@ -42,7 +40,7 @@ static void *RunFromFile(char *filename)
 
     char *content = (char *)malloc(size);
 
-    if (content == NULL)
+    if (!content)
     {
         fclose(file);
         return LeaveException(InterpreterError, filename, EmptyDocument());
@@ -50,10 +48,19 @@ static void *RunFromFile(char *filename)
 
     fread(content, sizeof(char), size, file);
     content[size] = 0;
-    Execute(filename, content);
+
+    Tokens *tokens = Tokenizer(filename, content);
+    AST ast = Parse(tokens);
+
+#ifdef __SOARE_DEBUG
+    TokensLog(tokens);
+    TreeLog(ast);
+#endif
+
     free(content);
     fclose(file);
-    return NULL;
+
+    return ast;
 }
 
 /**
@@ -69,19 +76,19 @@ char *RunFunction(AST tree)
 {
     AST func = BranchFind(tree->parent->child, tree->value, NODE_FUNCTION);
 
-    if (func == NULL)
+    if (!func)
         return LeaveException(UndefinedReference, tree->value, tree->file);
 
     AST ptr = func->child;
     AST src = tree->child;
     FUNCTION = Mem();
 
-    while (ptr != NULL)
+    while (ptr)
     {
         if (ptr->type == NODE_BODY)
             return Runtime(ptr);
 
-        if (src == NULL)
+        if (!src)
         {
             FUNCTION = MemFree(FUNCTION);
             return LeaveException(UndefinedReference, ptr->value, tree->file);
@@ -104,12 +111,12 @@ char *RunFunction(AST tree)
  */
 char *Runtime(AST tree)
 {
-    if (tree == NULL)
+    if (!tree)
         return NULL;
 
     AST root = tree;
 
-    if (MEMORY == NULL)
+    if (!MEMORY)
         MEMORY = Mem();
 
     MEM statement = MemLast(MEMORY);
@@ -126,7 +133,9 @@ char *Runtime(AST tree)
         switch (curr->type)
         {
         case NODE_IMPORT:
-            RunFromFile(curr->value);
+            tmp = loadimport(curr->value);
+            if (tmp)
+                BranchJuxtapose(curr, tmp->child);
             break;
 
         case NODE_CONTINUE:
@@ -140,12 +149,12 @@ char *Runtime(AST tree)
         case NODE_MEMSET:
             get = MemGet(MEMORY, curr->value);
             returned = Math(curr->child);
-            if (MemSet(get, returned) == NULL)
+            if (!MemSet(get, returned))
                 get = MemPush(statement, curr->value, returned);
             break;
 
         case NODE_ENUMERATE:
-            for (tmp = curr->child; tmp != NULL; tmp = tmp->sibling)
+            for (tmp = curr->child; tmp; tmp = tmp->sibling)
             {
                 returned = malloc(((int)(enumerate / 10)) + 2);
                 snprintf(returned, (((int)(enumerate / 10))) + 2, "%d", enumerate);
@@ -164,14 +173,14 @@ char *Runtime(AST tree)
 
             while (1)
             {
-                if (returned == NULL)
+                if (!returned)
                     break;
 
                 if (strcmp(returned, "0"))
                 {
                     free(returned);
                     returned = Runtime(tmp->sibling);
-                    if (returned != NULL)
+                    if (returned)
                     {
                         statement->next = MemFree(statement->next);
                         return returned;
@@ -180,7 +189,7 @@ char *Runtime(AST tree)
                 }
 
                 tmp = tmp->sibling->sibling;
-                if (tmp == NULL)
+                if (!tmp)
                     break;
 
                 free(returned);
@@ -194,13 +203,13 @@ char *Runtime(AST tree)
 
             returned = Math(curr->child);
 
-            while (returned != NULL)
+            while (returned)
             {
                 if (!strcmp(returned, "0"))
                     break;
                 free(returned);
                 returned = Runtime(curr->child->sibling);
-                if (returned != NULL)
+                if (returned)
                 {
                     statement->next = MemFree(statement->next);
                     return returned;
@@ -222,7 +231,7 @@ char *Runtime(AST tree)
                 ClearException();
                 returned = Runtime(curr->child->sibling);
             }
-            if (returned != NULL)
+            if (returned)
             {
                 statement->next = MemFree(statement->next);
                 return returned;
@@ -231,7 +240,7 @@ char *Runtime(AST tree)
 
         case NODE_OUTPUT:
             returned = Math(curr->child);
-            if (returned != NULL)
+            if (returned)
                 printf("%s\n", returned);
             break;
 
@@ -242,7 +251,7 @@ char *Runtime(AST tree)
 
         case NODE_RAISE:
             statement->next = MemFree(statement->next);
-            return LeaveException(curr->value, KEYWORD_RAISE, curr->file);
+            return LeaveException(Raise, curr->value, curr->file);
 
         default:
             break;

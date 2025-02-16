@@ -16,32 +16,21 @@
  *
  */
 
-/* Character Error */
-#define CharacterError "CharacterError"
+typedef enum SoareExceptions
+{
 
-/* Divide By Zero */
-#define DivideByZero "DivideByZero"
+    InterpreterError,
+    FileError,
+    CharacterError,
+    SyntaxError,
+    MissingAssignation,
+    UnexpectedNear,
+    UndefinedReference,
+    MathError,
+    DivideByZero,
+    Raise
 
-/* Interpreter Error (memory issues) */
-#define InterpreterError "InterpreterError"
-
-/* Syntax Error */
-#define SyntaxError "SyntaxError"
-
-/* Math Error */
-#define MathError "MathError"
-
-/* Unexpected Near */
-#define UnexpectedNear "UnexpectedNear"
-
-/* Undefined Reference */
-#define UndefinedReference "UndefinedReference"
-
-/* Missing Assignation */
-#define MissingAssignation "MissingAssignation"
-
-/* File Error */
-#define FileError "FileError"
+} SoareExceptions;
 
 /**
  * @brief Enable/disable error display
@@ -75,7 +64,7 @@ char ErrorLevel(void);
  * @param file
  * @return void* (always returns NULL)
  */
-void *LeaveException(char *error, char *string, Document file);
+void *LeaveException(SoareExceptions error, char *string, Document file);
 
 #define __SOARE_OUT_OF_MEMORY() LeaveException(InterpreterError, "OUT OF MEMORY", EmptyDocument());
 

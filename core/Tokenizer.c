@@ -169,10 +169,10 @@ Tokens *Token(char *filename, char *value, token_type type)
 {
     Tokens *token = (Tokens *)malloc(sizeof(Tokens));
 
-    if (token == NULL)
+    if (!token)
         return __SOARE_OUT_OF_MEMORY();
 
-    token->value = value == NULL ? NULL : strdup(value);
+    token->value = !value ? NULL : strdup(value);
     token->type = type;
 
     token->file.ln = 0;
@@ -203,7 +203,7 @@ void TokenNext(Tokens **tokens)
  */
 void TokensFree(Tokens *token)
 {
-    if (token == NULL)
+    if (!token)
         return;
 
     TokensFree(token->next);
@@ -219,7 +219,7 @@ void TokensFree(Tokens *token)
  */
 void TokensLog(Tokens *token)
 {
-    if (token == NULL)
+    if (!token)
         return;
 
     printf(
@@ -246,7 +246,7 @@ static char *strcut(const char *string, size_t size)
     if (strlen(string) < size)
         size = strlen(string);
     char *result = (char *)malloc(size + 1);
-    if (result == NULL)
+    if (!result)
         return __SOARE_OUT_OF_MEMORY();
     for (size_t ptr = 0; ptr < size; ptr++)
         result[ptr] = string[ptr];
@@ -277,7 +277,7 @@ static void updateln(u64 *ln, u64 *col)
  */
 Tokens *Tokenizer(char *filename, char *text)
 {
-    if (text == NULL)
+    if (!text)
         return NULL;
 
     Tokens *token = Token(filename, NULL, TKN_EOF);

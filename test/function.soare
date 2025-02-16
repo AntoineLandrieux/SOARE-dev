@@ -1,16 +1,27 @@
 
+loadimport "../script/std.soare"
+
 @Fib(n)
 
-    if n < 1 do
-        return "Invalid Input"
-    orif n equ 1 do
-        return 0;
-    orif n equ 2 do
-        return 1;
+    @Check(x)
+        if x < 1 do
+            return "Invalid Input"
+        orif x equ 1 do
+            return 0;
+        orif x equ 2 do
+            return 1;
+        end;
+        return M!(0-1);
     end;
 
-    return Fib!(n-1) + Fib!(n-2);
+    value = Check!(n);
+
+    if value equ M!(0-1) do
+        return Fib!(n-1) + Fib!(n-2);
+    end;
+
+    return value;
 
 end;
 
-writeln Fib!(10);
+writeln Fib!(10); ? 34

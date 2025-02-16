@@ -50,7 +50,7 @@ static u8 isNaN(char *string)
 static char *vardup(char *value)
 {
     char *result = strdup(value);
-    if (result == NULL)
+    if (!result)
         return __SOARE_OUT_OF_MEMORY();
     return result;
 }
@@ -67,7 +67,7 @@ static char *__float(double number)
     char string[50];
     sprintf(string, "%g", number);
     char *result = (char *)malloc(strlen(string));
-    if (result == NULL)
+    if (!result)
         return __SOARE_OUT_OF_MEMORY();
     strcpy(result, string);
     return result;
@@ -132,7 +132,7 @@ AST ParseValue(Tokens **tokens)
         while ((*tokens)->type != TKN_PARENR)
         {
             AST expr = ParseExpr(tokens, 0xFF);
-            if (expr == NULL)
+            if (!expr)
             {
                 TreeFree(value);
                 return NULL;
@@ -164,7 +164,7 @@ AST ParseValue(Tokens **tokens)
  * @author Antoine LANDRIEUX
  *
  * @param tokens
- * @param priority 
+ * @param priority
  * @return AST
  */
 AST ParseExpr(Tokens **tokens, u8 priority)
@@ -173,21 +173,21 @@ AST ParseExpr(Tokens **tokens, u8 priority)
     Node *right = NULL;
     Node *symbol = NULL;
 
-    if (left == NULL)
+    if (!left)
         return NULL;
 
     while ((*tokens)->type == TKN_OPERATOR && !ErrorLevel())
     {
-        u8 operator = MathPriority(*(*tokens)->value);
+        u8 operator= MathPriority(*(*tokens)->value);
 
-        if (operator >= priority)
+        if (operator>= priority)
             break;
 
         symbol = Branch((*tokens)->value, NODE_OPERATOR, (*tokens)->file);
         TokenNext(tokens);
         right = ParseExpr(tokens, priority);
 
-        if (symbol == NULL || right == NULL)
+        if (!symbol || !right)
         {
             TreeFree(left);
             TreeFree(right);
@@ -224,7 +224,7 @@ char *Math(AST tree)
     case NODE_MEMGET:
 
         get = MemGet(MEMORY, tree->value);
-        if (get == NULL)
+        if (!get)
             return LeaveException(UndefinedReference, tree->value, tree->file);
         return vardup(get->value);
 
@@ -242,13 +242,13 @@ char *Math(AST tree)
         sx = Math(tree->child);
         sy = Math(tree->child->sibling);
 
-        if (sx == NULL || sy == NULL)
+        if (!sx || !sy)
             return NULL;
 
         if (isNaN(sx) || isNaN(sy))
         {
             result = malloc(2);
-            if (result == NULL)
+            if (!result)
                 __SOARE_OUT_OF_MEMORY();
 
             switch (*(tree->value))
@@ -275,7 +275,7 @@ char *Math(AST tree)
                 break;
             case '+':
                 result = realloc(result, strlen(sx) + strlen(sy) + 1);
-                if (result == NULL)
+                if (!result)
                     return __SOARE_OUT_OF_MEMORY();
                 strcat(strcpy(result, sx), sy);
                 break;
@@ -289,7 +289,7 @@ char *Math(AST tree)
         dx = atof(sx);
         dy = atof(sy);
 
-        if (strchr("/%", *(tree->value)) != NULL && !dy)
+        if (strchr("/%", *(tree->value)) && !dy)
             return LeaveException(DivideByZero, tree->value, tree->file);
 
         switch (*(tree->value))

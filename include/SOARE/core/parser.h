@@ -93,6 +93,16 @@ Node *Branch(char *value, node_type type, Document file);
 Node *BranchFind(AST source, char *value, node_type type);
 
 /**
+ * @brief Add a sibling branch
+ * @author Antoine LANDRIEUX
+ *
+ * @param source
+ * @param element
+ * @return AST
+ */
+AST BranchJuxtapose(Node *source, AST element);
+
+/**
  * @brief Join 2 branches
  * @author Antoine LANDRIEUX
  *
