@@ -244,6 +244,18 @@ AST Parse(Tokens *tokens)
                         )
                     //
                 );
+            
+            else if (!strcmp(old->value, KEYWORD_INPUTCH))
+            {
+                if (tokens->type != TKN_NAME)
+                {
+                    TreeFree(root);
+                    return LeaveException(SyntaxError, old->value, old->file);
+                }
+
+                BranchJoin(curr, Branch(tokens->value, NODE_INPUT, old->file));
+                TokenNext(&tokens);
+            }
 
             else if (!strcmp(old->value, KEYWORD_LOADIMPORT) || !strcmp(old->value, KEYWORD_RAISE))
             {

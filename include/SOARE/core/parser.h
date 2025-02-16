@@ -33,6 +33,7 @@ typedef enum node_type
     NODE_STRING,
     NODE_IMPORT,
     NODE_CALL,
+    NODE_INPUT,
     NODE_FUNCTION,
     NODE_MEMGET,
     NODE_MEMSET,

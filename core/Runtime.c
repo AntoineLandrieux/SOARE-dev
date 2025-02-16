@@ -16,6 +16,24 @@
  */
 
 #include <SOARE/SOARE.h>
+#ifdef _WIN32
+#include <conio.h>
+#else
+// Why there are no fucking getch predefined ???
+#include <termios.h>
+static struct termios old, current;
+
+char getch(void)
+{
+    tcgetattr(0, &old);
+    current = old;
+    current.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(0, TCSANOW, &current);
+    char ch = getchar();
+    tcsetattr(0, TCSANOW, &old);
+    return ch;
+}
+#endif
 
 MEM MEMORY = NULL;
 static MEM FUNCTION = NULL;

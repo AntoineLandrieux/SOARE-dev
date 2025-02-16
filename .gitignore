@@ -26,6 +26,7 @@ tmp/
 
 *.a
 *.o
+*.out
 *.bin
 *.exe
 *.res

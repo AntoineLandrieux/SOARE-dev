@@ -20,7 +20,7 @@ comment "?"
 ## built-in functions
 color cyan "\<(M|NaN|isset|ftoi)\>"
 ## Keywords
-color brightblue "\<(continue|do|else|end|enumerate|if|iferror|loadimport|nop|orif|inputln|raise|return|try|while|writeln)\>"
+color brightblue "\<(continue|do|else|end|enumerate|if|iferror|loadimport|nop|orif|inputch|raise|return|try|while|writeln)\>"
 
 ## operators
 color magenta "[.:;,+*|=!\%@]" "<" ">" "/" "-" "&"

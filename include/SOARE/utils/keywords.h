@@ -27,7 +27,7 @@
 #define KEYWORD_ENUMERATE "enumerate"
 #define KEYWORD_IF "if"
 #define KEYWORD_IFERROR "iferror"
-#define KEYWORD_INPUTLN "inputln"
+#define KEYWORD_INPUTCH "inputch"
 #define KEYWORD_LOADIMPORT "loadimport"
 #define KEYWORD_ORIF "orif"
 #define KEYWORD_RAISE "raise"

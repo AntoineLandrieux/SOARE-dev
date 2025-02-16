@@ -112,7 +112,7 @@ static u8 strKeyword(char *string)
         !strcmp(KEYWORD_ENUMERATE, string) ||
         !strcmp(KEYWORD_IF, string) ||
         !strcmp(KEYWORD_IFERROR, string) ||
-        !strcmp(KEYWORD_INPUTLN, string) ||
+        !strcmp(KEYWORD_INPUTCH, string) ||
         !strcmp(KEYWORD_LOADIMPORT, string) ||
         !strcmp(KEYWORD_ORIF, string) ||
         !strcmp(KEYWORD_RAISE, string) ||
