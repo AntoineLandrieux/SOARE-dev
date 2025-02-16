@@ -34,7 +34,7 @@ static char *Exceptions[] = {
     "UndefinedReference",
     "MathError",
     "DivideByZero",
-    "Raise"
+    "RaiseException"
 
 };
 

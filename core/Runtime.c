@@ -251,7 +251,7 @@ char *Runtime(AST tree)
 
         case NODE_RAISE:
             statement->next = MemFree(statement->next);
-            return LeaveException(Raise, curr->value, curr->file);
+            return LeaveException(RaiseException, curr->value, curr->file);
 
         default:
             break;

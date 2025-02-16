@@ -249,7 +249,7 @@ char *Math(AST tree)
         {
             result = malloc(2);
             if (!result)
-                __SOARE_OUT_OF_MEMORY();
+                return __SOARE_OUT_OF_MEMORY();
 
             switch (*(tree->value))
             {
@@ -331,8 +331,7 @@ char *Math(AST tree)
         }
 
     default:
-        LeaveException(MathError, tree->value, tree->file);
-        return NULL;
+        return LeaveException(MathError, tree->value, tree->file);
     }
 
     return NULL;

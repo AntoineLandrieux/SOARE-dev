@@ -309,7 +309,6 @@ Tokens *Tokenizer(char *filename, char *text)
         {
             while (*text != '\n' && *text)
                 (volatile char *)text++;
-            updateln(&ln, &col);
             continue;
         }
 

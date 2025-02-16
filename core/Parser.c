@@ -66,10 +66,10 @@ Node *BranchFind(AST source, char *value, node_type type)
 /**
  * @brief Add a sibling branch
  * @author Antoine LANDRIEUX
- * 
+ *
  * @param source
  * @param element
- * @return AST 
+ * @return AST
  */
 AST BranchJuxtapose(Node *source, AST element)
 {

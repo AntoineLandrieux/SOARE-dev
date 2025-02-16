@@ -28,7 +28,7 @@ typedef enum SoareExceptions
     UndefinedReference,
     MathError,
     DivideByZero,
-    Raise
+    RaiseException
 
 } SoareExceptions;
 
