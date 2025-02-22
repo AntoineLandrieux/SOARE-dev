@@ -373,7 +373,7 @@ AST Parse(Tokens *tokens)
                 curr = body;
             }
 
-            else if (!strcmp(old->value, KEYWORD_WRITELN))
+            else if (!strcmp(old->value, KEYWORD_WRITE))
             {
                 AST content = ParseExpr(&tokens, 0xFF);
 

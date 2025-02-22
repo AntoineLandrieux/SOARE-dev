@@ -119,7 +119,7 @@ static u8 strKeyword(char *string)
         !strcmp(KEYWORD_RETURN, string) ||
         !strcmp(KEYWORD_TRY, string) ||
         !strcmp(KEYWORD_WHILE, string) ||
-        !strcmp(KEYWORD_WRITELN, string)
+        !strcmp(KEYWORD_WRITE, string)
         //
     );
 }

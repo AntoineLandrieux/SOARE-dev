@@ -1,5 +1,5 @@
 
-loadimport "../script/std.soare"
+loadimport "../script/std.soare";
 
 @Fib(n)
 
@@ -24,4 +24,4 @@ loadimport "../script/std.soare"
 
 end;
 
-writeln Fib!(10); ? 34
+write Fib!(10); ? 34

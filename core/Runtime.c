@@ -81,6 +81,23 @@ static AST loadimport(char *filename)
     return ast;
 }
 
+
+static void InterpreterVar()
+{
+    MEMORY = Mem();
+    
+    MemPush(MEMORY, strdup("__SOARE__"), strdup("SOARE Antoine LANDRIEUX (MIT LICENSE)"));
+    MemPush(MEMORY, strdup("__BUILD__"), strdup(__DATE__));
+
+    MemPush(MEMORY, strdup("__WRITE_END__"), strdup("\n"));
+
+    MemPush(MEMORY, strdup("BC"), strdup("\b"));
+    MemPush(MEMORY, strdup("CR"), strdup("\r"));
+    MemPush(MEMORY, strdup("LN"), strdup("\n"));
+    MemPush(MEMORY, strdup("TAB"), strdup("\t"));
+    MemPush(MEMORY, strdup("CLS"), strdup("\033c\033[3J"));
+}
+
 /**
  * @brief Execute a function
  * @author Antoine LANDRIEUX
@@ -135,7 +152,7 @@ char *Runtime(AST tree)
     AST root = tree;
 
     if (!MEMORY)
-        MEMORY = Mem();
+        InterpreterVar();
 
     MEM statement = MemLast(MEMORY);
     MemJoin(MEMORY, FUNCTION);
@@ -160,6 +177,23 @@ char *Runtime(AST tree)
             statement->next = MemFree(statement->next);
             return NULL;
 
+        case NODE_INPUT:
+            get = MemGet(MEMORY, curr->value);
+            if (get)
+            {
+                returned = malloc(2);
+                if (returned)
+                {
+                    returned[0] = getch();
+                    MemSet(get, returned);
+                }
+                else
+                    __SOARE_OUT_OF_MEMORY();
+            }
+            else
+                LeaveException(UndefinedReference, curr->value, curr->file);
+            break;
+
         case NODE_CALL:
             free(RunFunction(curr));
             break;
@@ -175,6 +209,11 @@ char *Runtime(AST tree)
             for (tmp = curr->child; tmp; tmp = tmp->sibling)
             {
                 returned = malloc(((int)(enumerate / 10)) + 2);
+                if (!returned)
+                {
+                    __SOARE_OUT_OF_MEMORY();
+                    break;
+                }
                 snprintf(returned, (((int)(enumerate / 10))) + 2, "%d", enumerate);
                 MemPush(
                     statement,
@@ -259,7 +298,10 @@ char *Runtime(AST tree)
         case NODE_OUTPUT:
             returned = Math(curr->child);
             if (returned)
-                printf("%s\n", returned);
+            {
+                printf("%s", returned);
+                printf("%s", MemGet(MEMORY, "__WRITE_END__")->value);
+            }
             break;
 
         case NODE_RETURN:

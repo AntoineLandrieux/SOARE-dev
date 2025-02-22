@@ -1,21 +1,21 @@
 
 ? "Hello World!"
 try
-    writeln "Hello World!";
+    write "Hello World!";
 iferror
-    writeln "Error ! #1";
+    write "Error ! #1";
 end;
 
 ? "Error ! #2"
 try
     raise "problem";
 iferror
-    writeln "Error ! #2";
+    write "Error ! #2";
 end;
 
 ? "Error ! #3"
 try
-    writeln 3/0;
+    write 3/0;
 iferror
-    writeln "Error ! #3";
+    write "Error ! #3";
 end;

@@ -1,12 +1,19 @@
+
+write CLS;
+write __SOARE__;
+write __BUILD__;
+
 try
-    writeln "=================";
+    write "=================";
     loadimport "function.soare";
-    writeln "=================";
+    write "=================";
     loadimport "maths.soare";
-    writeln "=================";
+    write "=================";
     loadimport "try-iferror.soare";
+    write "=================";
+    loadimport "while.soare";
 
 iferror
-    writeln "Can't load all files...";
+    write "Can't load all files...";
 
 end;

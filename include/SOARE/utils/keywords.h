@@ -34,6 +34,6 @@
 #define KEYWORD_RETURN "return"
 #define KEYWORD_TRY "try"
 #define KEYWORD_WHILE "while"
-#define KEYWORD_WRITELN "writeln"
+#define KEYWORD_WRITE "write"
 
 #endif /* __SOARE_KEYWORDS_H__ */
