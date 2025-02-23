@@ -25,6 +25,13 @@ INCLUDE = include
 
 CFLAGS = -Wall -Wextra -Wpedantic -Werror
 
+ifeq ($(OS), Windows_NT)
+WINDRES = windres
+RES = $(BIN)/res.o
+else
+WINDRES = echo
+endif
+
 # DEBUG = -D __SOARE_DEBUG
 # NO_COLORED_OUTPUT = -D __SOARE_NO_COLORED_OUTPUT
 
@@ -42,9 +49,10 @@ $(LIB)/%.o: $(CORE)/%.c
 
 $(BIN)/$(APP): $(LIB) $(CORE_OBJS) $(SRC)/Main.cpp
 	mkdir -p $(BIN)
+	$(WINDRES) windows/resources/app.rc -coeff $(RES)
 	ar rcs $(LIB)/libsoare$(VERSION_MAJ).a $(CORE_OBJS)
-	$(CPP) $(SRC)/Main.cpp -o $(BIN)/$(APP) -I $(INCLUDE) -L$(LIB) -lsoare$(VERSION_MAJ) $(CFLAGS) $(DEBUG) $(NO_COLORED_OUTPUT)
-	rm $(CORE_OBJS)
+	$(CPP) $(RES) $(SRC)/Main.cpp -o $(BIN)/$(APP) -I $(INCLUDE) -L$(LIB) -lsoare$(VERSION_MAJ) $(CFLAGS) $(DEBUG) $(NO_COLORED_OUTPUT)
+	rm $(CORE_OBJS) $(RES)
 
 run:
 	$(BIN)/$(APP)
