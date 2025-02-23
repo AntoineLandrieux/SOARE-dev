@@ -12,13 +12,33 @@
 ?
 
 ? @brief Useful for math, ex: 5*M(1+2)
-@M(number) return number*1; end;
+@M(any)
+    return any;
+end;
 
 ? @brief NaN
-@NaN(number) try M!(number) iferror return 1; end; return 0; end;
-
-? @brief isset
-@isset(any) return any; end;
+@NaN(number)
+    try
+        number = number * 1;
+    iferror
+        return 1;
+    end;
+    return 0;
+end;
 
 ? @brief ftoi
-@ftoi(float) if NaN!(float) do raise "NaN"; else return float^0; end; end;
+@ftoi(float)
+    if NaN(float) do
+        raise "NaN";
+    end;
+    return float^0;
+end;
+
+? @brief sleep
+? @deprecated
+@sleep(time)
+    time = ftoi(time) * 999999;
+    while time > 0 do
+        time = time - 1;
+    end;
+end;

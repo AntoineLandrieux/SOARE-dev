@@ -1,19 +1,7 @@
 
 loadimport "../script/std.soare";
 
-@sleep(time)
-    if NaN!(time) do
-        return 0;
-    end;
-    if time < 0 do
-        time = time * M!(0-1);
-    end;
-    time = time * 999999;
-    while time do
-        time = time - 1;
-    end;
-end;
-
+write "Please wait 10 seconds..."
 times = 0;
 
 while times < 10 + 1 do
@@ -27,7 +15,7 @@ while times < 10 + 1 do
         progressbar = progressbar + 1;
     end;
 
-    sleep!(1);
+    sleep(1);
     times = times + 1;
 
     __WRITE_END__ = CR;
@@ -37,4 +25,3 @@ end;
 
 __WRITE_END__ = LN;
 write "===== SUCESS =====";
-inputch __WRITE_END__;

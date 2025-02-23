@@ -12,6 +12,8 @@ try
     loadimport "try-iferror.soare";
     write "=================";
     loadimport "while.soare";
+    write "Press any key..."
+    inputch __WRITE_END__;
 
 iferror
     write "Can't load all files...";

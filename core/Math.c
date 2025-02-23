@@ -116,17 +116,10 @@ AST ParseValue(Tokens **tokens)
 
     case TKN_NAME:
         value->type = NODE_MEMGET;
-        if ((*tokens)->type != TKN_FUNCTION)
-            break;
-        value->type = NODE_CALL;
-        TokenNext(tokens);
-
         if ((*tokens)->type != TKN_PARENL)
-        {
-            free(value);
-            return NULL;
-        }
+            break;
 
+        value->type = NODE_CALL;
         TokenNext(tokens);
 
         while ((*tokens)->type != TKN_PARENR)
@@ -253,24 +246,16 @@ char *Math(AST tree)
 
             switch (*(tree->value))
             {
-            // AND
-            case 'A':
-            case 'a':
+            case '&':
                 snprintf(result, 2, "%d", !strcmp(sx, "0") && !strcmp(sy, "0"));
                 break;
-            // EQU
-            case 'E':
-            case 'e':
+            case '=':
                 snprintf(result, 2, "%d", !strcmp(sx, sy));
                 break;
-            // NEQ
-            case 'N':
-            case 'n':
+            case '!':
                 snprintf(result, 2, "%d", strcmp(sx, sy));
                 break;
-            // OR
-            case 'O':
-            case 'o':
+            case '|':
                 snprintf(result, 2, "%d", !strcmp(sx, "0") || !strcmp(sy, "0"));
                 break;
             case '+':
@@ -294,21 +279,13 @@ char *Math(AST tree)
 
         switch (*(tree->value))
         {
-        // AND
-        case 'A':
-        case 'a':
+        case '&':
             return __float(dx && dy);
-        // EQU
-        case 'E':
-        case 'e':
+        case '=':
             return __float(dx == dy);
-        // NEQ
-        case 'N':
-        case 'n':
+        case '!':
             return __float(dx != dy);
-        // OR
-        case 'O':
-        case 'o':
+        case '|':
             return __float(dx || dy);
         case '^':
             return __float((double)((int)dx ^ (int)dy));
@@ -323,9 +300,9 @@ char *Math(AST tree)
         case '-':
             return __float(dx - dy);
         case '<':
-            return __float(dx < dy);
+            return __float(dx < dy || (dx == dy && tree->value[1] == '='));
         case '>':
-            return __float(dx > dy);
+            return __float(dx > dy || (dx == dy && tree->value[1] == '='));
         default:
             return LeaveException(MathError, tree->value, tree->file);
         }

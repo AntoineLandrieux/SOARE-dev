@@ -298,10 +298,7 @@ char *Runtime(AST tree)
         case NODE_OUTPUT:
             returned = Math(curr->child);
             if (returned)
-            {
-                printf("%s", returned);
-                printf("%s", MemGet(MEMORY, "__WRITE_END__")->value);
-            }
+                printf("%s%s", returned, MemGet(MEMORY, "__WRITE_END__")->value);
             break;
 
         case NODE_RETURN:
@@ -339,10 +336,6 @@ int Execute(char *file, char *rawcode)
 #endif
 
     free(Runtime(ast));
-
-#ifdef __SOARE_DEBUG
-    MemLog(MEMORY);
-#endif
 
     MEMORY = MemFree(MEMORY);
     TokensFree(tokens);

@@ -88,10 +88,12 @@ static u8 chrOperator(const char character)
 static u8 strOperator(char *string)
 {
     return (
-        !strcasecmp("equ", string) ||
-        !strcasecmp("neq", string) ||
-        !strcasecmp("and", string) ||
-        !strcasecmp("or", string));
+        !strcmp("==", string) ||
+        !strcmp("<=", string) ||
+        !strcmp(">=", string) ||
+        !strcmp("!=", string) ||
+        !strcmp("&&", string) ||
+        !strcmp("||", string));
 }
 
 /**
@@ -132,11 +134,7 @@ static u8 strKeyword(char *string)
  */
 static token_type Symbol(char *string)
 {
-    if (strKeyword(string))
-        return TKN_KEYWORD;
-    else if (strOperator(string))
-        return TKN_OPERATOR;
-    return TKN_NAME;
+    return strKeyword(string) ? TKN_KEYWORD : TKN_NAME;
 }
 
 /**
@@ -318,7 +316,19 @@ Tokens *Tokenizer(char *filename, char *text)
         curr->file.ln = ln;
         curr->file.col = col;
 
-        if ('=' == *text)
+        char operator[3] = {
+            0 [text],
+            1 [text],
+            0
+        };
+
+        if (strOperator(operator))
+        {
+            offset += 1;
+            type = TKN_OPERATOR;
+        }
+
+        else if ('=' == *text)
             type = TKN_ASSIGN;
 
         else if ('@' == *text)
@@ -327,8 +337,8 @@ Tokens *Tokenizer(char *filename, char *text)
         else if (strchr("()", *text))
             type = *text == '(' ? TKN_PARENL : TKN_PARENR;
 
-        else if (chrOperator(*text) || *text == '!' || *text == ';')
-            type = *text == ';' ? TKN_SEMICOLON : (*text == '!' ? TKN_FUNCTION : TKN_OPERATOR);
+        else if (chrOperator(*text) || *text == ';')
+            type = *text == ';' ? TKN_SEMICOLON : TKN_OPERATOR;
 
         else if (chrAlpha(*text) || *text == '_')
             while (chrAlnum((&*text)[offset]) || (&*text)[offset] == '_')
