@@ -23,14 +23,16 @@
 #include <termios.h>
 static struct termios old, current;
 
-char getch(void)
+int getch()
 {
-    tcgetattr(0, &old);
-    current = old;
-    current.c_lflag &= ~(ICANON | ECHO);
-    tcsetattr(0, TCSANOW, &current);
-    char ch = getchar();
-    tcsetattr(0, TCSANOW, &old);
+    struct termios old, new;
+    int ch;
+    tcgetattr(STDIN_FILENO, &oldt);
+    new = old;
+    newt.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &new);
+    ch = getchar();
+    tcsetattr(STDIN_FILENO, TCSANOW, &old);
     return ch;
 }
 #endif
@@ -81,11 +83,10 @@ static AST loadimport(char *filename)
     return ast;
 }
 
-
 static void InterpreterVar()
 {
     MEMORY = Mem();
-    
+
     MemPush(MEMORY, strdup("__SOARE__"), strdup("SOARE Antoine LANDRIEUX (MIT LICENSE)"));
     MemPush(MEMORY, strdup("__BUILD__"), strdup(__DATE__));
 
@@ -129,7 +130,7 @@ char *RunFunction(AST tree)
             return LeaveException(UndefinedReference, ptr->value, tree->file);
         }
 
-        MemPush(FUNCTION, ptr->value, Math(src));
+        MemPush(FUNCTION, ptr->value, Eval(src));
         src = src->sibling;
         ptr = ptr->sibling;
     }
@@ -155,89 +156,88 @@ char *Runtime(AST tree)
         InterpreterVar();
 
     MEM statement = MemLast(MEMORY);
-    MemJoin(MEMORY, FUNCTION);
+    MemJoin(statement, FUNCTION);
     FUNCTION = NULL;
 
     for (AST curr = root->child; curr && !ErrorLevel(); curr = curr->sibling)
     {
         char *returned = NULL;
-        int enumerate = 0;
+        u64 enumerate = 0;
         AST tmp = NULL;
         MEM get = NULL;
 
         switch (curr->type)
         {
         case NODE_IMPORT:
-            tmp = loadimport(curr->value);
-            if (tmp)
+
+            if ((tmp = loadimport(curr->value)))
                 BranchJuxtapose(curr, tmp->child);
             break;
 
-        case NODE_CONTINUE:
-            statement->next = MemFree(statement->next);
-            return NULL;
-
         case NODE_INPUT:
-            get = MemGet(MEMORY, curr->value);
-            if (get)
+
+            if ((get = MemGet(MEMORY, curr->value)))
             {
-                returned = malloc(2);
-                if (returned)
-                {
-                    returned[0] = getch();
-                    MemSet(get, returned);
-                }
-                else
-                    __SOARE_OUT_OF_MEMORY();
-            }
-            else
-                LeaveException(UndefinedReference, curr->value, curr->file);
-            break;
-
-        case NODE_CALL:
-            free(RunFunction(curr));
-            break;
-
-        case NODE_MEMSET:
-            get = MemGet(MEMORY, curr->value);
-            returned = Math(curr->child);
-            if (!MemSet(get, returned))
-                get = MemPush(statement, curr->value, returned);
-            break;
-
-        case NODE_ENUMERATE:
-            for (tmp = curr->child; tmp; tmp = tmp->sibling)
-            {
-                returned = malloc(((int)(enumerate / 10)) + 2);
-                if (!returned)
+                if (!(returned = malloc(2)))
                 {
                     __SOARE_OUT_OF_MEMORY();
                     break;
                 }
-                snprintf(returned, (((int)(enumerate / 10))) + 2, "%d", enumerate);
-                MemPush(
-                    statement,
-                    tmp->value,
-                    returned);
+                returned[0] = (char)getch();
+                MemSet(get, returned);
+                break;
+            }
+            LeaveException(UndefinedReference, curr->value, curr->file);
+            break;
+
+        case NODE_CALL:
+
+            free(RunFunction(curr));
+            break;
+
+        case NODE_MEMNEW:
+
+            MemPush(statement, curr->value, Eval(curr->child));
+            break;
+
+        case NODE_MEMSET:
+
+            get = MemGet(MEMORY, curr->value);
+            returned = Eval(curr->child);
+
+            if (!MemSet(get, returned))
+            {
+                free(returned);
+                LeaveException(UndefinedReference, curr->value, curr->file);
+            }
+            break;
+
+        case NODE_ENUMERATE:
+
+            for (tmp = curr->child; tmp; tmp = tmp->sibling)
+            {
+                if (!(returned = malloc(((int)(enumerate / 10)) + 2)))
+                {
+                    __SOARE_OUT_OF_MEMORY();
+                    break;
+                }
+                snprintf(returned, (((int)(enumerate / 10))) + 2, "%lld", enumerate);
+                MemPush(statement, tmp->value, returned);
                 enumerate += 1;
             }
             break;
 
         case NODE_CONDITION:
 
-            returned = Math(curr->child);
+            returned = Eval(curr->child);
             tmp = curr->child;
 
-            while (1)
+            while (returned)
             {
-                if (!returned)
-                    break;
-
                 if (strcmp(returned, "0"))
                 {
                     free(returned);
-                    returned = Runtime(tmp->sibling);
-                    if (returned)
+                    if ((returned = Runtime(tmp->sibling)))
                     {
                         statement->next = MemFree(statement->next);
                         return returned;
@@ -245,12 +245,11 @@ char *Runtime(AST tree)
                     break;
                 }
 
-                tmp = tmp->sibling->sibling;
-                if (!tmp)
+                if (!(tmp = tmp->sibling->sibling))
                     break;
 
                 free(returned);
-                returned = Math(tmp);
+                returned = Eval(tmp);
             }
 
             free(returned);
@@ -258,55 +257,54 @@ char *Runtime(AST tree)
 
         case NODE_REPETITION:
 
-            returned = Math(curr->child);
-
-            while (returned)
+            while ((returned = Eval(curr->child)))
             {
-                if (!strcmp(returned, "0"))
+                if (!strcmp(returned, "0") || ErrorLevel())
                     break;
                 free(returned);
-                returned = Runtime(curr->child->sibling);
-                if (returned)
+                if ((returned = Runtime(curr->child->sibling)))
                 {
                     statement->next = MemFree(statement->next);
                     return returned;
                 }
-                returned = Math(curr->child);
             }
-
             free(returned);
             break;
 
         case NODE_TRY:
 
+            enumerate = (u64)AsIgnoredException();
             IgnoreException(0x1);
             returned = Runtime(curr->child);
-            IgnoreException(0x0);
+            IgnoreException((u8)enumerate);
+
             if (ErrorLevel())
             {
                 free(returned);
                 ClearException();
                 returned = Runtime(curr->child->sibling);
             }
-            if (returned)
-            {
-                statement->next = MemFree(statement->next);
-                return returned;
-            }
-            break;
+
+            if (!returned)
+                break;
+
+            statement->next = MemFree(statement->next);
+            return returned;
 
         case NODE_OUTPUT:
-            returned = Math(curr->child);
-            if (returned)
+
+            if ((returned = Eval(curr->child)))
                 printf("%s%s", returned, MemGet(MEMORY, "__WRITE_END__")->value);
             break;
 
         case NODE_RETURN:
-            returned = Math(curr->child);
+
+            returned = Eval(curr->child);
             statement->next = MemFree(statement->next);
             return returned;
 
         case NODE_RAISE:
+
             statement->next = MemFree(statement->next);
             return LeaveException(RaiseException, curr->value, curr->file);
 

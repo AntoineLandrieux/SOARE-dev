@@ -23,14 +23,21 @@ typedef enum SoareExceptions
     FileError,
     CharacterError,
     SyntaxError,
-    MissingAssignation,
     UnexpectedNear,
     UndefinedReference,
     MathError,
+    IndexOutOfRange,
     DivideByZero,
     RaiseException
 
 } SoareExceptions;
+
+/**
+ * @brief Error display
+ * @author Antoine LANDRIEUX
+ *
+ */
+u8 AsIgnoredException();
 
 /**
  * @brief Enable/disable error display

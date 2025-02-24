@@ -107,7 +107,6 @@ static u8 strKeyword(char *string)
 {
     return (
         //
-        !strcmp(KEYWORD_CONTINUE, string) ||
         !strcmp(KEYWORD_DO, string) ||
         !strcmp(KEYWORD_ELSE, string) ||
         !strcmp(KEYWORD_END, string) ||
@@ -331,11 +330,14 @@ Tokens *Tokenizer(char *filename, char *text)
         else if ('=' == *text)
             type = TKN_ASSIGN;
 
-        else if ('@' == *text)
+        else if ('@' == *text || '$' == *text)
             type = TKN_KEYWORD;
 
         else if (strchr("()", *text))
             type = *text == '(' ? TKN_PARENL : TKN_PARENR;
+
+        else if (strchr("[]", *text))
+            type = *text == '[' ? TKN_ARRAYL : TKN_ARRAYR;
 
         else if (chrOperator(*text) || *text == ';')
             type = *text == ';' ? TKN_SEMICOLON : TKN_OPERATOR;

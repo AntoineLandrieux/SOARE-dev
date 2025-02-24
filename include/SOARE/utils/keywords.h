@@ -20,7 +20,6 @@
  * List of keywords (alpha-numeric order)
  */
 
-#define KEYWORD_CONTINUE "continue"
 #define KEYWORD_DO "do"
 #define KEYWORD_ELSE "else"
 #define KEYWORD_END "end"

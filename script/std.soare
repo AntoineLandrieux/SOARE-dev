@@ -11,34 +11,93 @@
 ? <https://github.com/AntoineLandrieux/SOARE/>
 ?
 
+$null = "";
+
 ? @brief Useful for math, ex: 5*M(1+2)
 @M(any)
-    return any;
+  return any;
 end;
 
 ? @brief NaN
 @NaN(number)
-    try
-        number = number * 1;
-    iferror
-        return 1;
-    end;
-    return 0;
+  try
+    number = number * 1;
+  iferror
+    return 1;
+  end;
+  return 0;
 end;
 
 ? @brief ftoi
 @ftoi(float)
-    if NaN(float) do
-        raise "NaN";
-    end;
-    return float^0;
+  if NaN(float) do
+    raise "NaN";
+  end;
+  return float^0;
 end;
 
 ? @brief sleep
 ? @deprecated
 @sleep(time)
-    time = ftoi(time) * 999999;
-    while time > 0 do
-        time = time - 1;
+  if NaN(time) do
+    raise "NaN";
+  orif time < 0 do
+    return null;
+  end;
+  time = time * 999999;
+  while time > 0 do
+    time = time - 1;
+  end;
+end;
+
+? @brief in
+@in(parent; source)
+  $index = 0;
+  $r = index;
+  while 1 do
+    try
+      r = parent[index] == source;
+    iferror
+      return 0;
     end;
+    if r do
+      return index+1
+    end;
+    index = index+1;
+  end;
+end;
+
+? @brief alloc
+@alloc(size)
+  if NaN(size) do
+    raise "NaN";
+  orif size < 1 do
+    return null;
+  end;
+  $str = null;
+  $ptr = 0;
+  while ptr != size do
+    str = str + " ";
+    ptr = ptr + 1
+  end;
+  return str;
+end;
+
+? @brief input
+@input(message)
+  $conf = __WRITE_END__;
+  __WRITE_END__ = CR;
+  write message;
+  $usr = "";
+  $key = "";
+  inputch key;
+  while key != LN && key != CR do
+    sleep(0.1);
+    usr = usr + key;
+    write message + usr;
+    inputch key;
+  end;
+  write LN;
+  __WRITE_END__ = conf;
+  return usr;
 end;

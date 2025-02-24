@@ -30,6 +30,8 @@
  */
 static u8 isNaN(char *string)
 {
+    if (!string)
+        return 1;
     if (*string == '+' || *string == '-')
         (volatile char *)string++;
     for (u8 dot = 1; *string; (volatile char *)string++)
@@ -80,15 +82,34 @@ static char *__float(double number)
  * @param symbol
  * @return u8
  */
-u8 MathPriority(char symbol)
+static u8 MathPriority(char symbol)
 {
     if (strchr("/*%^", symbol))
-        return 0;
-    else if (strchr("+-", symbol))
         return 1;
-    else if (strchr("<=!>", symbol))
+    else if (strchr("+-", symbol))
         return 2;
-    return 3;
+    else if (strchr("<=!>", symbol))
+        return 3;
+    return 4;
+}
+
+/**
+ * @brief Return the value as an array
+ * @author Antoine LANDRIEUX
+ *
+ * @param tokens
+ * @return AST
+ */
+static AST ParseArray(Tokens **tokens)
+{
+    if ((*tokens)->type != TKN_ARRAYL)
+        return NULL;
+    TokenNext(tokens);
+    AST value = ParseExpr(tokens, 0xF);
+    if ((*tokens)->type != TKN_ARRAYR)
+        return NULL;
+    TokenNext(tokens);
+    return BranchJoin(Branch("ARRAY", NODE_ARRAY, (*tokens)->file), value);
 }
 
 /**
@@ -121,11 +142,11 @@ AST ParseValue(Tokens **tokens)
 
         value->type = NODE_CALL;
         TokenNext(tokens);
+        AST expr = NULL;
 
         while ((*tokens)->type != TKN_PARENR)
         {
-            AST expr = ParseExpr(tokens, 0xFF);
-            if (!expr)
+            if (!(expr = ParseExpr(tokens, 0xF)))
             {
                 TreeFree(value);
                 return NULL;
@@ -149,6 +170,7 @@ AST ParseValue(Tokens **tokens)
         return NULL;
     }
 
+    BranchJoin(value, ParseArray(tokens));
     return value;
 }
 
@@ -162,39 +184,79 @@ AST ParseValue(Tokens **tokens)
  */
 AST ParseExpr(Tokens **tokens, u8 priority)
 {
-    Node *left = ParseValue(tokens);
-    Node *right = NULL;
+    Node *x = ParseValue(tokens);
+    Node *y = NULL;
     Node *symbol = NULL;
 
-    if (!left)
+    if (!x)
         return NULL;
 
     while ((*tokens)->type == TKN_OPERATOR && !ErrorLevel())
     {
-        u8 operator= MathPriority(*(*tokens)->value);
+        u8 op = MathPriority(*(*tokens)->value);
 
-        if (operator>= priority)
+        if (op >= priority)
             break;
 
         symbol = Branch((*tokens)->value, NODE_OPERATOR, (*tokens)->file);
         TokenNext(tokens);
-        right = ParseExpr(tokens, priority);
+        y = ParseExpr(tokens, op);
 
-        if (!symbol || !right)
+        if (!symbol || !y)
         {
-            TreeFree(left);
-            TreeFree(right);
+            TreeFree(x);
+            TreeFree(y);
             TreeFree(symbol);
             return NULL;
         }
 
-        BranchJoin(symbol, left);
-        BranchJoin(symbol, right);
-
-        left = symbol;
+        BranchJoin(symbol, x);
+        BranchJoin(symbol, y);
+        x = symbol;
     }
 
-    return left;
+    return x;
+}
+
+char *Array(char *value, AST array)
+{
+    while (array)
+        if (array->type != NODE_ARRAY)
+            array = array->sibling;
+        else
+            break;
+
+    if (!array || !value)
+        return value;
+
+    array = array->child;
+    char *index = Eval(array);
+
+    if (isNaN(index))
+    {
+        free(value);
+        free(index);
+        return LeaveException(MathError, array->value, array->file);
+    }
+
+    int index_int = atoi(index);
+    free(index);
+
+    if (strlen(value) <= (size_t)index_int || index_int < 0)
+    {
+        free(value);
+        return LeaveException(IndexOutOfRange, array->value, array->file);
+    }
+
+    char *result = malloc(2);
+
+    if (!result)
+        return __SOARE_OUT_OF_MEMORY();
+
+    0 [result] = value[index_int];
+    1 [result] = 0;
+    free(value);
+    return result;
 }
 
 /**
@@ -232,8 +294,8 @@ char *Math(AST tree)
 
     case NODE_OPERATOR:
 
-        sx = Math(tree->child);
-        sy = Math(tree->child->sibling);
+        sx = Eval(tree->child);
+        sy = Eval(tree->child->sibling);
 
         if (!sx || !sy)
             return NULL;
@@ -247,7 +309,7 @@ char *Math(AST tree)
             switch (*(tree->value))
             {
             case '&':
-                snprintf(result, 2, "%d", !strcmp(sx, "0") && !strcmp(sy, "0"));
+                snprintf(result, 2, "%d", *sx && *sy);
                 break;
             case '=':
                 snprintf(result, 2, "%d", !strcmp(sx, sy));
@@ -256,7 +318,7 @@ char *Math(AST tree)
                 snprintf(result, 2, "%d", strcmp(sx, sy));
                 break;
             case '|':
-                snprintf(result, 2, "%d", !strcmp(sx, "0") || !strcmp(sy, "0"));
+                snprintf(result, 2, "%d", *sx || *sy);
                 break;
             case '+':
                 result = realloc(result, strlen(sx) + strlen(sy) + 1);
@@ -311,5 +373,12 @@ char *Math(AST tree)
         return LeaveException(MathError, tree->value, tree->file);
     }
 
+    return NULL;
+}
+
+char *Eval(AST tree)
+{
+    if (tree)
+        return Array(Math(tree), tree->child);
     return NULL;
 }

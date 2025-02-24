@@ -1,7 +1,7 @@
 
 loadimport "../script/std.soare";
 
-pi = 3.1415
+$pi = 3.1415
 
 write 1+3.1   ?  4.100
 write 1-3     ? -2.000
@@ -13,9 +13,9 @@ write 1<3     ?  1
 write 1>3     ?  0
 
 try
-    write 4/0;
+  write 4/0;
 iferror
-    write "Can't devide by 0"
+  write "Can't devide by 0"
 end;
 
 write ftoi(pi) ? 3

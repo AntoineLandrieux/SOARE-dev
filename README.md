@@ -15,7 +15,7 @@ See [SOARE Documentation](doc/documentation.md) and [SOARE Changelog](CHANGELOG.
 
 ```txt
 ? This is your first SOARE code !
-writeln "Hello World!";
+write "Hello World!";
 ```
 
 ## Contributing

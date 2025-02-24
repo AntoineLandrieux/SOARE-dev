@@ -29,14 +29,24 @@ static char *Exceptions[] = {
     "FileError",
     "CharacterError",
     "SyntaxError",
-    "MissingAssignation",
     "UnexpectedNear",
     "UndefinedReference",
     "MathError",
+    "IndexOutOfRange",
     "DivideByZero",
     "RaiseException"
 
 };
+
+/**
+ * @brief Error display
+ * @author Antoine LANDRIEUX
+ *
+ */
+u8 AsIgnoredException()
+{
+    return !enable;
+}
 
 /**
  * @brief Enable/disable error display
@@ -91,7 +101,7 @@ void *LeaveException(SoareExceptions error, char *string, Document file)
         fprintf(
             //
             stderr,
-            "Except: %s\n\t\"%.10s\"\n\t ^~~~\n\tAt file %s:%lld:%lld\n",
+            "\nExcept: %s\n\t\"%.10s\"\n\t ^~~~\n\tAt file %s:%lld:%lld\n",
             Exceptions[error],
             string,
             file.file,

@@ -219,7 +219,6 @@ AST Parse(Tokens *tokens)
                     }
 
                     BranchJoin(function, Branch(tokens->value, NODE_MEMSET, tokens->file));
-
                     TokenNext(&tokens);
 
                     if (tokens->type == TKN_SEMICOLON)
@@ -231,20 +230,31 @@ AST Parse(Tokens *tokens)
                 curr = body;
             }
 
+            else if (*(old->value) == '$')
+            {
+                if (tokens->type != TKN_NAME || tokens->next->type != TKN_ASSIGN)
+                {
+                    TreeFree(root);
+                    return LeaveException(SyntaxError, old->value, old->file);
+                }
+
+                old = tokens;
+                TokenNext(&tokens);
+                TokenNext(&tokens);
+                AST content = ParseExpr(&tokens, 0xF);
+
+                if (!content)
+                {
+                    TreeFree(root);
+                    return LeaveException(SyntaxError, old->value, old->file);
+                }
+
+                BranchJoin(curr, BranchJoin(Branch(old->value, NODE_MEMNEW, old->file), content));
+            }
+
             else if (!strcmp(old->value, KEYWORD_RETURN))
-                BranchJoin(
-                    //
-                    curr,
-                    //
-                    BranchJoin(
-                        //
-                        Branch(old->value, NODE_RETURN, old->file),
-                        ParseExpr(&tokens, 0xFF)
-                        //
-                        )
-                    //
-                );
-            
+                BranchJoin(curr, BranchJoin(Branch(old->value, NODE_RETURN, old->file), ParseExpr(&tokens, 0xF)));
+
             else if (!strcmp(old->value, KEYWORD_INPUTCH))
             {
                 if (tokens->type != TKN_NAME)
@@ -313,7 +323,7 @@ AST Parse(Tokens *tokens)
 
             else if (!strcmp(old->value, KEYWORD_IF) || !strcmp(old->value, KEYWORD_WHILE))
             {
-                AST content = ParseExpr(&tokens, 0xFF);
+                AST content = ParseExpr(&tokens, 0xF);
 
                 if (!content || tokens->type != TKN_KEYWORD || strcmp(tokens->value, "do"))
                 {
@@ -340,7 +350,7 @@ AST Parse(Tokens *tokens)
                     return LeaveException(UnexpectedNear, old->value, old->file);
                 }
 
-                AST content = ParseExpr(&tokens, 0xFF);
+                AST content = ParseExpr(&tokens, 0xF);
 
                 if (!content || tokens->type != TKN_KEYWORD || strcmp(tokens->value, "do"))
                 {
@@ -375,7 +385,7 @@ AST Parse(Tokens *tokens)
 
             else if (!strcmp(old->value, KEYWORD_WRITE))
             {
-                AST content = ParseExpr(&tokens, 0xFF);
+                AST content = ParseExpr(&tokens, 0xF);
 
                 if (!content)
                 {
@@ -383,29 +393,7 @@ AST Parse(Tokens *tokens)
                     return LeaveException(SyntaxError, old->value, old->file);
                 }
 
-                BranchJoin(
-                    //
-                    curr,
-                    //
-                    BranchJoin(
-                        //
-                        Branch(old->value, NODE_OUTPUT, old->file),
-                        content
-                        //
-                        )
-                    //
-                );
-            }
-
-            else if (!strcmp(old->value, KEYWORD_CONTINUE))
-            {
-                if (curr == root)
-                {
-                    TreeFree(root);
-                    return LeaveException(UnexpectedNear, old->value, old->file);
-                }
-
-                BranchJoin(curr, Branch(old->value, NODE_CONTINUE, old->file));
+                BranchJoin(curr, BranchJoin(Branch(old->value, NODE_OUTPUT, old->file), content));
             }
 
             else if (!strcmp(old->value, KEYWORD_END))
@@ -441,7 +429,7 @@ AST Parse(Tokens *tokens)
                     return LeaveException(UnexpectedNear, old->value, old->file);
                 }
                 TokenNext(&tokens);
-                AST content = ParseExpr(&tokens, 0xFF);
+                AST content = ParseExpr(&tokens, 0xF);
                 if (!content)
                 {
                     TreeFree(root);
@@ -450,9 +438,9 @@ AST Parse(Tokens *tokens)
                 }
                 parsed->type = NODE_MEMSET;
                 BranchJoin(curr, BranchJoin(parsed, content));
+                break;
             }
-            else
-                BranchJoin(curr, parsed);
+            BranchJoin(curr, parsed);
             break;
 
         default:

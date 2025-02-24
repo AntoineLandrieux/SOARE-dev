@@ -17,15 +17,6 @@
  */
 
 /**
- * @brief Looks up the mathematical priority of an operator
- * @author Antoine LANDRIEUX
- *
- * @param symbol
- * @return u8
- */
-u8 MathPriority(char symbol);
-
-/**
  * @brief Return the value as a node
  * @author Antoine LANDRIEUX
  *
@@ -51,6 +42,6 @@ AST ParseExpr(Tokens **tokens, u8 priority);
  * @param tree
  * @return char*
  */
-char *Math(AST tree);
+char *Eval(AST tree);
 
 #endif /* __SOARE_MATH_H__ */

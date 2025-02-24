@@ -35,6 +35,7 @@ typedef enum node_type
     NODE_CALL,
     NODE_INPUT,
     NODE_FUNCTION,
+    NODE_MEMNEW,
     NODE_MEMGET,
     NODE_MEMSET,
     NODE_ENUMERATE,
@@ -42,8 +43,7 @@ typedef enum node_type
     NODE_OPERATOR,
     NODE_CONDITION,
     NODE_REPETITION,
-    NODE_RETURN,
-    NODE_CONTINUE
+    NODE_RETURN
 
 } node_type;
 

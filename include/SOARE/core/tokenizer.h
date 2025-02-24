@@ -29,6 +29,8 @@ typedef enum token_type
     TKN_STRING,
     TKN_PARENL,
     TKN_PARENR,
+    TKN_ARRAYL,
+    TKN_ARRAYR,
     TKN_ASSIGN,
     TKN_KEYWORD,
     TKN_OPERATOR,
