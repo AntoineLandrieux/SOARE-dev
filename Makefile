@@ -14,6 +14,7 @@
 APP = soare
 VERSION_MAJ = 1
 
+AR = ar
 CC = gcc
 CPP = g++
 
@@ -50,7 +51,7 @@ $(LIB)/%.o: $(CORE)/%.c
 $(BIN)/$(APP): $(LIB) $(CORE_OBJS) $(SRC)/Main.cpp
 	mkdir -p $(BIN)
 	$(WINDRES) windows/resources/app.rc -coeff $(RES)
-	ar rcs $(LIB)/libsoare$(VERSION_MAJ).a $(CORE_OBJS)
+	$(AR) rcs $(LIB)/libsoare$(VERSION_MAJ).a $(CORE_OBJS)
 	$(CPP) $(RES) $(SRC)/Main.cpp -o $(BIN)/$(APP) -I $(INCLUDE) -L$(LIB) -lsoare$(VERSION_MAJ) $(CFLAGS) $(DEBUG) $(NO_COLORED_OUTPUT)
 	rm $(CORE_OBJS) $(RES)
 

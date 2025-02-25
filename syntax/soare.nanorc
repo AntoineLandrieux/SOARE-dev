@@ -18,12 +18,12 @@ magic "Soare script"
 comment "?"
 
 ## built-in functions
-color cyan "\<(M|NaN|isset|ftoi)\>"
+color cyan "\<(M|NaN|ftoi|sleep|in|alloc|input)\>"
 ## Keywords
-color brightblue "\<(continue|do|else|end|enumerate|if|iferror|loadimport|nop|orif|inputch|raise|return|try|while|writeln)\>"
+color brightblue "\<(do|else|end|enumerate|if|iferror|loadimport|nop|orif|inputch|raise|return|try|while|write)\>"
 
 ## operators
-color magenta "[.:;,+*|=!\%@]" "<" ">" "/" "-" "&"
+color magenta "[.:;,+*|=!\%@$]" "<" ">" "/" "-" "&"
 
 ## parentheses
 color magenta "[()]"

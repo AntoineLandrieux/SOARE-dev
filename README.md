@@ -1,7 +1,5 @@
 
-# The SOARE Interpreter
-
-# ![LOGO](resources/github/logo.svg)
+# ![LOGO](resources/icon/icon.svg) The SOARE Interpreter
 
 SOARE is distributed under the [MIT License](LICENSE).
 

@@ -1,7 +1,5 @@
 
-# SOARE documentation
-
-![LOGO](../resources/github/logo.svg)
+# ![LOGO](../resources/icon/icon.svg) SOARE documentation
 
 > [!NOTE]
 >
