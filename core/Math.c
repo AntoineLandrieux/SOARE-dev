@@ -376,6 +376,13 @@ char *Math(AST tree)
     return NULL;
 }
 
+/**
+ * @brief Evaluates the mathematical expression of a tree
+ * @author Antoine LANDRIEUX
+ *
+ * @param tree
+ * @return char*
+ */
 char *Eval(AST tree)
 {
     if (tree)

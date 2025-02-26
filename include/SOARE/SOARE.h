@@ -24,7 +24,7 @@ namespace SOARE
 {
     extern "C"
     {
-#endif
+#endif /* __cplusplus */
 
 /* SOARE major */
 #define SOARE_MAJOR 1
@@ -40,7 +40,7 @@ namespace SOARE
         typedef struct Document
         {
 
-            // FIle
+            // File
             char *file;
 
             // Line
@@ -66,6 +66,6 @@ namespace SOARE
 #ifdef __cplusplus
     }
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* __SOARE__ */

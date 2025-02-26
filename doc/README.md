@@ -10,4 +10,4 @@
 
 ## Documentation
 
-- [FRANÇAIS - FRANCE](documentation.fr.md)
+- [VIEW DOC](documentation.md)
