@@ -36,6 +36,16 @@ AST ParseValue(Tokens **tokens);
 AST ParseExpr(Tokens **tokens, u8 priority);
 
 /**
+ * @brief Get the Array Index
+ * @author Antoine LANDRIEUX
+ * 
+ * @param array 
+ * @param value 
+ * @return long long 
+ */
+long long GetArrayIndex(AST array, char *value);
+
+/**
  * @brief Evaluates the mathematical expression of a tree
  * @author Antoine LANDRIEUX
  *

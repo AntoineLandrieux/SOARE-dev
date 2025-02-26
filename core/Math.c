@@ -218,7 +218,15 @@ AST ParseExpr(Tokens **tokens, u8 priority)
     return x;
 }
 
-char *Array(char *value, AST array)
+/**
+ * @brief Get the Array Index object
+ * @author Antoine LANDRIEUX
+ * 
+ * @param array 
+ * @param value 
+ * @return long long 
+ */
+long long GetArrayIndex(AST array, char *value)
 {
     while (array)
         if (array->type != NODE_ARRAY)
@@ -227,34 +235,56 @@ char *Array(char *value, AST array)
             break;
 
     if (!array || !value)
-        return value;
+        return -1;
 
     array = array->child;
     char *index = Eval(array);
 
     if (isNaN(index))
     {
-        free(value);
         free(index);
-        return LeaveException(MathError, array->value, array->file);
+        LeaveException(MathError, array->value, array->file);
+        return -1;
     }
 
-    int index_int = atoi(index);
+    long long indexlld = atoll(index);
     free(index);
 
-    if (strlen(value) <= (size_t)index_int || index_int < 0)
+    if (strlen(value) <= (size_t)indexlld || indexlld < 0)
     {
-        free(value);
-        return LeaveException(IndexOutOfRange, array->value, array->file);
+        LeaveException(IndexOutOfRange, array->value, array->file);
+        return -1;
     }
+
+    return indexlld;
+}
+
+/**
+ * @brief Array parser
+ * @author Antoine LANDRIEUX
+ * 
+ * @param value 
+ * @param array 
+ * @return char* 
+ */
+static char *Array(char *value, AST array)
+{
+    long long index = GetArrayIndex(array, value);
+
+    if (index < 0)
+        return value;
 
     char *result = malloc(2);
 
     if (!result)
+    {
+        free(value);
         return __SOARE_OUT_OF_MEMORY();
+    }
 
-    0 [result] = value[index_int];
+    0 [result] = value[index];
     1 [result] = 0;
+
     free(value);
     return result;
 }
@@ -385,7 +415,15 @@ char *Math(AST tree)
  */
 char *Eval(AST tree)
 {
+    char *string = NULL;
     if (tree)
-        return Array(Math(tree), tree->child);
-    return NULL;
+    {
+        string = Array(Math(tree), tree->child);
+        if (ErrorLevel())
+        {
+            free(string);
+            return NULL;
+        }
+    }
+    return string;
 }

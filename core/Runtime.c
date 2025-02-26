@@ -23,16 +23,14 @@
 #include <termios.h>
 static struct termios old, current;
 
-int getch()
+char getch(void)
 {
-    struct termios old, new;
-    int ch;
-    tcgetattr(STDIN_FILENO, &oldt);
-    new = old;
-    newt.c_lflag &= ~(ICANON | ECHO);
-    tcsetattr(STDIN_FILENO, TCSANOW, &new);
-    ch = getchar();
-    tcsetattr(STDIN_FILENO, TCSANOW, &old);
+    tcgetattr(0, &old);
+    current = old;
+    current.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(0, TCSANOW, &current);
+    char ch = getchar();
+    tcsetattr(0, TCSANOW, &old);
     return ch;
 }
 #endif
@@ -162,7 +160,7 @@ char *Runtime(AST tree)
     for (AST curr = root->child; curr && !ErrorLevel(); curr = curr->sibling)
     {
         char *returned = NULL;
-        u64 enumerate = 0;
+        i64 num = 0;
         AST tmp = NULL;
         MEM get = NULL;
 
@@ -203,27 +201,38 @@ char *Runtime(AST tree)
         case NODE_MEMSET:
 
             get = MemGet(MEMORY, curr->value);
-            returned = Eval(curr->child);
+            num = GetArrayIndex(curr->child, get->value);
+            returned = Eval(num < 0 ? curr->child : curr->child->sibling);
 
-            if (!MemSet(get, returned))
+            if (!get)
             {
                 free(returned);
                 LeaveException(UndefinedReference, curr->value, curr->file);
+                break;
             }
+
+            if (num >= 0)
+            {
+                get->value[num] = returned[0];
+                free(returned);
+                break;
+            }
+
+            MemSet(get, returned);
             break;
 
         case NODE_ENUMERATE:
 
             for (tmp = curr->child; tmp; tmp = tmp->sibling)
             {
-                if (!(returned = malloc(((int)(enumerate / 10)) + 2)))
+                if (!(returned = malloc(((i64)(num / 10)) + 2)))
                 {
                     __SOARE_OUT_OF_MEMORY();
                     break;
                 }
-                snprintf(returned, (((int)(enumerate / 10))) + 2, "%lld", enumerate);
+                snprintf(returned, (((i64)(num / 10))) + 2, "%lld", num);
                 MemPush(statement, tmp->value, returned);
-                enumerate += 1;
+                num += 1;
             }
             break;
 
@@ -273,10 +282,10 @@ char *Runtime(AST tree)
 
         case NODE_TRY:
 
-            enumerate = (u64)AsIgnoredException();
+            num = (i64)AsIgnoredException();
             IgnoreException(0x1);
             returned = Runtime(curr->child);
-            IgnoreException((u8)enumerate);
+            IgnoreException((u8)num);
 
             if (ErrorLevel())
             {
