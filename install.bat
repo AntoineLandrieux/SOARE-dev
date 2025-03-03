@@ -28,26 +28,26 @@ IF EXIST "LICENSE" (
 )
 
 @REM Ask for install
-:askinstall
-SET askinst=""
-SET /P askinst="Install SOARE? (yes/no): "
-IF "%askinst%" EQU "yes" GOTO :main
-IF "%askinst%" EQU "y" GOTO :main
-IF "%askinst%" EQU "no" GOTO :cancel
-IF "%askinst%" EQU "n" GOTO :cancel
-GOTO :askinstall
+:ask_install
+SET ask=""
+SET /P ask="Install SOARE? (yes/no): "
+IF "%ask%" EQU "yes" GOTO :main
+IF "%ask%" EQU "y" GOTO :main
+IF "%ask%" EQU "no" GOTO :cancel
+IF "%ask%" EQU "n" GOTO :cancel
+GOTO :ask_install
 
 :main
 @REM If an installation is already present
 IF EXIST %install_path% (
     ECHO Warning: Existing installation
 :input
-    SET askrem=""
-    SET /P askrem="Delete the old installation? (yes/no): "
-    IF "%askrem%" EQU "yes" GOTO :delete_install
-    IF "%askrem%" EQU "y" GOTO :delete_install
-    IF "%askrem%" EQU "no" GOTO :cancel
-    IF "%askrem%" EQU "n" GOTO :cancel
+    SET ask_rem=""
+    SET /P ask_rem="Delete the old installation? (yes/no): "
+    IF "%ask_rem%" EQU "yes" GOTO :delete_install
+    IF "%ask_rem%" EQU "y" GOTO :delete_install
+    IF "%ask_rem%" EQU "no" GOTO :cancel
+    IF "%ask_rem%" EQU "n" GOTO :cancel
     GOTO :input
 )
 
