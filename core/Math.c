@@ -57,6 +57,16 @@ static char *vardup(char *value)
     return result;
 }
 
+static void zeros(char *string)
+{
+    char *end = string + strlen(string) - 1;
+    while (end > string && *end == '0')
+        --end;
+    if (*end == '.')
+        --end;
+    *(end + 1) = 0;
+}
+
 /**
  * @brief Convert float to string
  * @author Antoine LANDRIEUX
@@ -64,10 +74,11 @@ static char *vardup(char *value)
  * @param number
  * @return char*
  */
-static char *__float(double number)
+static char *__float(long double number)
 {
-    char string[50];
-    sprintf(string, "%g", number);
+    char string[100];
+    sprintf(string, "%Lf", number);
+    zeros(string);
     char *result = (char *)malloc(strlen(string));
     if (!result)
         return __SOARE_OUT_OF_MEMORY();
@@ -221,10 +232,10 @@ AST ParseExpr(Tokens **tokens, u8 priority)
 /**
  * @brief Get the Array Index object
  * @author Antoine LANDRIEUX
- * 
- * @param array 
- * @param value 
- * @return long long 
+ *
+ * @param array
+ * @param value
+ * @return long long
  */
 long long GetArrayIndex(AST array, char *value)
 {
@@ -262,10 +273,10 @@ long long GetArrayIndex(AST array, char *value)
 /**
  * @brief Array parser
  * @author Antoine LANDRIEUX
- * 
- * @param value 
- * @param array 
- * @return char* 
+ *
+ * @param value
+ * @param array
+ * @return char*
  */
 static char *Array(char *value, AST array)
 {
@@ -298,7 +309,7 @@ static char *Array(char *value, AST array)
  */
 char *Math(AST tree)
 {
-    double dx, dy;
+    long double dx, dy;
     char *sx, *sy;
     char *result = NULL;
 
@@ -363,8 +374,8 @@ char *Math(AST tree)
             return result;
         }
 
-        dx = atof(sx);
-        dy = atof(sy);
+        dx = strtold(sx, &result);
+        dy = strtold(sy, &result);
 
         if (strchr("/%", *(tree->value)) && !dy)
             return LeaveException(DivideByZero, tree->value, tree->file);

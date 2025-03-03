@@ -337,6 +337,7 @@ char *Runtime(AST tree)
  */
 int Execute(char *file, char *rawcode)
 {
+    ClearException();
     Tokens *tokens = Tokenizer(file, rawcode);
     AST ast = Parse(tokens);
 
