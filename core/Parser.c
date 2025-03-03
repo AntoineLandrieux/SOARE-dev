@@ -342,7 +342,7 @@ AST Parse(Tokens *tokens)
                 TokenNext(&tokens);
             }
 
-            else if (!strcmp(old->value, KEYWORD_ORIF))
+            else if (!strcmp(old->value, KEYWORD_OR))
             {
                 if (curr->parent->type != NODE_CONDITION)
                 {

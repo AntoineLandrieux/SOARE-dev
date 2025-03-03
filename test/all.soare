@@ -1,4 +1,6 @@
 
+loadimport "../script/std.soare";
+
 write CLS;
 write __SOARE__;
 write __BUILD__;
@@ -16,6 +18,10 @@ try
   loadimport "while.soare";
   write "Press any key..."
   inputch __WRITE_END__;
+  write "=================";
+  loadimport "inputch.soare";
+
+  write LN + "SUCCESS" + LN;
 
 iferror
   write "Can't load all files...";

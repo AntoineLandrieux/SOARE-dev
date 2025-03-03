@@ -195,21 +195,24 @@ char *Runtime(AST tree)
 
         case NODE_MEMNEW:
 
-            MemPush(statement, curr->value, Eval(curr->child));
+            MemPush(statement, strdup(curr->value), Eval(curr->child));
             break;
 
         case NODE_MEMSET:
 
             get = MemGet(MEMORY, curr->value);
-            num = GetArrayIndex(curr->child, get->value);
-            returned = Eval(num < 0 ? curr->child : curr->child->sibling);
 
             if (!get)
             {
-                free(returned);
                 LeaveException(UndefinedReference, curr->value, curr->file);
                 break;
             }
+
+            num = GetArrayIndex(curr->child, get->value);
+            returned = Eval(num < 0 ? curr->child : curr->child->sibling);
+
+            if (!returned)
+                break;
 
             if (num >= 0)
             {

@@ -41,7 +41,7 @@ end;
 @sleep(time)
   if NaN(time) do
     raise "NaN";
-  orif time < 0 do
+  or time < 0 do
     return null;
   end;
   time = time * 999999;
@@ -71,7 +71,7 @@ end;
 @alloc(size)
   if NaN(size) do
     raise "NaN";
-  orif size < 1 do
+  or size < 1 do
     return null;
   end;
   $str = null;
@@ -84,6 +84,7 @@ end;
 end;
 
 ? @brief input
+? @deprecated
 @input(message)
   $conf = __WRITE_END__;
   __WRITE_END__ = CR;

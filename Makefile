@@ -50,7 +50,7 @@ $(LIB)/%.o: $(CORE)/%.c
 
 $(BIN)/$(APP): $(LIB) $(CORE_OBJS) $(SRC)/Main.cpp
 	mkdir -p $(BIN)
-	$(WINDRES) windows/resources/app.rc -coeff $(RES)
+	$(WINDRES) windows/resources/app.rc -coff $(RES)
 	$(AR) rcs $(LIB)/libsoare$(VERSION_MAJ).a $(CORE_OBJS)
 	$(CPP) $(RES) $(SRC)/Main.cpp -o $(BIN)/$(APP) -I $(INCLUDE) -L$(LIB) -lsoare$(VERSION_MAJ) $(CFLAGS) $(DEBUG) $(NO_COLORED_OUTPUT)
 	rm $(CORE_OBJS) $(RES)

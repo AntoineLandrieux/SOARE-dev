@@ -4,9 +4,9 @@
   @Check(x)
     if x < 1 do
       return "Invalid Input"
-    orif x == 1 do
+    or x == 1 do
       return 0;
-    orif x == 2 do
+    or x == 2 do
       return 1;
     end;
     return 0-1;

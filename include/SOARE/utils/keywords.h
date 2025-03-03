@@ -28,7 +28,7 @@
 #define KEYWORD_IFERROR "iferror"
 #define KEYWORD_INPUTCH "inputch"
 #define KEYWORD_LOADIMPORT "loadimport"
-#define KEYWORD_ORIF "orif"
+#define KEYWORD_OR "or"
 #define KEYWORD_RAISE "raise"
 #define KEYWORD_RETURN "return"
 #define KEYWORD_TRY "try"

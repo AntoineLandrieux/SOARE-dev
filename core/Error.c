@@ -101,7 +101,7 @@ void *LeaveException(SoareExceptions error, char *string, Document file)
         fprintf(
             //
             stderr,
-            "\nExcept: %s\n\t\"%.10s\"\n\t ^~~~\n\tAt file %s:%lld:%lld\n",
+            "Except: %s\n\t\"%.10s\"\n\t ^~~~\n\tAt file %s:%lld:%lld\n",
             Exceptions[error],
             string,
             file.file,

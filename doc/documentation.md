@@ -229,9 +229,9 @@ try
 
   if NaN(x) do
     write "Not a number"
-  orif x < 0 do
+  or x < 0 do
     write "Negative";
-  orif x == 0 do
+  or x == 0 do
     write "Zero";
   else
     write "Positive";

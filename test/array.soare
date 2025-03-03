@@ -1,4 +1,5 @@
-loadimport "../script/std.soare"
+
+? loadimport "../script/std.soare";
 
 $msg="Hello World!";
 
