@@ -163,8 +163,6 @@ void *MemFree(MEM memory)
         return NULL;
 
     MemFree(memory->next);
-    memory->next = NULL;
-    free(memory->name);
     free(memory->value);
     free(memory);
     return NULL;

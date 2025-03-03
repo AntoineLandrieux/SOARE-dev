@@ -85,16 +85,16 @@ static void InterpreterVar()
 {
     MEMORY = Mem();
 
-    MemPush(MEMORY, strdup("__SOARE__"), strdup("SOARE Antoine LANDRIEUX (MIT LICENSE)"));
-    MemPush(MEMORY, strdup("__BUILD__"), strdup(__DATE__));
+    MemPush(MEMORY, "__SOARE__", strdup("SOARE Antoine LANDRIEUX (MIT LICENSE)"));
+    MemPush(MEMORY, "__BUILD__", strdup(__DATE__));
 
-    MemPush(MEMORY, strdup("__WRITE_END__"), strdup("\n"));
+    MemPush(MEMORY, "__WRITE_END__", strdup("\n"));
 
-    MemPush(MEMORY, strdup("BC"), strdup("\b"));
-    MemPush(MEMORY, strdup("CR"), strdup("\r"));
-    MemPush(MEMORY, strdup("LN"), strdup("\n"));
-    MemPush(MEMORY, strdup("TAB"), strdup("\t"));
-    MemPush(MEMORY, strdup("CLS"), strdup("\033c\033[3J"));
+    MemPush(MEMORY, "BC", strdup("\b"));
+    MemPush(MEMORY, "CR", strdup("\r"));
+    MemPush(MEMORY, "LN", strdup("\n"));
+    MemPush(MEMORY, "TAB", strdup("\t"));
+    MemPush(MEMORY, "CLS", strdup("\033c\033[3J"));
 }
 
 /**
@@ -195,7 +195,7 @@ char *Runtime(AST tree)
 
         case NODE_MEMNEW:
 
-            MemPush(statement, strdup(curr->value), Eval(curr->child));
+            MemPush(statement, curr->value, Eval(curr->child));
             break;
 
         case NODE_MEMSET:
