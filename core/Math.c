@@ -57,6 +57,12 @@ static char *vardup(char *value)
     return result;
 }
 
+/**
+ * @brief Remove useless zeros
+ * @author Antoine LANDRIEUX
+ * 
+ * @param string 
+ */
 static void zeros(char *string)
 {
     char *end = string + strlen(string) - 1;

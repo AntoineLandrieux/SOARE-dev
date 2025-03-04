@@ -13,6 +13,11 @@
 
 $null = "";
 
+enumerate
+  false
+  true
+end;
+
 ? @brief Useful for math, ex: 5*M(1+2)
 @M(any)
   return any;

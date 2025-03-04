@@ -360,11 +360,7 @@ Tokens *Tokenizer(char *filename, char *text)
             char quote = *text;
             (volatile char *)text++;
             while ((&*text)[offset] != quote && (&*text)[offset])
-            {
-                if ((&*text)[offset] != '\n')
-                    updateln(&ln, &col);
                 offset++;
-            }
             type = TKN_STRING;
             offset++;
         }
@@ -381,8 +377,13 @@ Tokens *Tokenizer(char *filename, char *text)
         curr = curr->next;
 
         for (u64 i = 0; i < offset; i++)
+        {
+            col += 1;
+            if (*text == '\n')
+                updateln(&ln, &col);
             (volatile char *)text++;
-        col += offset + (type == TKN_STRING);
+        }
+        col += type == TKN_STRING;
     }
 
     return token;
