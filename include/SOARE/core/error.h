@@ -16,6 +16,10 @@
  *
  */
 
+/**
+ * @brief List the different types of errors
+ * @author Antoine LANDRIEUX
+ */
 typedef enum SoareExceptions
 {
 
@@ -73,6 +77,6 @@ char ErrorLevel(void);
  */
 void *LeaveException(SoareExceptions error, char *string, Document file);
 
-#define __SOARE_OUT_OF_MEMORY() LeaveException(InterpreterError, "OUT OF MEMORY", EmptyDocument());
+#define __SOARE_OUT_OF_MEMORY() LeaveException(InterpreterError, "OUT OF MEMORY", EmptyDocument())
 
 #endif /* __SOARE_ERROR_H__ */
