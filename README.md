@@ -1,26 +1,23 @@
 
-# ![LOGO](resources/icon/icon.svg) SOARE
+# ![LOGO](resources/icon/icon.svg) BORIUM
 
-SOARE is distributed under the [MIT License](LICENSE).
+BORIUM is distributed under the [MIT LICENSE](LICENSE).
+
+## Simple Operating System based on [SOARE](https://github.com/AntoineLandrieux/SOARE)
+
+![image](resources/github/image.png)
 
 ---
 
 ## Documentation
 
-See [SOARE Documentation](doc/documentation.md) and [SOARE Changelog](CHANGELOG.md)
-
-## INTERPRETER
-
-```txt
-? This is your first SOARE code !
-write "Hello World!";
-```
+See **[BORIUM Documentation](doc/README.md)**
 
 ## Contributing
 
-The SOARE source code is located in the Git repository at [github.com/AntoineLandrieux/SOARE](https://github.com/AntoineLandrieux/SOARE/).
+The BORIUM source code is located in the Git repository at [github.com/AntoineLandrieux/BORIUM](https://github.com/AntoineLandrieux/BORIUM/).
 Contributions are most welcome by forking the repository and sending a pull request.
 
 ## Credit
 
-See [SOARE Authors](AUTHORS)
+See **[AUTHORS file](AUTHORS)**

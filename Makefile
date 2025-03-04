@@ -1,62 +1,41 @@
 
 #
-#  _____  _____  ___  ______ _____
-# /  ___||  _  |/ _ \ | ___ \  ___|
-# \ `--. | | | / /_\ \| |_/ / |__
-#  `--. \| | | |  _  ||    /|  __|
-# /\__/ /\ \_/ / | | || |\ \| |___
-# \____/  \___/\_| |_/\_| \_\____/
+# Makefile
 #
-# Antoine LANDRIEUX (MIT License) <Makefile>
-# <https://github.com/AntoineLandrieux/SOARE/>
+# Antoine LANDRIEUX
+# BORIUM <https://github.com/AntoineLandrieux/BORIUM>
+#
+# MIT License
 #
 
-APP = soare
-VERSION_MAJ = 1
+OUT = borium.bin
 
-AR = ar
+LD = ld
 CC = gcc
-CPP = g++
+NASM = nasm
 
 BIN = bin
-LIB = lib
-SRC = src
-CORE = core
+BOOT = boot
+KERNEL = kernel
+DRIVER = driver
 INCLUDE = include
 
-CFLAGS = -Wall -Wextra -Wpedantic -Werror
+LINKER_SCRIPT = script/linker.ld
 
-ifeq ($(OS), Windows_NT)
-WINDRES = windres
-RES = $(BIN)/res.o
-else
-WINDRES = echo
-endif
+CFLAGS = -Wall -Wextra -ffreestanding -m32 -fno-pie -fno-stack-protector -O1 -Wno-implicit-fallthrough
 
-DEBUG = -D __SOARE_DEBUG
-# NO_COLORED_OUTPUT = -D __SOARE_NO_COLORED_OUTPUT
-
-default: $(BIN)/$(APP)
-
-$(LIB)/libsoare.a: $(CORE_OBJS)
-
-CORE_OBJS := $(patsubst $(CORE)/%.c, $(LIB)/%.o, $(wildcard $(CORE)/*.c))
-
-$(LIB):
-	mkdir -p $(LIB)
-
-$(LIB)/%.o: $(CORE)/%.c
-	$(CC) -c $< -o $@ -I $(INCLUDE) $(CFLAGS) $(DEBUG) $(NO_COLORED_OUTPUT)
-
-$(BIN)/$(APP): $(LIB) $(CORE_OBJS) $(SRC)/Main.cpp
-	mkdir -p $(BIN)
-	$(WINDRES) windows/resources/app.rc -coff $(RES)
-	$(AR) rcs $(LIB)/libsoare$(VERSION_MAJ).a $(CORE_OBJS)
-	$(CPP) $(RES) $(SRC)/Main.cpp -o $(BIN)/$(APP) -I $(INCLUDE) -L$(LIB) -lsoare$(VERSION_MAJ) $(CFLAGS) $(DEBUG) $(NO_COLORED_OUTPUT)
-	rm $(CORE_OBJS) $(RES)
+default:
+	mkdir -p bin
+	$(NASM) $(BOOT)/boot.asm -f bin -o $(BIN)/boot.bin
+	$(NASM) $(BOOT)/entry.asm -f elf -o $(BIN)/entry.o
+	$(CC) $(CFLAGS) -c $(KERNEL)/kernel.c -o $(BIN)/kernel.o -I $(INCLUDE)
+	$(CC) $(CFLAGS) -c $(DRIVER)/video.c -o $(BIN)/video.o -I $(INCLUDE)
+	$(CC) $(CFLAGS) -c $(DRIVER)/keyboard.c -o $(BIN)/keyboard.o -I $(INCLUDE)
+	$(LD) -m elf_i386 -T $(LINKER_SCRIPT) -o $(BIN)/kernel.bin $(BIN)/entry.o $(BIN)/kernel.o $(BIN)/video.o $(BIN)/keyboard.o --oformat binary
+	(cat $(BIN)/boot.bin ; cat $(BIN)/kernel.bin) > $(BIN)/$(OUT)
 
 run:
-	$(BIN)/$(APP)
+	qemu-system-x86_64 $(BIN)/$(OUT)
 
 clean:
-	rm -rf $(BIN) $(LIB)
+	rm -drf $(BIN)

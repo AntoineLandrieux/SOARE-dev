@@ -1,5 +1,5 @@
 
-# ![LOGO](../resources/icon/icon.svg) SOARE documentation
+# ![LOGO](../resources/icon/icon.svg) BORIUM documentation
 
 > [!NOTE]
 >
@@ -10,4 +10,6 @@
 
 ## Documentation
 
-- [VIEW DOC](documentation.md)
+- [SEE BORIUM DOC](documentation.md)
+
+- [SEE SOARE DOC](https://github.com/AntoineLandrieux/SOARE/blob/main/doc/documentation.md)
