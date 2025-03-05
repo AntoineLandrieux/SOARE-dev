@@ -1,5 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <DRIVER/video.h>
+#include <DRIVER/memory.h>
 
 /**
  *  _____  _____  ___  ______ _____
@@ -89,30 +89,16 @@ char ErrorLevel(void)
  * @param file
  * @return void* (always returns NULL)
  */
-void *LeaveException(SoareExceptions error, char *string, Document file)
+void *LeaveException(SoareExceptions error, char *string)
 {
     // If the errors are disabled, nothing is displayed
     if (enable)
     {
-#ifndef __SOARE_NO_COLORED_OUTPUT
-        // Red
-        fprintf(stderr, "\033[31m");
-#endif /* __SOARE_NO_COLORED_OUTPUT */
-        fprintf(
-            //
-            stderr,
-            "Except: %s\n\t\"%.10s\"\n\t ^~~~\n\tAt file %s:%lld:%lld\n",
-            Exceptions[error],
-            string,
-            file.file,
-            file.ln,
-            file.col
-            //
-        );
-#ifndef __SOARE_NO_COLORED_OUTPUT
-        // Normal
-        fprintf(stderr, "\033[0;39m");
-#endif /* __SOARE_NO_COLORED_OUTPUT */
+        CPUTS("Except: ", 0xC);
+        CPUTS(Exceptions[error], 0xC);
+        CPUTS("\n        \"", 0xC);
+        CPUTS(string, 0xC);
+        CPUTS("\"\n         ^~~~\n", 0xC);
     }
     // set error at level 1
     ErrorLvl = 1;

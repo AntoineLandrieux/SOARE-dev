@@ -1,8 +1,6 @@
 #ifndef __SOARE_MATH_H__
 #define __SOARE_MATH_H__ 0x1
 
-/* #prama once */
-
 /**
  *  _____  _____  ___  ______ _____
  * /  ___||  _  |/ _ \ | ___ \  ___|

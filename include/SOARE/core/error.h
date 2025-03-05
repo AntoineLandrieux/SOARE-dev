@@ -1,8 +1,6 @@
 #ifndef __SOARE_ERROR_H__
 #define __SOARE_ERROR_H__ 0x1
 
-/* #prama once */
-
 /**
  *  _____  _____  ___  ______ _____
  * /  ___||  _  |/ _ \ | ___ \  ___|
@@ -75,8 +73,8 @@ char ErrorLevel(void);
  * @param file
  * @return void* (always returns NULL)
  */
-void *LeaveException(SoareExceptions error, char *string, Document file);
+void *LeaveException(SoareExceptions error, char *string);
 
-#define __SOARE_OUT_OF_MEMORY() LeaveException(InterpreterError, "OUT OF MEMORY", EmptyDocument())
+#define __SOARE_OUT_OF_MEMORY() LeaveException(InterpreterError, "OUT OF MEMORY")
 
 #endif /* __SOARE_ERROR_H__ */

@@ -1,6 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <DRIVER/memory.h>
+#include <DRIVER/video.h>
+#include <DRIVER/keyboard.h>
 
 /**
  *  _____  _____  ___  ______ _____
@@ -16,85 +16,24 @@
  */
 
 #include <SOARE/SOARE.h>
-#ifdef _WIN32
-#include <conio.h>
-#else
-// Why there are no fucking getch predefined ???
-#include <termios.h>
-static struct termios old, current;
-
-char getch(void)
-{
-    tcgetattr(0, &old);
-    current = old;
-    current.c_lflag &= ~(ICANON | ECHO);
-    tcsetattr(0, TCSANOW, &current);
-    char ch = getchar();
-    tcsetattr(0, TCSANOW, &old);
-    return ch;
-}
-#endif
 
 MEM MEMORY = NULL;
 static MEM FUNCTION = NULL;
-
-/**
- * @brief From file file
- * @author Antoine LANDRIEUX
- *
- * @param filename
- * @return AST
- */
-static AST loadimport(char *filename)
-{
-    FILE *file = fopen(filename, "rb");
-
-    if (!file)
-        return LeaveException(FileError, filename, EmptyDocument());
-
-    fseek(file, 0, SEEK_END);
-    long size = ftell(file);
-    rewind(file);
-
-    char *content = (char *)malloc(size);
-
-    if (!content)
-    {
-        fclose(file);
-        return LeaveException(InterpreterError, filename, EmptyDocument());
-    }
-
-    fread(content, sizeof(char), size, file);
-    content[size] = 0;
-
-    Tokens *tokens = Tokenizer(filename, content);
-    AST ast = Parse(tokens);
-
-#ifdef __SOARE_DEBUG
-    TokensLog(tokens);
-    TreeLog(ast);
-#endif
-
-    free(content);
-    fclose(file);
-
-    return ast;
-}
 
 static void InterpreterVar()
 {
     MEMORY = Mem();
 
-    MemPush(MEMORY, "__SOARE__", strdup("SOARE Antoine LANDRIEUX (MIT LICENSE)"));
-    MemPush(MEMORY, "__BUILD__", strdup(__DATE__));
+    MemPush(MEMORY, "__SOARE__", "SOARE Antoine LANDRIEUX (MIT LICENSE)");
+    MemPush(MEMORY, "__BUILD__", __DATE__);
 
-    MemPush(MEMORY, "__WRITE_END__", strdup("\n"));
+    MemPush(MEMORY, "__WRITE_END__", "\n");
 
-    MemPush(MEMORY, "BC", strdup("\b"));
-    MemPush(MEMORY, "CR", strdup("\r"));
-    MemPush(MEMORY, "LN", strdup("\n"));
-    MemPush(MEMORY, "TAB", strdup("\t"));
-    MemPush(MEMORY, "CLS", strdup("\033c\033[3J"));
+    MemPush(MEMORY, "BC", "\b");
+    MemPush(MEMORY, "CR", "\r");
+    MemPush(MEMORY, "LN", "\n");
+    MemPush(MEMORY, "TAB", "\t");
+    MemPush(MEMORY, "CLS", "\033c\033[3J");
 }
 
 /**
@@ -111,7 +50,7 @@ char *RunFunction(AST tree)
     AST func = BranchFind(tree->parent->child, tree->value, NODE_FUNCTION);
 
     if (!func)
-        return LeaveException(UndefinedReference, tree->value, tree->file);
+        return LeaveException(UndefinedReference, tree->value);
 
     AST ptr = func->child;
     AST src = tree->child;
@@ -124,8 +63,8 @@ char *RunFunction(AST tree)
 
         if (!src)
         {
-            FUNCTION = MemFree(FUNCTION);
-            return LeaveException(UndefinedReference, ptr->value, tree->file);
+            FUNCTION = NULL;
+            return LeaveException(UndefinedReference, ptr->value);
         }
 
         MemPush(FUNCTION, ptr->value, Eval(src));
@@ -149,10 +88,6 @@ char *Runtime(AST tree)
         return NULL;
 
     AST root = tree;
-
-    if (!MEMORY)
-        InterpreterVar();
-
     MEM statement = MemLast(MEMORY);
     MemJoin(statement, FUNCTION);
     FUNCTION = NULL;
@@ -160,37 +95,27 @@ char *Runtime(AST tree)
     for (AST curr = root->child; curr && !ErrorLevel(); curr = curr->sibling)
     {
         char *returned = NULL;
+        char buff[100] = {0};
         i64 num = 0;
         AST tmp = NULL;
         MEM get = NULL;
 
         switch (curr->type)
         {
-        case NODE_IMPORT:
-
-            if ((tmp = loadimport(curr->value)))
-                BranchJuxtapose(curr, tmp->child);
-            break;
-
         case NODE_INPUT:
 
             if ((get = MemGet(MEMORY, curr->value)))
             {
-                if (!(returned = malloc(2)))
-                {
-                    __SOARE_OUT_OF_MEMORY();
-                    break;
-                }
-                returned[0] = (char)getch();
-                MemSet(get, returned);
+                buff[0] = GETC();
+                MemSet(get, buff);
                 break;
             }
-            LeaveException(UndefinedReference, curr->value, curr->file);
+            LeaveException(UndefinedReference, curr->value);
             break;
 
         case NODE_CALL:
 
-            free(RunFunction(curr));
+            RunFunction(curr);
             break;
 
         case NODE_MEMNEW:
@@ -204,7 +129,7 @@ char *Runtime(AST tree)
 
             if (!get)
             {
-                LeaveException(UndefinedReference, curr->value, curr->file);
+                LeaveException(UndefinedReference, curr->value);
                 break;
             }
 
@@ -217,7 +142,6 @@ char *Runtime(AST tree)
             if (num >= 0)
             {
                 get->value[num] = returned[0];
-                free(returned);
                 break;
             }
 
@@ -228,13 +152,8 @@ char *Runtime(AST tree)
 
             for (tmp = curr->child; tmp; tmp = tmp->sibling)
             {
-                if (!(returned = malloc(((i64)(num / 10)) + 2)))
-                {
-                    __SOARE_OUT_OF_MEMORY();
-                    break;
-                }
-                snprintf(returned, (((i64)(num / 10))) + 2, "%lld", num);
-                MemPush(statement, tmp->value, returned);
+                lltoa(buff, sizeof(buff), num);
+                MemPush(statement, tmp->value, buff);
                 num += 1;
             }
             break;
@@ -248,10 +167,9 @@ char *Runtime(AST tree)
             {
                 if (strcmp(returned, "0"))
                 {
-                    free(returned);
                     if ((returned = Runtime(tmp->sibling)))
                     {
-                        statement->next = MemFree(statement->next);
+                        statement->next = NULL;
                         return returned;
                     }
                     break;
@@ -260,11 +178,9 @@ char *Runtime(AST tree)
                 if (!(tmp = tmp->sibling->sibling))
                     break;
 
-                free(returned);
                 returned = Eval(tmp);
             }
 
-            free(returned);
             break;
 
         case NODE_REPETITION:
@@ -273,14 +189,12 @@ char *Runtime(AST tree)
             {
                 if (!strcmp(returned, "0") || ErrorLevel())
                     break;
-                free(returned);
                 if ((returned = Runtime(curr->child->sibling)))
                 {
-                    statement->next = MemFree(statement->next);
+                    statement->next = NULL;
                     return returned;
                 }
             }
-            free(returned);
             break;
 
         case NODE_TRY:
@@ -292,7 +206,6 @@ char *Runtime(AST tree)
 
             if (ErrorLevel())
             {
-                free(returned);
                 ClearException();
                 returned = Runtime(curr->child->sibling);
             }
@@ -300,32 +213,35 @@ char *Runtime(AST tree)
             if (!returned)
                 break;
 
-            statement->next = MemFree(statement->next);
+            statement->next = NULL;
             return returned;
 
         case NODE_OUTPUT:
 
             if ((returned = Eval(curr->child)))
-                printf("%s%s", returned, MemGet(MEMORY, "__WRITE_END__")->value);
+            {
+                PUTS(returned);
+                PUTS(MemGet(MEMORY, "__WRITE_END__")->value);
+            }
             break;
 
         case NODE_RETURN:
 
             returned = Eval(curr->child);
-            statement->next = MemFree(statement->next);
+            statement->next = NULL;
             return returned;
 
         case NODE_RAISE:
 
-            statement->next = MemFree(statement->next);
-            return LeaveException(RaiseException, curr->value, curr->file);
+            statement->next = NULL;
+            return LeaveException(RaiseException, curr->value);
 
         default:
             break;
         }
     }
 
-    statement->next = MemFree(statement->next);
+    statement->next = NULL;
     return NULL;
 }
 
@@ -335,22 +251,11 @@ char *Runtime(AST tree)
  *
  * @param rawcode
  */
-int Execute(char *file, char *rawcode)
+int Execute(char *rawcode)
 {
     ClearException();
-    Tokens *tokens = Tokenizer(file, rawcode);
-    AST ast = Parse(tokens);
-
-#ifdef __SOARE_DEBUG
-    TokensLog(tokens);
-    TreeLog(ast);
-#endif
-
-    free(Runtime(ast));
-
-    MEMORY = MemFree(MEMORY);
-    TokensFree(tokens);
-    TreeFree(ast);
-
+    if (MEMORY == NULL)
+        InterpreterVar();
+    Runtime(Parse(Tokenizer(rawcode)));
     return (int)ErrorLevel();
 }

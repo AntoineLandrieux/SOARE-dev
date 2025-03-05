@@ -1,8 +1,6 @@
 #ifndef __SOARE_MEMORY_H__
 #define __SOARE_MEMORY_H__ 0x1
 
-/* #prama once */
-
 /**
  *  _____  _____  ___  ______ _____
  * /  ___||  _  |/ _ \ | ___ \  ___|
@@ -81,14 +79,6 @@ MEM MemGet(MEM memory, char *name);
 MEM MemSet(MEM memory, char *value);
 
 /**
- * @brief Display all variables
- * @author Antoine LANDRIEUX
- *
- * @param memory
- */
-void MemLog(MEM memory);
-
-/**
  * @brief Join 2 memories
  * @author Antoine LANDRIEUX
  *
@@ -96,14 +86,5 @@ void MemLog(MEM memory);
  * @param from
  */
 void MemJoin(MEM to, MEM from);
-
-/**
- * @brief Free the allocated memory
- * @author Antoine LANDRIEUX
- *
- * @param memory
- * @return void* (always returns NULL)
- */
-void *MemFree(MEM memory);
 
 #endif /* __SOARE_MEMORY_H__ */

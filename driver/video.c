@@ -1,71 +1,68 @@
 #include <DRIVER/video.h>
 
-/*
- * video.c
-
- * Antoine LANDRIEUX
- * BORIUM <https://github.com/AntoineLandrieux/BORIUM>
+/**
  *
- * MIT License
-*/
+ *  _____  _____ _____ _____ _   _ __  __
+ * | ___ \|  _  | ___ \_   _| | | |  \/  |
+ * | |_/ /| | | | |_/ / | | | | | | .  . |
+ * | ___ \| | | |    /  | | | | | | |\/| |
+ * | |_/ /\ \_/ / |\ \ _| |_| |_| | |  | |
+ * \____/  \___/\_| \_|\___/ \___/\_|  |_/
+ *
+ * Antoine LANDRIEUX (MIT License) <video.c>
+ * <https://github.com/AntoineLandrieux/BORIUM/>
+ *
+ */
 
 static unsigned short VGA_POINTER = 0;
 
-void CPUTC(const char _Char, const unsigned char _Color)
+void CPUTC(const char character, const unsigned char color)
 {
     char *VIDEO = (char *)VGA_ADDRESS;
 
     if (VGA_POINTER >= (SCREEN * 2))
         SCREEN_SCROLL();
 
-    switch (_Char)
+    switch (character)
     {
-    case '\0':
-        return;
-
     case '\n':
         VGA_POINTER += (SCREEN_WIDTH * 2);
     case '\r':
         VGA_POINTER -= (VGA_POINTER % (SCREEN_WIDTH * 2));
-        return;
-
-    case '\t':
-        /* TODO: fix '\t' case */
-        for (int i = 0; i < TAB_SIZE; i++)
-            CPUTC(' ', _Color);
-        return;
+    case '\0':
+        break;
 
     default:
-        VIDEO[(volatile unsigned short)VGA_POINTER++] = _Char;
-        VIDEO[(volatile unsigned short)VGA_POINTER++] = _Color;
-        return;
+        VIDEO[(volatile unsigned short)VGA_POINTER++] = character;
+        VIDEO[(volatile unsigned short)VGA_POINTER++] = color;
+        break;
     }
 }
 
-void CPUTS(const char *_String, const unsigned char _Color)
+void CPUTS(const char *string, const unsigned char color)
 {
-    for (; *_String; (volatile char *)_String++)
-        CPUTC(*_String, _Color);
+    for (; *string; (volatile char *)string++)
+        CPUTC(*string, color);
 }
 
-void PUTC(const char _Char)
+void PUTC(const char character)
 {
-    CPUTC(_Char, 0xF);
+    CPUTC(character, 0xF);
 }
 
-void PUTS(const char *_String)
+void PUTS(const char *string)
 {
-    CPUTS(_String, 0xF);
+    CPUTS(string, 0xF);
 }
 
-void CURSOR_MOVE_LEFT(unsigned int _Move)
+void CURSOR_MOVE_LEFT(unsigned int step)
 {
-    VGA_POINTER -= (_Move * 2);
+    VGA_POINTER -= (step * 2);
 }
 
-void CURSOR_MOVE_RIGHT(unsigned int _Move)
+void CURSOR_MOVE_RIGHT(unsigned int step)
 {
-    VGA_POINTER += (_Move * 2);
+    VGA_POINTER += (step * 2);
 }
 
 void SCREEN_SCROLL()

@@ -15,6 +15,7 @@ CC = gcc
 NASM = nasm
 
 BIN = bin
+CORE = core
 BOOT = boot
 KERNEL = kernel
 DRIVER = driver
@@ -26,12 +27,24 @@ CFLAGS = -Wall -Wextra -ffreestanding -m32 -fno-pie -fno-stack-protector -O1 -Wn
 
 default:
 	mkdir -p bin
+	#
 	$(NASM) $(BOOT)/boot.asm -f bin -o $(BIN)/boot.bin
 	$(NASM) $(BOOT)/entry.asm -f elf -o $(BIN)/entry.o
+	#
 	$(CC) $(CFLAGS) -c $(KERNEL)/kernel.c -o $(BIN)/kernel.o -I $(INCLUDE)
-	$(CC) $(CFLAGS) -c $(DRIVER)/video.c -o $(BIN)/video.o -I $(INCLUDE)
-	$(CC) $(CFLAGS) -c $(DRIVER)/keyboard.c -o $(BIN)/keyboard.o -I $(INCLUDE)
-	$(LD) -m elf_i386 -T $(LINKER_SCRIPT) -o $(BIN)/kernel.bin $(BIN)/entry.o $(BIN)/kernel.o $(BIN)/video.o $(BIN)/keyboard.o --oformat binary
+	#
+	$(CC) $(CFLAGS) -c $(DRIVER)/video.c -o $(BIN)/dvideo.o -I $(INCLUDE)
+	$(CC) $(CFLAGS) -c $(DRIVER)/memory.c -o $(BIN)/dmemory.o -I $(INCLUDE)
+	$(CC) $(CFLAGS) -c $(DRIVER)/keyboard.c -o $(BIN)/dkeyboard.o -I $(INCLUDE)
+	#
+	$(CC) $(CFLAGS) -c $(CORE)/Error.c -o $(BIN)/Error.o -I $(INCLUDE)
+	$(CC) $(CFLAGS) -c $(CORE)/Math.c -o $(BIN)/Math.o -I $(INCLUDE)
+	$(CC) $(CFLAGS) -c $(CORE)/Memory.c -o $(BIN)/Memory.o -I $(INCLUDE)
+	$(CC) $(CFLAGS) -c $(CORE)/Parser.c -o $(BIN)/Parser.o -I $(INCLUDE)
+	$(CC) $(CFLAGS) -c $(CORE)/Runtime.c -o $(BIN)/Runtime.o -I $(INCLUDE)
+	$(CC) $(CFLAGS) -c $(CORE)/Tokenizer.c -o $(BIN)/Tokenizer.o -I $(INCLUDE)
+	#
+	$(LD) -m elf_i386 -T $(LINKER_SCRIPT) -o $(BIN)/kernel.bin $(BIN)/entry.o $(BIN)/kernel.o $(BIN)/dvideo.o $(BIN)/dkeyboard.o $(BIN)/dmemory.o $(BIN)/Error.o $(BIN)/Math.o $(BIN)/Memory.o $(BIN)/Parser.o $(BIN)/Runtime.o $(BIN)/Tokenizer.o --oformat binary
 	(cat $(BIN)/boot.bin ; cat $(BIN)/kernel.bin) > $(BIN)/$(OUT)
 
 run:

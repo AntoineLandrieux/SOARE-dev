@@ -1,6 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <DRIVER/memory.h>
 
 /**
  *  _____  _____  ___  ______ _____
@@ -16,10 +14,6 @@
  */
 
 #include <SOARE/SOARE.h>
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 /**
  * @brief Return 1 if the string is a number
@@ -43,53 +37,17 @@ static u8 isNaN(char *string)
 }
 
 /**
- * @brief Copy a string
- * @author Antoine LANDRIEUX
- *
- * @param value
- * @return char*
- */
-static char *vardup(char *value)
-{
-    char *result = strdup(value);
-    if (!result)
-        return __SOARE_OUT_OF_MEMORY();
-    return result;
-}
-
-/**
- * @brief Remove useless zeros
- * @author Antoine LANDRIEUX
- * 
- * @param string 
- */
-static void zeros(char *string)
-{
-    char *end = string + strlen(string) - 1;
-    while (end > string && *end == '0')
-        --end;
-    if (*end == '.')
-        --end;
-    *(end + 1) = 0;
-}
-
-/**
  * @brief Convert float to string
  * @author Antoine LANDRIEUX
  *
  * @param number
  * @return char*
  */
-static char *__float(long double number)
+static char *__long(long long number)
 {
-    char string[100];
-    sprintf(string, "%Lf", number);
-    zeros(string);
-    char *result = (char *)malloc(strlen(string));
-    if (!result)
-        return __SOARE_OUT_OF_MEMORY();
-    strcpy(result, string);
-    return result;
+    char string[100] = {0};
+    lltoa(string, sizeof(string), number);
+    return string;
 }
 
 /**
@@ -126,7 +84,7 @@ static AST ParseArray(Tokens **tokens)
     if ((*tokens)->type != TKN_ARRAYR)
         return NULL;
     TokenNext(tokens);
-    return BranchJoin(Branch("ARRAY", NODE_ARRAY, (*tokens)->file), value);
+    return BranchJoin(Branch("ARRAY", NODE_ARRAY), value);
 }
 
 /**
@@ -138,7 +96,7 @@ static AST ParseArray(Tokens **tokens)
  */
 AST ParseValue(Tokens **tokens)
 {
-    Node *value = Branch((*tokens)->value, NODE_ROOT, (*tokens)->file);
+    Node *value = Branch((*tokens)->value, NODE_ROOT);
     Tokens *old = *tokens;
     TokenNext(tokens);
 
@@ -164,10 +122,7 @@ AST ParseValue(Tokens **tokens)
         while ((*tokens)->type != TKN_PARENR)
         {
             if (!(expr = ParseExpr(tokens, 0xF)))
-            {
-                TreeFree(value);
                 return NULL;
-            }
             BranchJoin(value, expr);
             if ((*tokens)->type != TKN_SEMICOLON)
                 break;
@@ -175,15 +130,11 @@ AST ParseValue(Tokens **tokens)
         }
 
         if ((*tokens)->type != TKN_PARENR)
-        {
-            TreeFree(value);
             return NULL;
-        }
         TokenNext(tokens);
         break;
 
     default:
-        TreeFree(value);
         return NULL;
     }
 
@@ -215,17 +166,12 @@ AST ParseExpr(Tokens **tokens, u8 priority)
         if (op >= priority)
             break;
 
-        symbol = Branch((*tokens)->value, NODE_OPERATOR, (*tokens)->file);
+        symbol = Branch((*tokens)->value, NODE_OPERATOR);
         TokenNext(tokens);
         y = ParseExpr(tokens, op);
 
         if (!symbol || !y)
-        {
-            TreeFree(x);
-            TreeFree(y);
-            TreeFree(symbol);
             return NULL;
-        }
 
         BranchJoin(symbol, x);
         BranchJoin(symbol, y);
@@ -259,17 +205,15 @@ long long GetArrayIndex(AST array, char *value)
 
     if (isNaN(index))
     {
-        free(index);
-        LeaveException(MathError, array->value, array->file);
+        LeaveException(MathError, array->value);
         return -1;
     }
 
     long long indexlld = atoll(index);
-    free(index);
 
-    if (strlen(value) <= (size_t)indexlld || indexlld < 0)
+    if (strlen(value) <= indexlld || indexlld < 0)
     {
-        LeaveException(IndexOutOfRange, array->value, array->file);
+        LeaveException(IndexOutOfRange, array->value);
         return -1;
     }
 
@@ -294,15 +238,11 @@ static char *Array(char *value, AST array)
     char *result = malloc(2);
 
     if (!result)
-    {
-        free(value);
         return __SOARE_OUT_OF_MEMORY();
-    }
 
     0 [result] = value[index];
     1 [result] = 0;
 
-    free(value);
     return result;
 }
 
@@ -327,8 +267,8 @@ char *Math(AST tree)
 
         get = MemGet(MEMORY, tree->value);
         if (!get)
-            return LeaveException(UndefinedReference, tree->value, tree->file);
-        return vardup(get->value);
+            return LeaveException(UndefinedReference, tree->value);
+        return get->value;
 
     case NODE_CALL:
 
@@ -337,7 +277,7 @@ char *Math(AST tree)
     case NODE_STRING:
     case NODE_NUMBER:
 
-        return vardup(tree->value);
+        return tree->value;
 
     case NODE_OPERATOR:
 
@@ -356,68 +296,61 @@ char *Math(AST tree)
             switch (*(tree->value))
             {
             case '&':
-                snprintf(result, 2, "%d", *sx && *sy);
+                lltoa(result, 2, *sx && *sy);
                 break;
             case '=':
-                snprintf(result, 2, "%d", !strcmp(sx, sy));
+                lltoa(result, 2, !strcmp(sx, sy));
                 break;
             case '!':
-                snprintf(result, 2, "%d", strcmp(sx, sy));
+                lltoa(result, 2, strcmp(sx, sy));
                 break;
             case '|':
-                snprintf(result, 2, "%d", *sx || *sy);
-                break;
-            case '+':
-                result = realloc(result, strlen(sx) + strlen(sy) + 1);
-                if (!result)
-                    return __SOARE_OUT_OF_MEMORY();
-                strcat(strcpy(result, sx), sy);
+                lltoa(result, 2, sx || sy);
                 break;
             default:
-                free(result);
-                return LeaveException(MathError, tree->value, tree->file);
+                return LeaveException(MathError, tree->value);
             }
             return result;
         }
 
-        dx = strtold(sx, &result);
-        dy = strtold(sy, &result);
+        dx = atoll(sx);
+        dy = atoll(sy);
 
         if (strchr("/%", *(tree->value)) && !dy)
-            return LeaveException(DivideByZero, tree->value, tree->file);
+            return LeaveException(DivideByZero, tree->value);
 
         switch (*(tree->value))
         {
         case '&':
-            return __float(dx && dy);
+            return __long(dx && dy);
         case '=':
-            return __float(dx == dy);
+            return __long(dx == dy);
         case '!':
-            return __float(dx != dy);
+            return __long(dx != dy);
         case '|':
-            return __float(dx || dy);
+            return __long(dx || dy);
         case '^':
-            return __float((double)((int)dx ^ (int)dy));
+            return __long((double)((int)dx ^ (int)dy));
         case '%':
-            return __float((double)((int)dx % (int)dy));
+            return __long((double)((int)dx % (int)dy));
         case '*':
-            return __float(dx * dy);
+            return __long(dx * dy);
         case '/':
-            return __float(dx / dy);
+            return __long(dx / dy);
         case '+':
-            return __float(dx + dy);
+            return __long(dx + dy);
         case '-':
-            return __float(dx - dy);
+            return __long(dx - dy);
         case '<':
-            return __float(dx < dy || (dx == dy && tree->value[1] == '='));
+            return __long(dx < dy || (dx == dy && tree->value[1] == '='));
         case '>':
-            return __float(dx > dy || (dx == dy && tree->value[1] == '='));
+            return __long(dx > dy || (dx == dy && tree->value[1] == '='));
         default:
-            return LeaveException(MathError, tree->value, tree->file);
+            return LeaveException(MathError, tree->value);
         }
 
     default:
-        return LeaveException(MathError, tree->value, tree->file);
+        return LeaveException(MathError, tree->value);
     }
 
     return NULL;
@@ -434,13 +367,8 @@ char *Eval(AST tree)
 {
     char *string = NULL;
     if (tree)
-    {
         string = Array(Math(tree), tree->child);
-        if (ErrorLevel())
-        {
-            free(string);
-            return NULL;
-        }
-    }
+    if (ErrorLevel())
+        return NULL;
     return string;
 }

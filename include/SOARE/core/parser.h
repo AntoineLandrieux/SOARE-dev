@@ -1,8 +1,6 @@
 #ifndef __SOARE_PARSER_H__
 #define __SOARE_PARSER_H__ 0x1
 
-/* #prama once */
-
 /**
  *  _____  _____  ___  ______ _____
  * /  ___||  _  |/ _ \ | ___ \  ___|
@@ -59,9 +57,6 @@ typedef struct node
     // Type
     node_type type;
 
-    // Document
-    Document file;
-
     // Node Parent
     struct node *parent;
     // Node Child
@@ -77,10 +72,9 @@ typedef struct node
  *
  * @param value
  * @param type
- * @param file
  * @return Node*
  */
-Node *Branch(char *value, node_type type, Document file);
+Node *Branch(char *value, node_type type);
 
 /**
  * @brief Find a node
@@ -94,16 +88,6 @@ Node *Branch(char *value, node_type type, Document file);
 Node *BranchFind(AST source, char *value, node_type type);
 
 /**
- * @brief Add a sibling branch
- * @author Antoine LANDRIEUX
- *
- * @param source
- * @param element
- * @return AST
- */
-AST BranchJuxtapose(Node *source, AST element);
-
-/**
  * @brief Join 2 branches
  * @author Antoine LANDRIEUX
  *
@@ -112,22 +96,6 @@ AST BranchJuxtapose(Node *source, AST element);
  * @return AST
  */
 AST BranchJoin(Node *parent, Node *child);
-
-/**
- * @brief Frees the memory allocated by a tree
- * @author Antoine LANDRIEUX
- *
- * @param tree
- */
-void TreeFree(AST tree);
-
-/**
- * @brief Display a tree
- * @author Antoine LANDRIEUX
- *
- * @param tree
- */
-void TreeLog(AST tree);
 
 /**
  * @brief Turns a sequence of tokens into a tree (AST)

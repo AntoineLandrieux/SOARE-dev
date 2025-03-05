@@ -1,6 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <DRIVER/memory.h>
 
 /**
  *  _____  _____  ___  ______ _____
@@ -23,19 +21,17 @@
  *
  * @param value
  * @param type
- * @param file
  * @return Node*
  */
-Node *Branch(char *value, node_type type, Document file)
+Node *Branch(char *value, node_type type)
 {
     Node *branch = (Node *)malloc(sizeof(Node));
 
     if (!branch)
         return __SOARE_OUT_OF_MEMORY();
 
-    branch->value = !value ? NULL : strdup(value);
+    branch->value = value;
     branch->type = type;
-    branch->file = file;
     branch->parent = NULL;
     branch->child = NULL;
     branch->sibling = NULL;
@@ -64,31 +60,6 @@ Node *BranchFind(AST source, char *value, node_type type)
 }
 
 /**
- * @brief Add a sibling branch
- * @author Antoine LANDRIEUX
- *
- * @param source
- * @param element
- * @return AST
- */
-AST BranchJuxtapose(Node *source, AST element)
-{
-    if (!source || !element)
-        return source;
-
-    AST tmp = source->sibling;
-    source->sibling = element;
-
-    for (; element->sibling; element = element->sibling)
-        element->parent = source->parent;
-
-    element->parent = source->parent;
-    element->sibling = tmp;
-
-    return source;
-}
-
-/**
  * @brief Join 2 branches
  * @author Antoine LANDRIEUX
  *
@@ -114,57 +85,6 @@ AST BranchJoin(Node *parent, Node *child)
 }
 
 /**
- * @brief Frees the memory allocated by a tree
- * @author Antoine LANDRIEUX
- *
- * @param tree
- */
-void TreeFree(AST tree)
-{
-    if (!tree)
-        return;
-
-    TreeFree(tree->child);
-    TreeFree(tree->sibling);
-    free(tree->value);
-    free(tree);
-}
-
-/**
- * @brief Display a tree
- * @author Antoine LANDRIEUX
- *
- * @param tree
- */
-void TreeLog(AST tree)
-{
-    if (!tree)
-        return;
-
-    printf("[BRANCH] ");
-
-    if (tree->parent)
-        printf(
-            "[%p, %s:%.5lld:%.5lld, %.2X, \"%s\"]\t",
-            (void *)tree->parent,
-            tree->parent->file.file,
-            tree->parent->file.ln,
-            tree->parent->file.col,
-            tree->parent->type,
-            tree->parent->value);
-    printf(
-        "[%p, %s:%.5lld:%.5lld, %.2X, \"%s\"]\n",
-        (void *)tree,
-        tree->file.file,
-        tree->file.ln,
-        tree->file.col,
-        tree->type,
-        tree->value);
-    TreeLog(tree->child);
-    TreeLog(tree->sibling);
-}
-
-/**
  * @brief Turns a sequence of tokens into a tree (AST)
  * @author Antoine LANDRIEUX
  *
@@ -173,7 +93,7 @@ void TreeLog(AST tree)
  */
 AST Parse(Tokens *tokens)
 {
-    Node *root = Branch("root", NODE_ROOT, EmptyDocument());
+    Node *root = Branch("root", NODE_ROOT);
     Node *curr = root;
 
     while (tokens)
@@ -194,13 +114,10 @@ AST Parse(Tokens *tokens)
             if (*(old->value) == '@')
             {
                 if (tokens->type != TKN_NAME || tokens->next->type != TKN_PARENL)
-                {
-                    TreeFree(root);
-                    return LeaveException(SyntaxError, old->value, old->file);
-                }
+                    return LeaveException(SyntaxError, old->value);
 
-                AST function = Branch(tokens->value, NODE_FUNCTION, old->file);
-                AST body = Branch("BODY", NODE_BODY, old->file);
+                AST function = Branch(tokens->value, NODE_FUNCTION);
+                AST body = Branch("BODY", NODE_BODY);
 
                 TokenNext(&tokens);
                 TokenNext(&tokens);
@@ -212,13 +129,9 @@ AST Parse(Tokens *tokens)
                         break;
 
                     if (tokens->type != TKN_NAME)
-                    {
-                        TreeFree(root);
-                        TreeFree(body);
-                        return LeaveException(SyntaxError, tokens->value, tokens->file);
-                    }
+                        return LeaveException(SyntaxError, tokens->value);
 
-                    BranchJoin(function, Branch(tokens->value, NODE_MEMSET, tokens->file));
+                    BranchJoin(function, Branch(tokens->value, NODE_MEMSET));
                     TokenNext(&tokens);
 
                     if (tokens->type == TKN_SEMICOLON)
@@ -233,10 +146,7 @@ AST Parse(Tokens *tokens)
             else if (*(old->value) == '$')
             {
                 if (tokens->type != TKN_NAME || tokens->next->type != TKN_ASSIGN)
-                {
-                    TreeFree(root);
-                    return LeaveException(SyntaxError, old->value, old->file);
-                }
+                    return LeaveException(SyntaxError, old->value);
 
                 old = tokens;
                 TokenNext(&tokens);
@@ -244,45 +154,36 @@ AST Parse(Tokens *tokens)
                 AST content = ParseExpr(&tokens, 0xF);
 
                 if (!content)
-                {
-                    TreeFree(root);
-                    return LeaveException(SyntaxError, old->value, old->file);
-                }
+                    return LeaveException(SyntaxError, old->value);
 
-                BranchJoin(curr, BranchJoin(Branch(old->value, NODE_MEMNEW, old->file), content));
+                BranchJoin(curr, BranchJoin(Branch(old->value, NODE_MEMNEW), content));
             }
 
             else if (!strcmp(old->value, KEYWORD_RETURN))
-                BranchJoin(curr, BranchJoin(Branch(old->value, NODE_RETURN, old->file), ParseExpr(&tokens, 0xF)));
+                BranchJoin(curr, BranchJoin(Branch(old->value, NODE_RETURN), ParseExpr(&tokens, 0xF)));
 
             else if (!strcmp(old->value, KEYWORD_INPUTCH))
             {
                 if (tokens->type != TKN_NAME)
-                {
-                    TreeFree(root);
-                    return LeaveException(SyntaxError, old->value, old->file);
-                }
+                    return LeaveException(SyntaxError, old->value);
 
-                BranchJoin(curr, Branch(tokens->value, NODE_INPUT, old->file));
+                BranchJoin(curr, Branch(tokens->value, NODE_INPUT));
                 TokenNext(&tokens);
             }
 
             else if (!strcmp(old->value, KEYWORD_LOADIMPORT) || !strcmp(old->value, KEYWORD_RAISE))
             {
                 if (tokens->type != TKN_STRING)
-                {
-                    TreeFree(root);
-                    return LeaveException(SyntaxError, old->value, old->file);
-                }
+                    return LeaveException(SyntaxError, old->value);
 
-                BranchJoin(curr, Branch(tokens->value, strcmp(old->value, KEYWORD_RAISE) ? NODE_IMPORT : NODE_RAISE, old->file));
+                BranchJoin(curr, Branch(tokens->value, strcmp(old->value, KEYWORD_RAISE) ? NODE_IMPORT : NODE_RAISE));
                 TokenNext(&tokens);
             }
 
             else if (!strcmp(old->value, KEYWORD_TRY))
             {
-                Node *try = Branch(old->value, NODE_TRY, old->file);
-                BranchJoin(try, Branch("BODY", NODE_BODY, old->file));
+                Node *try = Branch(old->value, NODE_TRY);
+                BranchJoin(try, Branch("BODY", NODE_BODY));
                 BranchJoin(curr, try);
 
                 curr = try->child;
@@ -290,17 +191,13 @@ AST Parse(Tokens *tokens)
 
             else if (!strcmp(old->value, KEYWORD_ENUMERATE))
             {
-                Node *enumerate = Branch(old->value, NODE_ENUMERATE, old->file);
+                Node *enumerate = Branch(old->value, NODE_ENUMERATE);
 
                 for (; tokens->type != TKN_KEYWORD || strcmp(KEYWORD_END, tokens->value); TokenNext(&tokens))
                 {
                     if (tokens->type != TKN_NAME)
-                    {
-                        TreeFree(root);
-                        TreeFree(enumerate);
-                        return LeaveException(SyntaxError, old->value, old->file);
-                    }
-                    BranchJoin(enumerate, Branch(tokens->value, NODE_MEMSET, tokens->file));
+                        return LeaveException(SyntaxError, old->value);
+                    BranchJoin(enumerate, Branch(tokens->value, NODE_MEMSET));
                 }
 
                 BranchJoin(curr, enumerate);
@@ -310,12 +207,9 @@ AST Parse(Tokens *tokens)
             else if (!strcmp(old->value, KEYWORD_IFERROR))
             {
                 if (curr == root || curr->parent->type != NODE_TRY || curr->type == NODE_IFERROR)
-                {
-                    TreeFree(root);
-                    return LeaveException(UnexpectedNear, old->value, old->file);
-                }
+                    return LeaveException(UnexpectedNear, old->value);
 
-                Node *iferror = Branch(old->value, NODE_IFERROR, old->file);
+                Node *iferror = Branch(old->value, NODE_IFERROR);
                 BranchJoin(curr->parent, iferror);
 
                 curr = iferror;
@@ -326,13 +220,10 @@ AST Parse(Tokens *tokens)
                 AST content = ParseExpr(&tokens, 0xF);
 
                 if (!content || tokens->type != TKN_KEYWORD || strcmp(tokens->value, "do"))
-                {
-                    TreeFree(root);
-                    return LeaveException(SyntaxError, old->value, old->file);
-                }
+                    return LeaveException(SyntaxError, old->value);
 
-                AST statement = Branch(old->value, strcmp(old->value, KEYWORD_IF) ? NODE_REPETITION : NODE_CONDITION, old->file);
-                AST body = Branch("BODY", NODE_BODY, old->file);
+                AST statement = Branch(old->value, strcmp(old->value, KEYWORD_IF) ? NODE_REPETITION : NODE_CONDITION);
+                AST body = Branch("BODY", NODE_BODY);
 
                 BranchJoin(statement, content);
                 BranchJoin(statement, body);
@@ -345,20 +236,14 @@ AST Parse(Tokens *tokens)
             else if (!strcmp(old->value, KEYWORD_OR))
             {
                 if (curr->parent->type != NODE_CONDITION)
-                {
-                    TreeFree(root);
-                    return LeaveException(UnexpectedNear, old->value, old->file);
-                }
+                    return LeaveException(UnexpectedNear, old->value);
 
                 AST content = ParseExpr(&tokens, 0xF);
 
                 if (!content || tokens->type != TKN_KEYWORD || strcmp(tokens->value, "do"))
-                {
-                    TreeFree(root);
-                    return LeaveException(SyntaxError, old->value, old->file);
-                }
+                    return LeaveException(SyntaxError, old->value);
 
-                AST body = Branch("BODY", NODE_BODY, old->file);
+                AST body = Branch("BODY", NODE_BODY);
 
                 BranchJoin(curr->parent, content);
                 BranchJoin(curr->parent, body);
@@ -370,14 +255,11 @@ AST Parse(Tokens *tokens)
             else if (!strcmp(old->value, KEYWORD_ELSE))
             {
                 if (curr->parent->type != NODE_CONDITION)
-                {
-                    TreeFree(root);
-                    return LeaveException(UnexpectedNear, old->value, old->file);
-                }
+                    return LeaveException(UnexpectedNear, old->value);
 
-                AST body = Branch("BODY", NODE_BODY, old->file);
+                AST body = Branch("BODY", NODE_BODY);
 
-                BranchJoin(curr->parent, Branch("1", NODE_NUMBER, old->file));
+                BranchJoin(curr->parent, Branch("1", NODE_NUMBER));
                 BranchJoin(curr->parent, body);
 
                 curr = body;
@@ -388,21 +270,15 @@ AST Parse(Tokens *tokens)
                 AST content = ParseExpr(&tokens, 0xF);
 
                 if (!content)
-                {
-                    TreeFree(root);
-                    return LeaveException(SyntaxError, old->value, old->file);
-                }
+                    return LeaveException(SyntaxError, old->value);
 
-                BranchJoin(curr, BranchJoin(Branch(old->value, NODE_OUTPUT, old->file), content));
+                BranchJoin(curr, BranchJoin(Branch(old->value, NODE_OUTPUT), content));
             }
 
             else if (!strcmp(old->value, KEYWORD_END))
             {
                 if (curr == root)
-                {
-                    TreeFree(root);
-                    return LeaveException(UnexpectedNear, old->value, old->file);
-                }
+                    return LeaveException(UnexpectedNear, old->value);
 
                 curr = curr->parent->parent;
             }
@@ -415,27 +291,17 @@ AST Parse(Tokens *tokens)
             AST parsed = ParseValue(&tokens);
 
             if (!parsed)
-            {
-                TreeFree(root);
-                return LeaveException(SyntaxError, old->value, old->file);
-            }
+                return LeaveException(SyntaxError, old->value);
 
             if (parsed->type == NODE_MEMGET)
             {
                 if (tokens->type != TKN_ASSIGN)
-                {
-                    TreeFree(root);
-                    TreeFree(parsed);
-                    return LeaveException(UnexpectedNear, old->value, old->file);
-                }
+                    return LeaveException(UnexpectedNear, old->value);
+
                 TokenNext(&tokens);
                 AST content = ParseExpr(&tokens, 0xF);
                 if (!content)
-                {
-                    TreeFree(root);
-                    TreeFree(parsed);
-                    return LeaveException(SyntaxError, old->value, old->file);
-                }
+                    return LeaveException(SyntaxError, old->value);
                 parsed->type = NODE_MEMSET;
                 BranchJoin(curr, BranchJoin(parsed, content));
                 break;
@@ -444,8 +310,7 @@ AST Parse(Tokens *tokens)
             break;
 
         default:
-            TreeFree(root);
-            return LeaveException(UnexpectedNear, old->value, old->file);
+            return LeaveException(UnexpectedNear, old->value);
         }
     }
 

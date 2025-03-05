@@ -33,26 +33,6 @@ namespace SOARE
 /* SOARE patch */
 #define SOARE_PATCH 0
 
-        /**
-         * @brief Structure of a document
-         * @author Antoine LANDRIEUX
-         */
-        typedef struct Document
-        {
-
-            // File
-            char *file;
-
-            // Line
-            unsigned long long ln;
-            // Column
-            unsigned long long col;
-
-        } Document;
-
-/* Input file for console mode */
-#define __SOARE_FILE__ "_input"
-
 #include "utils/int.h"
 #include "utils/keywords.h"
 

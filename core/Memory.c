@@ -1,7 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
+#include <DRIVER/memory.h>
 
 /**
  *  _____  _____  ___  ______ _____
@@ -113,27 +110,8 @@ MEM MemSet(MEM memory, char *value)
 {
     if (!memory)
         return NULL;
-    free(memory->value);
     memory->value = value;
     return memory;
-}
-
-/**
- * @brief Display all variables
- * @author Antoine LANDRIEUX
- *
- * @param memory
- */
-void MemLog(MEM memory)
-{
-    if (!memory)
-        return;
-    printf(
-        "[MEMORY] [%p, %s\t%s]\n",
-        (void *)memory,
-        memory->name,
-        memory->value);
-    MemLog(memory->next);
 }
 
 /**
@@ -148,22 +126,4 @@ void MemJoin(MEM to, MEM from)
     if (!to || !from)
         return;
     MemLast(to)->next = from;
-}
-
-/**
- * @brief Free the allocated memory
- * @author Antoine LANDRIEUX
- *
- * @param memory
- * @return void* (always returns NULL)
- */
-void *MemFree(MEM memory)
-{
-    if (!memory)
-        return NULL;
-
-    MemFree(memory->next);
-    free(memory->value);
-    free(memory);
-    return NULL;
 }

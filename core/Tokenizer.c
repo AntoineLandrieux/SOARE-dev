@@ -1,6 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <DRIVER/video.h>
+#include <DRIVER/memory.h>
 
 /**
  *  _____  _____  ___  ______ _____
@@ -75,7 +74,7 @@ static u8 chrSpace(const char character)
  */
 static u8 chrOperator(const char character)
 {
-    return strchr("<+-^*/%%>", character) != NULL;
+    return strchr("<+-^*/%%>", character);
 }
 
 /**
@@ -137,47 +136,23 @@ static token_type Symbol(char *string)
 }
 
 /**
- * @brief Return an empty document
- * @author Antoine LANDRIEUX
- *
- * @return Document
- */
-Document EmptyDocument(void)
-{
-    Document document;
-
-    document.file = NULL;
-    document.ln = 0;
-    document.col = 0;
-
-    return document;
-}
-
-/**
  * @brief Create a new token
  * @author Antoine LANDRIEUX
  *
- * @param filename
  * @param value
  * @param type
  * @return Tokens*
  */
-Tokens *Token(char *filename, char *value, token_type type)
+Tokens *Token(char *value, token_type type)
 {
     Tokens *token = (Tokens *)malloc(sizeof(Tokens));
 
     if (!token)
         return __SOARE_OUT_OF_MEMORY();
 
-    token->value = !value ? NULL : strdup(value);
+    token->value = !value ? NULL : value;
     token->type = type;
-
-    token->file.ln = 0;
-    token->file.col = 0;
-    token->file.file = filename;
-
     token->next = NULL;
-
     return token;
 }
 
@@ -193,44 +168,6 @@ void TokenNext(Tokens **tokens)
 }
 
 /**
- * @brief Free the memory allocated by the tokens
- * @author Antoine LANDRIEUX
- *
- * @param token
- */
-void TokensFree(Tokens *token)
-{
-    if (!token)
-        return;
-
-    TokensFree(token->next);
-    free(token->value);
-    free(token);
-}
-
-/**
- * @brief Display the tokens
- * @author Antoine LANDRIEUX
- *
- * @param token
- */
-void TokensLog(Tokens *token)
-{
-    if (!token)
-        return;
-
-    printf(
-        "[TOKENS] [%p, %s:%.5lld:%.5lld, %.2X, \"%s\"]\n",
-        (void *)token,
-        token->file.file,
-        token->file.ln,
-        token->file.col,
-        token->type,
-        token->value);
-    TokensLog(token->next);
-}
-
-/**
  * @brief Cut a string
  * @author Antoine LANDRIEUX
  *
@@ -238,66 +175,38 @@ void TokensLog(Tokens *token)
  * @param size
  * @return char*
  */
-static char *strcut(const char *string, size_t size)
+static char *strcut(const char *string, long long size)
 {
     if (strlen(string) < size)
         size = strlen(string);
     char *result = (char *)malloc(size + 1);
     if (!result)
         return __SOARE_OUT_OF_MEMORY();
-    for (size_t ptr = 0; ptr < size; ptr++)
+    for (long long ptr = 0; ptr < size; ptr++)
         result[ptr] = string[ptr];
     result[size] = 0;
     return result;
 }
 
 /**
- * @brief Add +1 to ln and set col to 0
- * @author Antoine LANDRIEUX
- *
- * @param ln
- * @param col
- */
-static void updateln(u64 *ln, u64 *col)
-{
-    *ln = (*ln) + 1;
-    *col = 1;
-}
-
-/**
  * @brief Transform a string into a sequence of tokens
  * @author Antoine LANDRIEUX
  *
- * @param filename
  * @param text
  * @return Tokens*
  */
-Tokens *Tokenizer(char *filename, char *text)
+Tokens *Tokenizer(char *text)
 {
     if (!text)
         return NULL;
 
-    Tokens *token = Token(filename, NULL, TKN_EOF);
+    Tokens *token = Token(NULL, TKN_EOF);
     Tokens *curr = token;
-
-    u64 col = 0;
-    u64 ln = 0;
-
-    updateln(&ln, &col);
 
     while (*text)
     {
-        if (ErrorLevel())
-        {
-            TokensFree(token);
-            return NULL;
-        }
-
         if (chrSpace(*text))
         {
-            col++;
-            if (*text == '\n')
-                updateln(&ln, &col);
             (volatile char *)text++;
             continue;
         }
@@ -311,9 +220,6 @@ Tokens *Tokenizer(char *filename, char *text)
 
         token_type type = TKN_EOF;
         u64 offset = 1;
-
-        curr->file.ln = ln;
-        curr->file.col = col;
 
         char operator[3] = {
             0 [text],
@@ -354,7 +260,7 @@ Tokens *Tokenizer(char *filename, char *text)
             type = TKN_NUMBER;
         }
 
-        else if (strchr("\"'`", *text) != NULL)
+        else if (strchr("\"'`", *text))
         {
             offset--;
             char quote = *text;
@@ -366,24 +272,15 @@ Tokens *Tokenizer(char *filename, char *text)
         }
 
         else
-        {
-            LeaveException(CharacterError, &*text, curr->file);
-            continue;
-        }
+            return LeaveException(CharacterError, &*text);
 
         curr->value = type == TKN_STRING ? strcut(&*text, offset - 1) : strcut(&*text, offset);
         curr->type = type == TKN_EOF ? Symbol(curr->value) : type;
-        curr->next = Token(filename, NULL, TKN_EOF);
+        curr->next = Token(NULL, TKN_EOF);
         curr = curr->next;
-
+        
         for (u64 i = 0; i < offset; i++)
-        {
-            col += 1;
-            if (*text == '\n')
-                updateln(&ln, &col);
             (volatile char *)text++;
-        }
-        col += type == TKN_STRING;
     }
 
     return token;

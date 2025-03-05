@@ -1,8 +1,6 @@
 #ifndef __SOARE_RUNTIME_H__
 #define __SOARE_RUNTIME_H__ 0x1
 
-/* #prama once */
-
 /**
  *  _____  _____  ___  ______ _____
  * /  ___||  _  |/ _ \ | ___ \  ___|
@@ -45,6 +43,6 @@ char *Runtime(AST tree);
  *
  * @param rawcode
  */
-int Execute(char *file, char *rawcode);
+int Execute(char *rawcode);
 
 #endif /* __SOARE_RUNTIME_H__ */
