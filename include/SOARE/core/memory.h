@@ -69,16 +69,6 @@ MEM MemPush(MEM memory, char *name, char *value);
 MEM MemGet(MEM memory, char *name);
 
 /**
- * @brief Update a variable
- * @author Antoine LANDRIEUX
- *
- * @param memory
- * @param name
- * @return MEM
- */
-MEM MemSet(MEM memory, char *value);
-
-/**
  * @brief Join 2 memories
  * @author Antoine LANDRIEUX
  *

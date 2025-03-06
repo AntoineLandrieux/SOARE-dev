@@ -58,7 +58,7 @@ void sleep(unsigned long long time);
  * @param keycode
  * @return char
  */
-char ascii_char(unsigned char keycode);
+char ascii_char(unsigned char keycode, unsigned char shift_pressed);
 
 /**
  * @brief Get char

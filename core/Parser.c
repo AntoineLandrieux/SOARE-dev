@@ -171,15 +171,6 @@ AST Parse(Tokens *tokens)
                 TokenNext(&tokens);
             }
 
-            else if (!strcmp(old->value, KEYWORD_LOADIMPORT) || !strcmp(old->value, KEYWORD_RAISE))
-            {
-                if (tokens->type != TKN_STRING)
-                    return LeaveException(SyntaxError, old->value);
-
-                BranchJoin(curr, Branch(tokens->value, strcmp(old->value, KEYWORD_RAISE) ? NODE_IMPORT : NODE_RAISE));
-                TokenNext(&tokens);
-            }
-
             else if (!strcmp(old->value, KEYWORD_TRY))
             {
                 Node *try = Branch(old->value, NODE_TRY);

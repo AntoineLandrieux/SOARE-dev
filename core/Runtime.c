@@ -33,7 +33,7 @@ static void InterpreterVar()
     MemPush(MEMORY, "CR", "\r");
     MemPush(MEMORY, "LN", "\n");
     MemPush(MEMORY, "TAB", "\t");
-    MemPush(MEMORY, "CLS", "\033c\033[3J");
+    MemPush(MEMORY, "CLS", "\a");
 }
 
 /**
@@ -107,7 +107,7 @@ char *Runtime(AST tree)
             if ((get = MemGet(MEMORY, curr->value)))
             {
                 buff[0] = GETC();
-                MemSet(get, buff);
+                get->value = buff;
                 break;
             }
             LeaveException(UndefinedReference, curr->value);
@@ -145,7 +145,7 @@ char *Runtime(AST tree)
                 break;
             }
 
-            MemSet(get, returned);
+            get->value = returned;
             break;
 
         case NODE_ENUMERATE:
@@ -254,8 +254,8 @@ char *Runtime(AST tree)
 int Execute(char *rawcode)
 {
     ClearException();
-    if (MEMORY == NULL)
-        InterpreterVar();
+    InterpreterVar();
     Runtime(Parse(Tokenizer(rawcode)));
+    MEMORY = NULL;
     return (int)ErrorLevel();
 }

@@ -1,4 +1,5 @@
 #include <DRIVER/memory.h>
+#include <DRIVER/video.h>
 
 /**
  *  _____  _____  ___  ______ _____
@@ -45,9 +46,13 @@ static u8 isNaN(char *string)
  */
 static char *__long(long long number)
 {
-    char string[100] = {0};
+    char string[250] = {0};
     lltoa(string, sizeof(string), number);
-    return string;
+    char *result = malloc(strlen(string));
+    if (!result)
+        return __SOARE_OUT_OF_MEMORY();
+    stradd(result, string, strlen(string));
+    return result;
 }
 
 /**
@@ -255,7 +260,7 @@ static char *Array(char *value, AST array)
  */
 char *Math(AST tree)
 {
-    long double dx, dy;
+    long long dx, dy;
     char *sx, *sy;
     char *result = NULL;
 
@@ -289,23 +294,41 @@ char *Math(AST tree)
 
         if (isNaN(sx) || isNaN(sy))
         {
-            result = malloc(2);
-            if (!result)
-                return __SOARE_OUT_OF_MEMORY();
-
             switch (*(tree->value))
             {
             case '&':
+                result = malloc(2);
+                if (!result)
+                    return __SOARE_OUT_OF_MEMORY();
                 lltoa(result, 2, *sx && *sy);
                 break;
+                result = malloc(2);
+                if (!result)
+                    return __SOARE_OUT_OF_MEMORY();
             case '=':
                 lltoa(result, 2, !strcmp(sx, sy));
                 break;
+                result = malloc(2);
+                if (!result)
+                    return __SOARE_OUT_OF_MEMORY();
             case '!':
                 lltoa(result, 2, strcmp(sx, sy));
                 break;
+                result = malloc(2);
+                if (!result)
+                    return __SOARE_OUT_OF_MEMORY();
             case '|':
+                result = malloc(2);
+                if (!result)
+                    return __SOARE_OUT_OF_MEMORY();
                 lltoa(result, 2, sx || sy);
+                break;
+            case '+':
+                dx = strlen(sx);
+                dy = strlen(sy);
+                result = malloc(dx + dy + 2);
+                if (!result || !stradd(result, sx, dx + 1) || !stradd(result, sy, dx + dy + 2))
+                    return __SOARE_OUT_OF_MEMORY();
                 break;
             default:
                 return LeaveException(MathError, tree->value);
@@ -330,13 +353,13 @@ char *Math(AST tree)
         case '|':
             return __long(dx || dy);
         case '^':
-            return __long((double)((int)dx ^ (int)dy));
+            return __long(dx ^ dy);
         case '%':
-            return __long((double)((int)dx % (int)dy));
+            return __long((int)dx % (int)dy);
         case '*':
             return __long(dx * dy);
         case '/':
-            return __long(dx / dy);
+            return __long((int)dx / (int)dy);
         case '+':
             return __long(dx + dy);
         case '-':

@@ -57,22 +57,6 @@ void PUTC(const char character);
 void PUTS(const char *string);
 
 /**
- * @brief Move cursor left
- * @author Antoine LANDRIEUX
- *
- * @param step
- */
-void CURSOR_MOVE_LEFT(unsigned int step);
-
-/**
- * @brief Move cursor right
- * @author Antoine LANDRIEUX
- *
- * @param step
- */
-void CURSOR_MOVE_RIGHT(unsigned int step);
-
-/**
  * @brief Screen scroll
  * @author Antoine LANDRIEUX
  *

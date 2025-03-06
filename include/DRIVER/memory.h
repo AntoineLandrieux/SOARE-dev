@@ -16,15 +16,17 @@
  */
 
 #define __MEMORY_POOL_SIZE__ 0x2000
-#define NULL (void*)(0x0)
+#define NULL (void *)(0x0)
 
 /**
  * @brief Memory allocation
- * 
- * @param size 
- * @return void* 
+ *
+ * @param size
+ * @return void*
  */
 void *malloc(unsigned long long size);
+
+void free();
 
 unsigned char strcmp(char *str1, char *str2);
 
@@ -35,5 +37,7 @@ long long strlen(const char *string);
 long long int atoll(const char *string);
 
 char *lltoa(char *buff, int size, long long value);
+
+unsigned char stradd(char *dest, char *string, unsigned long long size);
 
 #endif /* __MEMORY_H__ */

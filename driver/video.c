@@ -25,6 +25,15 @@ void CPUTC(const char character, const unsigned char color)
 
     switch (character)
     {
+    case '\a':
+        SCREEN_CLEAR();
+        break;
+
+    case '\b':
+        VGA_POINTER -= 2;
+        VIDEO[VGA_POINTER] = ' ';
+        break;
+
     case '\n':
         VGA_POINTER += (SCREEN_WIDTH * 2);
     case '\r':
@@ -53,16 +62,6 @@ void PUTC(const char character)
 void PUTS(const char *string)
 {
     CPUTS(string, 0xF);
-}
-
-void CURSOR_MOVE_LEFT(unsigned int step)
-{
-    VGA_POINTER -= (step * 2);
-}
-
-void CURSOR_MOVE_RIGHT(unsigned int step)
-{
-    VGA_POINTER += (step * 2);
 }
 
 void SCREEN_SCROLL()
