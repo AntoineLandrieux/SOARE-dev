@@ -23,8 +23,7 @@
 #define SCREEN (SCREEN_HEIGHT * SCREEN_WIDTH)
 
 /**
- * @brief Writes single character to stream output at current position
- * @author Antoine LANDRIEUX
+ * @brief Writes single character to stream output at current position (colored)
  *
  * @param character
  * @param color
@@ -32,8 +31,7 @@
 void CPUTC(const char character, const unsigned char color);
 
 /**
- * @brief Writes strings to stream output at current position
- * @author Antoine LANDRIEUX
+ * @brief Writes strings to stream output at current position (colored)
  *
  * @param string
  * @param color
@@ -42,7 +40,6 @@ void CPUTS(const char *string, const unsigned char color);
 
 /**
  * @brief Writes single character to stream output at current position
- * @author Antoine LANDRIEUX
  *
  * @param character
  */
@@ -50,22 +47,19 @@ void PUTC(const char character);
 
 /**
  * @brief Writes strings to stream output at current position
- * @author Antoine LANDRIEUX
  *
  * @param string
  */
 void PUTS(const char *string);
 
 /**
- * @brief Screen scroll
- * @author Antoine LANDRIEUX
+ * @brief Scroll the screen
  *
  */
 void SCREEN_SCROLL();
 
 /**
  * @brief Clear screen
- * @author Antoine LANDRIEUX
  *
  */
 void SCREEN_CLEAR();

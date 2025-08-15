@@ -5,7 +5,7 @@
 >
 > **Help me to translate !**
 >
-> Contribute to SOARE to allow the translation of the documentation!
+> Contribute to SOARE and BORIUM to allow the translation of the documentation!
 >
 
 ## Documentation

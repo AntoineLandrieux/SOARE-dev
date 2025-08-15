@@ -15,6 +15,7 @@ CC = gcc
 NASM = nasm
 
 BIN = bin
+STD = std
 CORE = core
 BOOT = boot
 KERNEL = kernel
@@ -34,8 +35,9 @@ default:
 	$(CC) $(CFLAGS) -c $(KERNEL)/kernel.c -o $(BIN)/kernel.o -I $(INCLUDE)
 	#
 	$(CC) $(CFLAGS) -c $(DRIVER)/video.c -o $(BIN)/dvideo.o -I $(INCLUDE)
-	$(CC) $(CFLAGS) -c $(DRIVER)/memory.c -o $(BIN)/dmemory.o -I $(INCLUDE)
 	$(CC) $(CFLAGS) -c $(DRIVER)/keyboard.c -o $(BIN)/dkeyboard.o -I $(INCLUDE)
+	#
+	$(CC) $(CFLAGS) -c $(STD)/stdlib.c -o $(BIN)/stdlib.o -I $(INCLUDE)
 	#
 	$(CC) $(CFLAGS) -c $(CORE)/Error.c -o $(BIN)/Error.o -I $(INCLUDE)
 	$(CC) $(CFLAGS) -c $(CORE)/Math.c -o $(BIN)/Math.o -I $(INCLUDE)
@@ -44,7 +46,7 @@ default:
 	$(CC) $(CFLAGS) -c $(CORE)/Runtime.c -o $(BIN)/Runtime.o -I $(INCLUDE)
 	$(CC) $(CFLAGS) -c $(CORE)/Tokenizer.c -o $(BIN)/Tokenizer.o -I $(INCLUDE)
 	#
-	$(LD) -m elf_i386 -T $(LINKER_SCRIPT) -o $(BIN)/kernel.bin $(BIN)/entry.o $(BIN)/kernel.o $(BIN)/dvideo.o $(BIN)/dkeyboard.o $(BIN)/dmemory.o $(BIN)/Error.o $(BIN)/Math.o $(BIN)/Memory.o $(BIN)/Parser.o $(BIN)/Runtime.o $(BIN)/Tokenizer.o --oformat binary
+	$(LD) -m elf_i386 -T $(LINKER_SCRIPT) -o $(BIN)/kernel.bin $(BIN)/entry.o $(BIN)/kernel.o $(BIN)/dvideo.o $(BIN)/dkeyboard.o $(BIN)/stdlib.o $(BIN)/Error.o $(BIN)/Math.o $(BIN)/Memory.o $(BIN)/Parser.o $(BIN)/Runtime.o $(BIN)/Tokenizer.o --oformat binary
 	(cat $(BIN)/boot.bin ; cat $(BIN)/kernel.bin) > $(BIN)/$(OUT)
 
 run:

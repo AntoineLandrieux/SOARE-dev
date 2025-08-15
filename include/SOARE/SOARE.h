@@ -1,7 +1,7 @@
 #ifndef __SOARE__
 #define __SOARE__ 0x1
 
-/* #prama once */
+/* #pragma once */
 
 /**
  *  _____  _____  ___  ______ _____
@@ -16,6 +16,28 @@
  *
  */
 
+/* SOARE major */
+#define SOARE_MAJOR 1
+/* SOARE minor */
+#define SOARE_MINOR 1
+/* SOARE patch */
+#define SOARE_PATCH 1
+
+/**
+ * SOARE version
+ * 
+ * R: release
+ * A: alpha
+ * B: beta
+ * S: snapshot
+ * T: testing
+ * 
+ */
+#define SOARE_VERSION "Rv1.1.1"
+
+/* SOARE max input */
+#define __SOARE_MAX_INPUT__ 70
+
 #ifdef __cplusplus
 /**
  * SOARE namespace
@@ -26,14 +48,6 @@ namespace SOARE
     {
 #endif /* __cplusplus */
 
-/* SOARE major */
-#define SOARE_MAJOR 1
-/* SOARE minor */
-#define SOARE_MINOR 0
-/* SOARE patch */
-#define SOARE_PATCH 0
-
-#include "utils/int.h"
 #include "utils/keywords.h"
 
 #include "core/error.h"

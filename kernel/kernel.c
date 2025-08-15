@@ -1,10 +1,9 @@
 #include <DRIVER/keyboard.h>
-#include <DRIVER/memory.h>
 #include <DRIVER/video.h>
 
-#include <SOARE/SOARE.h>
+#include <STD/stdlib.h>
 
-#include "kernel.h"
+#include <SOARE/SOARE.h>
 
 /**
  *
@@ -20,8 +19,15 @@
  *
  */
 
+#include "kernel.h"
+
+// Is the kernel running?
 unsigned char running = 0;
 
+/**
+ * @brief Select the keyboard layout
+ * 
+ */
 static void KEYBOARD_SELECTOR()
 {
     PUTS("\n KEYBOARD\n\n ");
@@ -44,43 +50,98 @@ static void KEYBOARD_SELECTOR()
     }
 }
 
+/**
+ * @brief Shell for the interpreter
+ * 
+ */
 static void shell()
 {
     char input[1024] = {0};
 
     CPUTS("\nSOARE INTERPRETER\n", 0x09);
     CPUTS("Enter '?run' to run code or '?exit' to quit.\n", 0x07);
-    CPUTS("\n[OK] 1KB INPUT\n\n", 0x0A);
+    CPUTS("\n[OK] 1024 BYTE INPUT\n\n", 0x0A);
 
     while (running)
     {
         CPUTS(">>> ", 0x0D);
-        char user[SCREEN_WIDTH - 6] = {0};
+
+        char user[__SOARE_MAX_INPUT__] = {0};
         GETS(user, sizeof(user) - 1);
 
         if (!strcmp(user, "?run"))
         {
             Execute(input);
             free();
+        }
+
+        else if (!strcmp(user, "?commit"))
+        {
+
+            Execute(input);
+            free();
             for (unsigned int i = 0; i < sizeof(input); i++)
                 input[i] = 0;
-            continue;
+        }
+
+        else if (!strcmp(user, "?clear"))
+        {
+            PUTC('\a');
         }
 
         else if (!strcmp(user, "?exit"))
+        {
             running = 0;
+        }
 
-        else if (!stradd(input, user, sizeof(input)))
+        else if (strlen(user) + strlen(input) > sizeof(input))
+        {
             __SOARE_OUT_OF_MEMORY();
+
+            CPUTS("Clear input ? (Y/N)\n", 0x07);
+
+            switch (GETC())
+            {
+            case 'Y':
+            case 'y':
+
+                free();
+
+                for (unsigned int i = 0; i < sizeof(input); i++)
+                    input[i] = 0;
+
+                CPUTS("BUFFER ERASED\n", 0x0A);
+                break;
+
+            default:
+
+                CPUTS("CANCELED\n", 0x0C);
+                break;
+            }
+        }
+
+        else
+        {
+            strcat(input, user);
+        }
     }
 }
 
+/**
+ * @brief Setup the kernel
+ * 
+ */
 static void setup()
 {
     PUTS("\n BORIUM [Antoine LANDRIEUX MIT license]\n");
     KEYBOARD_SELECTOR();
 }
 
+/**
+ * @brief Start the kernel
+ * 
+ * @return * void 
+ */
 void start()
 {
     running = 1;

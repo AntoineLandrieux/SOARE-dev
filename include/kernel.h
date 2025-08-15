@@ -15,15 +15,21 @@
  *
  */
 
+// Kernel version
+#define BORIUM_KERNEL_VERSION "Rv1.0.0"
+
+// Kernel version major
 #define BORIUM_KERNEL_MAJOR 1
+// Kernel version minor
 #define BORIUM_KERNEL_MINOR 0
+// Kernel version patch
 #define BORIUM_KERNEL_PATCH 0
 
+// Is the kernel running?
 extern unsigned char running;
 
 /**
  * @brief Start kernel
- * @author Antoine LANDRIEUX
  * 
  */
 void start();

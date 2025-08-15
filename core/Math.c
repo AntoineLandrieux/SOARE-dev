@@ -1,5 +1,6 @@
-#include <DRIVER/memory.h>
 #include <DRIVER/video.h>
+
+#include <STD/stdlib.h>
 
 /**
  *  _____  _____  ___  ______ _____
@@ -16,53 +17,97 @@
 
 #include <SOARE/SOARE.h>
 
+/* A clean way to write (*tokens) = (*tokens)->next */
+#define __tokens_next() (*tokens) = (*tokens)->next
+
 /**
- * @brief Return 1 if the string is a number
- * @author Antoine LANDRIEUX
+ * @brief Returns 1 if the string is Not a Number
  *
  * @param string
- * @return u8
+ * @return unsigned char
  */
-static u8 isNaN(char *string)
+static unsigned char isNaN(char *string)
 {
-    if (!string)
-        return 1;
-    if (*string == '+' || *string == '-')
-        (volatile char *)string++;
-    for (u8 dot = 1; *string; (volatile char *)string++)
+    // Is negative ?
+    if (*string == '-')
+        string++;
+
+    /**
+     *
+     * Example:
+     *
+     * -4   : Number (returns 0)
+     * 3.2  : Number (returns 0)
+     * -1.  : Number (returns 0)
+     * .    : Number (returns 0)
+     * 0.e  : Not a Number (returns 1)
+     * a.1  : Not a Number (returns 1)
+     * f    : Not a Number (returns 1)
+     *
+     */
+
+    for (unsigned char dot = 1; *string; string++)
         if (*string == '.' && dot)
             dot = 0;
-        else if (!(*string >= '0' && *string <= '9'))
+        else if (*string < '0' || *string > '9')
             return 1;
+
     return 0;
 }
 
 /**
- * @brief Convert float to string
- * @author Antoine LANDRIEUX
+ * @brief Duplicate a string
  *
- * @param number
+ * @param value
  * @return char*
  */
-static char *__long(long long number)
+char *vardup(char *string)
 {
-    char string[250] = {0};
-    lltoa(string, sizeof(string), number);
-    char *result = malloc(strlen(string));
+    char *result = malloc(strlen(string) + 1);
     if (!result)
         return __SOARE_OUT_OF_MEMORY();
-    stradd(result, string, strlen(string));
+    strcat(result, string);
     return result;
 }
 
 /**
+ * @brief Convert int to string
+ *
+ * @param number
+ * @return char*
+ */
+static char *__int(int number)
+{
+    char string[150] = {0};
+    itoa(string, sizeof(string), number);
+    return vardup(string);
+}
+
+/**
+ * @brief Convert boolean to string
+ *
+ * @param boolean
+ * @return char*
+ */
+static char *__boolean(char boolean)
+{
+    // Convert char:1 to string
+    char string[2] = {0, 0};
+
+    // Now convert
+    string[0] = '0' + (boolean && 1);
+
+    // Duplicate string
+    return vardup(string);
+}
+
+/**
  * @brief Looks up the mathematical priority of an operator
- * @author Antoine LANDRIEUX
  *
  * @param symbol
- * @return u8
+ * @return unsigned char
  */
-static u8 MathPriority(char symbol)
+static unsigned char MathPriority(char symbol)
 {
     if (strchr("/*%^", symbol))
         return 1;
@@ -74,27 +119,7 @@ static u8 MathPriority(char symbol)
 }
 
 /**
- * @brief Return the value as an array
- * @author Antoine LANDRIEUX
- *
- * @param tokens
- * @return AST
- */
-static AST ParseArray(Tokens **tokens)
-{
-    if ((*tokens)->type != TKN_ARRAYL)
-        return NULL;
-    TokenNext(tokens);
-    AST value = ParseExpr(tokens, 0xF);
-    if ((*tokens)->type != TKN_ARRAYR)
-        return NULL;
-    TokenNext(tokens);
-    return BranchJoin(Branch("ARRAY", NODE_ARRAY), value);
-}
-
-/**
  * @brief Return the value as a node
- * @author Antoine LANDRIEUX
  *
  * @param tokens
  * @return AST
@@ -103,60 +128,80 @@ AST ParseValue(Tokens **tokens)
 {
     Node *value = Branch((*tokens)->value, NODE_ROOT);
     Tokens *old = *tokens;
-    TokenNext(tokens);
+
+    __tokens_next();
 
     switch (old->type)
     {
-    case TKN_NUMBER:
-        value->type = NODE_NUMBER;
-        break;
-
     case TKN_STRING:
-        value->type = NODE_STRING;
+    case TKN_NUMBER:
+
+        value->type = NODE_VALUE;
         break;
 
     case TKN_NAME:
+
         value->type = NODE_MEMGET;
         if ((*tokens)->type != TKN_PARENL)
             break;
 
         value->type = NODE_CALL;
-        TokenNext(tokens);
+        __tokens_next();
         AST expr = NULL;
 
         while ((*tokens)->type != TKN_PARENR)
         {
             if (!(expr = ParseExpr(tokens, 0xF)))
                 return NULL;
+
             BranchJoin(value, expr);
+
             if ((*tokens)->type != TKN_SEMICOLON)
                 break;
-            TokenNext(tokens);
+
+            __tokens_next();
         }
 
         if ((*tokens)->type != TKN_PARENR)
             return NULL;
-        TokenNext(tokens);
+
+        __tokens_next();
         break;
 
     default:
+
         return NULL;
     }
 
-    BranchJoin(value, ParseArray(tokens));
     return value;
 }
 
 /**
  * @brief Build a math tree
- * @author Antoine LANDRIEUX
  *
  * @param tokens
  * @param priority
  * @return AST
  */
-AST ParseExpr(Tokens **tokens, u8 priority)
+AST ParseExpr(Tokens **tokens, unsigned char priority)
 {
+
+    /**
+     *
+     * Example:
+     *
+     * Tokens: ["4"]->["+"]->["3"]->["*"]->["2.5"]
+     *
+     * Result:
+     *
+     *    (+)
+     *    /
+     *  (4)-(*)
+     *      /
+     *    (3)-(2.5)
+     *
+     */
+
     Node *x = ParseValue(tokens);
     Node *y = NULL;
     Node *symbol = NULL;
@@ -166,13 +211,13 @@ AST ParseExpr(Tokens **tokens, u8 priority)
 
     while ((*tokens)->type == TKN_OPERATOR && !ErrorLevel())
     {
-        u8 op = MathPriority(*(*tokens)->value);
+        unsigned char op = MathPriority(*(*tokens)->value);
 
         if (op >= priority)
             break;
 
         symbol = Branch((*tokens)->value, NODE_OPERATOR);
-        TokenNext(tokens);
+        __tokens_next();
         y = ParseExpr(tokens, op);
 
         if (!symbol || !y)
@@ -187,80 +232,14 @@ AST ParseExpr(Tokens **tokens, u8 priority)
 }
 
 /**
- * @brief Get the Array Index object
- * @author Antoine LANDRIEUX
- *
- * @param array
- * @param value
- * @return long long
- */
-long long GetArrayIndex(AST array, char *value)
-{
-    while (array)
-        if (array->type != NODE_ARRAY)
-            array = array->sibling;
-        else
-            break;
-
-    if (!array || !value)
-        return -1;
-
-    array = array->child;
-    char *index = Eval(array);
-
-    if (isNaN(index))
-    {
-        LeaveException(MathError, array->value);
-        return -1;
-    }
-
-    long long indexlld = atoll(index);
-
-    if (strlen(value) <= indexlld || indexlld < 0)
-    {
-        LeaveException(IndexOutOfRange, array->value);
-        return -1;
-    }
-
-    return indexlld;
-}
-
-/**
- * @brief Array parser
- * @author Antoine LANDRIEUX
- *
- * @param value
- * @param array
- * @return char*
- */
-static char *Array(char *value, AST array)
-{
-    long long index = GetArrayIndex(array, value);
-
-    if (index < 0)
-        return value;
-
-    char *result = malloc(2);
-
-    if (!result)
-        return __SOARE_OUT_OF_MEMORY();
-
-    0 [result] = value[index];
-    1 [result] = 0;
-
-    return result;
-}
-
-/**
- * @brief Evaluates the mathematical expression of a tree
- * @author Antoine LANDRIEUX
+ * @brief Evaluate the mathematical expression of a tree
  *
  * @param tree
  * @return char*
  */
 char *Math(AST tree)
 {
-    long long dx, dy;
+    int x, y;
     char *sx, *sy;
     char *result = NULL;
 
@@ -271,103 +250,104 @@ char *Math(AST tree)
     case NODE_MEMGET:
 
         get = MemGet(MEMORY, tree->value);
+
         if (!get)
             return LeaveException(UndefinedReference, tree->value);
-        return get->value;
+
+        if (get->body)
+            return LeaveException(VariableDefinedAsFunction, tree->value);
+
+        return vardup(get->value);
 
     case NODE_CALL:
 
         return RunFunction(tree);
 
-    case NODE_STRING:
-    case NODE_NUMBER:
+    case NODE_VALUE:
 
-        return tree->value;
+        return vardup(tree->value);
 
     case NODE_OPERATOR:
 
-        sx = Eval(tree->child);
-        sy = Eval(tree->child->sibling);
+        sx = Math(tree->child);
+        sy = Math(tree->child->sibling);
 
         if (!sx || !sy)
             return NULL;
+
+        if (*(tree->value) == ',')
+        {
+            if (!(result = malloc(strlen(sx) + strlen(sy) + 1)))
+                return __SOARE_OUT_OF_MEMORY();
+
+            strcat(result, sx);
+            strcat(result, sy);
+            return result;
+        }
 
         if (isNaN(sx) || isNaN(sy))
         {
             switch (*(tree->value))
             {
-            case '&':
-                result = malloc(2);
-                if (!result)
-                    return __SOARE_OUT_OF_MEMORY();
-                lltoa(result, 2, *sx && *sy);
-                break;
-                result = malloc(2);
-                if (!result)
-                    return __SOARE_OUT_OF_MEMORY();
             case '=':
-                lltoa(result, 2, !strcmp(sx, sy));
-                break;
-                result = malloc(2);
-                if (!result)
-                    return __SOARE_OUT_OF_MEMORY();
+                result = __boolean(!strcmp(sx, sy));
+                return result;
+
+            case '~':
             case '!':
-                lltoa(result, 2, strcmp(sx, sy));
-                break;
-                result = malloc(2);
-                if (!result)
-                    return __SOARE_OUT_OF_MEMORY();
-            case '|':
-                result = malloc(2);
-                if (!result)
-                    return __SOARE_OUT_OF_MEMORY();
-                lltoa(result, 2, sx || sy);
-                break;
-            case '+':
-                dx = strlen(sx);
-                dy = strlen(sy);
-                result = malloc(dx + dy + 2);
-                if (!result || !stradd(result, sx, dx + 1) || !stradd(result, sy, dx + dy + 2))
-                    return __SOARE_OUT_OF_MEMORY();
-                break;
+                result = __boolean(strcmp(sx, sy));
+                return result;
+
             default:
                 return LeaveException(MathError, tree->value);
             }
-            return result;
         }
 
-        dx = atoll(sx);
-        dy = atoll(sy);
+        x = atoi(sx);
+        y = atoi(sy);
 
-        if (strchr("/%", *(tree->value)) && !dy)
+        if ((*(tree->value) == '/' || *(tree->value) == '%') && !y)
             return LeaveException(DivideByZero, tree->value);
 
         switch (*(tree->value))
         {
-        case '&':
-            return __long(dx && dy);
-        case '=':
-            return __long(dx == dy);
+        case '~':
         case '!':
-            return __long(dx != dy);
+            return __boolean(x != y);
+
+        case '=':
+            return __boolean(x == y);
+
+        case '&':
+            return __boolean(x && y);
+
         case '|':
-            return __long(dx || dy);
+            return __boolean(x || y);
+
         case '^':
-            return __long(dx ^ dy);
+            return __int((int)x ^ (int)y);
+
         case '%':
-            return __long((int)dx % (int)dy);
+            return __int((int)x % (int)y);
+
         case '*':
-            return __long(dx * dy);
+            return __int(x * y);
+
         case '/':
-            return __long((int)dx / (int)dy);
+            return __int(x / y);
+
         case '+':
-            return __long(dx + dy);
+            return __int(x + y);
+
         case '-':
-            return __long(dx - dy);
+            return __int(x - y);
+
         case '<':
-            return __long(dx < dy || (dx == dy && tree->value[1] == '='));
+            return __boolean(x < y || (x == y && tree->value[1] == '='));
+
         case '>':
-            return __long(dx > dy || (dx == dy && tree->value[1] == '='));
+            return __boolean(x > y || (x == y && tree->value[1] == '='));
+
         default:
             return LeaveException(MathError, tree->value);
         }
@@ -377,21 +357,4 @@ char *Math(AST tree)
     }
 
     return NULL;
-}
-
-/**
- * @brief Evaluates the mathematical expression of a tree
- * @author Antoine LANDRIEUX
- *
- * @param tree
- * @return char*
- */
-char *Eval(AST tree)
-{
-    char *string = NULL;
-    if (tree)
-        string = Array(Math(tree), tree->child);
-    if (ErrorLevel())
-        return NULL;
-    return string;
 }

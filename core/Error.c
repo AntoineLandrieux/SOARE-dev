@@ -1,5 +1,6 @@
 #include <DRIVER/video.h>
-#include <DRIVER/memory.h>
+
+#include <STD/stdlib.h>
 
 /**
  *  _____  _____  ___  ______ _____
@@ -17,10 +18,10 @@
 #include <SOARE/SOARE.h>
 
 /* Enable/disable error display */
-static u8 enable = 1;
+static unsigned char enable = 1;
 
 /* Error level */
-static i8 ErrorLvl = 0;
+static char errorlevel = 0;
 
 /* Exceptions */
 static char *Exceptions[] = {
@@ -29,9 +30,13 @@ static char *Exceptions[] = {
     "FileError",
     "CharacterError",
     "SyntaxError",
+    "ValueError",
     "UnexpectedNear",
     "UndefinedReference",
+    "ObjectIsNotCallable",
+    "VariableDefinedAsFunction",
     "MathError",
+    "InvalidEscapeSequence",
     "IndexOutOfRange",
     "DivideByZero",
     "RaiseException"
@@ -40,44 +45,41 @@ static char *Exceptions[] = {
 
 /**
  * @brief Error display
- * @author Antoine LANDRIEUX
  *
+ * @return unsigned char
  */
-u8 AsIgnoredException()
+unsigned char AsIgnoredException(void)
 {
     return !enable;
 }
 
 /**
  * @brief Enable/disable error display
- * @author Antoine LANDRIEUX
  *
  * @param ignore
  */
-void IgnoreException(u8 ignore)
+void IgnoreException(unsigned char ignore)
 {
     enable = !ignore;
 }
 
 /**
  * @brief Clears errors
- * @author Antoine LANDRIEUX
  *
  */
 void ClearException(void)
 {
-    ErrorLvl = 0;
+    errorlevel = 0;
 }
 
 /**
  * @brief Returns the error level
- * @author Antoine LANDRIEUX
  *
  * @return char
  */
 char ErrorLevel(void)
 {
-    return ErrorLvl;
+    return errorlevel;
 }
 
 /**
@@ -100,7 +102,12 @@ void *LeaveException(SoareExceptions error, char *string)
         CPUTS(string, 0xC);
         CPUTS("\"\n         ^~~~\n", 0xC);
     }
+
     // set error at level 1
-    ErrorLvl = 1;
+    errorlevel = 1;
+
+    // Store the error in the `__ERROR__` variable
+    MemSet(MemGet(MEMORY, "__ERROR__"), Exceptions[error]);
+
     return NULL;
 }

@@ -14,8 +14,15 @@
  *
  */
 
+// Video memory address pointer
 static unsigned short VGA_POINTER = 0;
 
+/**
+ * @brief Writes single character to stream output at current position (colored)
+ * 
+ * @param character 
+ * @param color 
+ */
 void CPUTC(const char character, const unsigned char color)
 {
     char *VIDEO = (char *)VGA_ADDRESS;
@@ -48,22 +55,44 @@ void CPUTC(const char character, const unsigned char color)
     }
 }
 
+/**
+ * @brief Writes strings to stream output at current position (colored)
+ * 
+ * @param string 
+ * @param color 
+ */
 void CPUTS(const char *string, const unsigned char color)
 {
-    for (; *string; (volatile char *)string++)
+    for (; *string; string++)
         CPUTC(*string, color);
 }
 
+/**
+ * @brief Writes single character to stream output at current position
+ * 
+ * @param character 
+ */
 void PUTC(const char character)
 {
     CPUTC(character, 0xF);
 }
 
+/**
+ * @brief Writes strings to stream output at current position
+ * 
+ * @param string 
+ */
 void PUTS(const char *string)
 {
+    if (!string)
+        return PUTS("(null)");
     CPUTS(string, 0xF);
 }
 
+/**
+ * @brief Scroll the screen
+ * 
+ */
 void SCREEN_SCROLL()
 {
     char *VIDEO = (char *)VGA_ADDRESS;
@@ -76,6 +105,10 @@ void SCREEN_SCROLL()
     }
 }
 
+/**
+ * @brief Clear screen
+ * 
+ */
 void SCREEN_CLEAR()
 {
     char *VIDEO = (char *)VGA_ADDRESS;

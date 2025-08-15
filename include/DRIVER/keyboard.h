@@ -44,14 +44,6 @@ void KEYBOARD_INIT(KEYBOARD_INPUT keyboard);
 unsigned char inb(unsigned short port);
 
 /**
- * @brief Wait a moment
- * @author Antoine LANDRIEUX
- *
- * @param time
- */
-void sleep(unsigned long long time);
-
-/**
  * @brief Convert inb to ascii char (QUERTY mode)
  * @author Antoine LANDRIEUX
  *

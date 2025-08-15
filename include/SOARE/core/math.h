@@ -15,6 +15,14 @@
  */
 
 /**
+ * @brief Duplicate a string
+ *
+ * @param value
+ * @return char*
+ */
+char *vardup(char *string);
+
+/**
  * @brief Return the value as a node
  * @author Antoine LANDRIEUX
  *
@@ -31,25 +39,14 @@ AST ParseValue(Tokens **tokens);
  * @param priority 
  * @return AST
  */
-AST ParseExpr(Tokens **tokens, u8 priority);
-
-/**
- * @brief Get the Array Index
- * @author Antoine LANDRIEUX
- * 
- * @param array 
- * @param value 
- * @return long long 
- */
-long long GetArrayIndex(AST array, char *value);
+AST ParseExpr(Tokens **tokens, unsigned char priority);
 
 /**
  * @brief Evaluates the mathematical expression of a tree
- * @author Antoine LANDRIEUX
  *
  * @param tree
  * @return char*
  */
-char *Eval(AST tree);
+char *Math(AST tree);
 
 #endif /* __SOARE_MATH_H__ */

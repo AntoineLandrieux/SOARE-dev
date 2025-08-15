@@ -1,7 +1,7 @@
 #ifndef __SOARE_KEYWORDS_H__
 #define __SOARE_KEYWORDS_H__ 0x1
 
-/* #prama once */
+/* #pragma once */
 
 /**
  *  _____  _____  ___  ______ _____
@@ -20,18 +20,20 @@
  * List of keywords (alpha-numeric order)
  */
 
-#define KEYWORD_DO "do"
-#define KEYWORD_ELSE "else"
-#define KEYWORD_END "end"
-#define KEYWORD_ENUMERATE "enumerate"
-#define KEYWORD_IF "if"
-#define KEYWORD_IFERROR "iferror"
-#define KEYWORD_INPUTCH "inputch"
-#define KEYWORD_OR "or"
-#define KEYWORD_RAISE "raise"
-#define KEYWORD_RETURN "return"
-#define KEYWORD_TRY "try"
-#define KEYWORD_WHILE "while"
-#define KEYWORD_WRITE "write"
+#define KEYWORD_BREAK       "break"
+#define KEYWORD_DO          "do"
+#define KEYWORD_ELSE        "else"
+#define KEYWORD_END         "end"
+#define KEYWORD_FN          "fn"
+#define KEYWORD_IF          "if"
+#define KEYWORD_IFERROR     "iferror"
+#define KEYWORD_INPUT       "input"
+#define KEYWORD_LET         "let"
+#define KEYWORD_OR          "or"
+#define KEYWORD_RAISE       "raise"
+#define KEYWORD_RETURN      "return"
+#define KEYWORD_TRY         "try"
+#define KEYWORD_WHILE       "while"
+#define KEYWORD_WRITE       "write"
 
 #endif /* __SOARE_KEYWORDS_H__ */

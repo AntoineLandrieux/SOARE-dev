@@ -1,6 +1,8 @@
 #ifndef __SOARE_PARSER_H__
 #define __SOARE_PARSER_H__ 0x1
 
+/* #pragma once */
+
 /**
  *  _____  _____  ___  ______ _____
  * /  ___||  _  |/ _ \ | ___ \  ___|
@@ -16,7 +18,6 @@
 
 /**
  * @brief List the different types of nodes
- * @author Antoine LANDRIEUX
  */
 typedef enum node_type
 {
@@ -25,28 +26,28 @@ typedef enum node_type
     NODE_TRY,
     NODE_BODY,
     NODE_RAISE,
-    NODE_ARRAY,
     NODE_OUTPUT,
-    NODE_NUMBER,
-    NODE_STRING,
+    NODE_VALUE,
+    NODE_IMPORT,
     NODE_CALL,
+    NODE_TYPE,
     NODE_INPUT,
     NODE_FUNCTION,
     NODE_MEMNEW,
     NODE_MEMGET,
     NODE_MEMSET,
-    NODE_ENUMERATE,
     NODE_IFERROR,
     NODE_OPERATOR,
     NODE_CONDITION,
     NODE_REPETITION,
+    NODE_BREAK,
+    NODE_SHELL,
     NODE_RETURN
 
 } node_type;
 
 /**
  * @brief Structure of a node
- * @author Antoine LANDRIEUX
  */
 typedef struct node
 {
@@ -67,28 +68,25 @@ typedef struct node
 
 /**
  * @brief Create a new node
- * @author Antoine LANDRIEUX
  *
  * @param value
  * @param type
+ * @param file
  * @return Node*
  */
 Node *Branch(char *value, node_type type);
 
 /**
- * @brief Find a node
- * @author Antoine LANDRIEUX
+ * @brief Add a sibling branch
  *
  * @param source
- * @param value
- * @param type
- * @return Node*
+ * @param element
+ * @return AST
  */
-Node *BranchFind(AST source, char *value, node_type type);
+AST BranchJuxtapose(Node *source, AST element);
 
 /**
  * @brief Join 2 branches
- * @author Antoine LANDRIEUX
  *
  * @param parent
  * @param child
@@ -98,7 +96,6 @@ AST BranchJoin(Node *parent, Node *child);
 
 /**
  * @brief Turns a sequence of tokens into a tree (AST)
- * @author Antoine LANDRIEUX
  *
  * @param tokens
  * @return AST
