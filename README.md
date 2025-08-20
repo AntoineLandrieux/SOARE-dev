@@ -3,6 +3,15 @@
 
 SOARE and BORIUM are distributed under the [MIT License](LICENSE).
 
+> [!WARNING]
+> **This repo is no longer maintained.**
+>
+> However, the following projects are available:
+>
+> - [**BORIUM**](https://github.com/AntoineLandrieux/BORIUM): Kernel for SOARE without backdoors
+> - [**SOARE**](https://github.com/AntoineLandrieux/SOARE): SOARE Programming Language
+>
+
 ---
 
 ![IMAGE](resources/github/image.png)
